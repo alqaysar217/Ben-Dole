@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "logo",
+      "description": "Bank Talabat Logo",
+      "imageUrl": "https://images.unsplash.com/photo-1617944420044-877cbed124bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiYW5rJTIwbG9nb3xlbnwwfHx8fDE3NzE0NTcyMDV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bank logo"
+    },
+    {
+      "id": "sandwich",
+      "description": "Delicious Sandwich",
+      "imageUrl": "https://images.unsplash.com/photo-1627754468578-d9cb6b9f9b64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2FuZHdpY2glMjBmb29kfGVufDB8fHx8MTc3MTQ1NzIwNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sandwich food"
+    },
+    {
+      "id": "drink",
+      "description": "Cold Lemon Juice",
+      "imageUrl": "https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZW1vbiUyMGp1aWNlfGVufDB8fHx8MTc3MTQ1NzIwNXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "lemon juice"
+    },
+    {
+      "id": "login-hero",
+      "description": "Banking Security Infographic",
+      "imageUrl": "https://images.unsplash.com/photo-1582139329536-e7284fece509?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiYW5rJTIwc2VjdXJpdHl8ZW58MHx8fHwxNzcxNDU3MjA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bank security"
+    }
+  ]
 }

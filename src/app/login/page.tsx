@@ -45,6 +45,7 @@ export default function LoginPage() {
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
 
+      // تحكم بسيط في الأدوار بناءً على كلمة المرور للتجربة
       if (password === "adminha892019") {
         emailSuffix = "admin";
         role = "ADMIN";
@@ -73,7 +74,7 @@ export default function LoginPage() {
         setNetworkError(true);
         errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من الإنترنت.";
       } else if (err.code === 'auth/invalid-credential') {
-        errorMessage = "بيانات الدخول غير صحيحة. تأكد من وجود الحساب في لوحة تحكم Firebase.";
+        errorMessage = "بيانات الدخول غير صحيحة.";
       }
 
       toast({ 
@@ -141,9 +142,9 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
-                  <Smartphone className="h-3.5 w-3.5" /> رقم الهاتف
+              <div className="space-y-2 text-right">
+                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
+                  رقم الهاتف <Smartphone className="h-3.5 w-3.5" />
                 </label>
                 <Input 
                   type="text" 
@@ -155,9 +156,9 @@ export default function LoginPage() {
                   dir="rtl"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
-                  <Lock className="h-3.5 w-3.5" /> كلمة المرور
+              <div className="space-y-2 text-right">
+                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
+                  كلمة المرور <Lock className="h-3.5 w-3.5" />
                 </label>
                 <Input 
                   type="password" 
@@ -197,7 +198,7 @@ export default function LoginPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6 py-6">
-              <div className="space-y-2">
+              <div className="space-y-2 text-right">
                 <Label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">كلمة المرور الجديدة</Label>
                 <Input 
                   type="password" 
