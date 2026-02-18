@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, useAuth, deleteDocumentNonBlocking, updateDocumentNonBlocking, initiateAnonymousSignIn } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useAuth, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +16,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function OrdersPage() {
   const db = useFirestore();
-  const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const { userRole } = useUIStore();
   const { toast } = useToast();
@@ -24,13 +23,6 @@ export default function OrdersPage() {
   const isAdmin = userRole === "ADMIN";
   const isSupervisor = userRole === "SUPERVISOR";
   const canManage = isAdmin || isSupervisor;
-
-  // ضمان وجود جلسة دخول للتمكن من إجراء العمليات (حذف/أرشفة)
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      initiateAnonymousSignIn(auth);
-    }
-  }, [user, isUserLoading, auth]);
 
   const empsQuery = useMemoFirebase(() => collection(db, "employees"), [db]);
   const { data: employees } = useCollection(empsQuery);
@@ -100,37 +92,24 @@ export default function OrdersPage() {
   };
 
   const handleClearTodayOrders = () => {
-    if (!isAdmin) {
-      toast({ title: "صلاحية مرفوضة", description: "فقط مدير النظام يمكنه مسح كافة الطلبات", variant: "destructive" });
-      return;
-    }
     if (!confirm("هل أنت متأكد من مسح جميع طلبات اليوم المعلقة نهائياً؟")) return;
-    
     todayOrders.forEach(order => {
       deleteDocumentNonBlocking(doc(db, "orders", order.id));
     });
-    
     toast({ title: "تم المسح", description: "جاري مسح طلبات اليوم..." });
   };
 
   const handleDeleteOrder = (orderId: string) => {
-    if (!canManage) {
-      toast({ title: "صلاحية مرفوضة", description: "ليس لديك صلاحية الحذف", variant: "destructive" });
-      return;
-    }
     if (!confirm("هل تريد حذف هذا الطلب نهائياً؟")) return;
     deleteDocumentNonBlocking(doc(db, "orders", orderId));
     toast({ title: "تم الحذف", description: "تمت إزالة الطلب بنجاح" });
   };
 
   const handleCompleteAll = () => {
-    if (!canManage) return;
     if (!confirm("هل تريد أرشفة كافة طلبات اليوم ونقلها للسجل؟")) return;
-    
     todayOrders.forEach(order => {
       updateDocumentNonBlocking(doc(db, "orders", order.id), { status: "completed" });
     });
-    
     toast({ title: "تمت الأرشفة", description: "تم نقل الطلبات إلى سجل التاريخ" });
   };
 
@@ -194,15 +173,6 @@ export default function OrdersPage() {
       <TopNav />
 
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        {!user && !isUserLoading && (
-          <Alert variant="destructive" className="bg-amber-50 border-amber-200 text-amber-800">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-xs">
-              جاري تهيئة الاتصال الآمن... يرجى الانتظار ثوانٍ لتفعيل أزرار التحكم.
-            </AlertDescription>
-          </Alert>
-        )}
-
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>

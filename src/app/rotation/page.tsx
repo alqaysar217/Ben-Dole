@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking, useAuth, initiateAnonymousSignIn } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking, useAuth } from "@/firebase";
 import { collection, query, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,20 +15,13 @@ import { useUIStore } from "@/lib/store";
 
 export default function RotationPage() {
   const db = useFirestore();
-  const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const { userRole } = useUIStore();
   const { toast } = useToast();
 
   const isManagement = userRole === "ADMIN" || userRole === "SUPERVISOR";
 
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      initiateAnonymousSignIn(auth);
-    }
-  }, [user, isUserLoading, auth]);
-
-  const ready = !isUserLoading && user !== null;
+  const ready = !isUserLoading;
 
   // Only get employees who ARE allowed to rotate
   const empsQuery = useMemoFirebase(() => {
