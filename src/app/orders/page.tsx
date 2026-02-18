@@ -9,10 +9,8 @@ import { useUIStore } from "@/lib/store";
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Sparkles, Clock, User, Trash2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Copy, Clock, User, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { aiOrderInsightTool, AiOrderInsightOutput } from "@/ai/flows/ai-order-insight-tool";
 
 export default function OrdersPage() {
   const db = useFirestore();
@@ -20,9 +18,6 @@ export default function OrdersPage() {
   const { userRole } = useUIStore();
   const { toast } = useToast();
   
-  const [aiInsights, setAiInsights] = useState<AiOrderInsightOutput | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
-
   const canManage = userRole === "ADMIN" || userRole === "SUPERVISOR";
 
   // Real-time Orders
@@ -65,24 +60,6 @@ export default function OrdersPage() {
     toast({ title: "تم المسح", description: "تم إفراغ قائمة الطلبات" });
   };
 
-  const handleAiInsight = async () => {
-    setIsAiLoading(true);
-    try {
-      const insightInput = {
-        pendingOrders: pendingOrders.map(o => ({
-          employeeName: "موظف",
-          items: o.items.map((i: any) => ({ name: i.itemName, quantity: i.quantity }))
-        }))
-      };
-      const result = await aiOrderInsightTool(insightInput);
-      setAiInsights(result);
-    } catch (error) {
-      toast({ title: "خطأ AI", description: "فشل في الحصول على رؤى الذكاء الاصطناعي", variant: "destructive" });
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
   return (
     <div className="pt-14 pb-20">
       <TopNav />
@@ -92,40 +69,17 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold text-primary">الطلبات الجارية</h1>
           <div className="flex gap-2">
             {canManage && (
-              <>
-                <Button size="icon" variant="outline" onClick={handleAiInsight} disabled={isAiLoading || pendingOrders.length === 0}>
-                  <Sparkles className="h-4 w-4 text-primary" />
-                </Button>
-                <Button size="icon" variant="outline" onClick={handleCopySummary} disabled={pendingOrders.length === 0}>
-                  <Copy className="h-4 w-4 text-primary" />
-                </Button>
-              </>
+              <Button size="icon" variant="outline" onClick={handleCopySummary} disabled={pendingOrders.length === 0} title="نسخ ملخص الطلبات">
+                <Copy className="h-4 w-4 text-primary" />
+              </Button>
             )}
             {userRole === "ADMIN" && (
-              <Button size="icon" variant="destructive" onClick={handleClearOrders}>
+              <Button size="icon" variant="destructive" onClick={handleClearOrders} title="مسح كافة الطلبات">
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
           </div>
         </div>
-
-        {aiInsights && (
-          <Card className="border-primary/10 bg-primary/5 border shadow-sm">
-            <CardHeader className="p-4 pb-0">
-              <CardTitle className="text-sm font-bold flex items-center gap-2 text-primary">
-                <Sparkles className="h-4 w-4" /> رؤى الذكاء الاصطناعي
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-2">
-              {aiInsights.suggestedForgottenItems.map((s, idx) => (
-                <div key={idx} className="bg-white p-2 rounded border border-slate-100 text-xs">
-                  <span className="font-bold text-primary">اقتراح: </span>
-                  قد يحتاج {s.suggestedItems.join(", ")} ({s.reason})
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
 
         {pendingOrders.length === 0 ? (
           <div className="text-center py-20 text-slate-400">
