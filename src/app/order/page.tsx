@@ -10,7 +10,7 @@ import { collection, query, where, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils, Sandwich, Coffee, Pizza } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -19,6 +19,12 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+
+const CATEGORY_MAP: Record<string, { label: string, icon: any }> = {
+  "sandwich": { label: "سندوتشات", icon: Sandwich },
+  "drink": { label: "مشروبات", icon: Coffee },
+  "add-on": { label: "إضافات", icon: Pizza }
+};
 
 export default function OrderPage() {
   const db = useFirestore();
@@ -64,11 +70,19 @@ export default function OrderPage() {
     return pending[0]?.name || "الكل مكتمل اليوم";
   }, [allRotationEmployees]);
 
-  const filteredMenu = useMemo(() => {
-    if (!menu) return [];
-    return menu.filter(item => 
+  const groupedMenu = useMemo(() => {
+    if (!menu) return {};
+    
+    const filtered = menu.filter(item => 
       item.itemName.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    return filtered.reduce((acc, item) => {
+      const cat = item.category || "sandwich";
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(item);
+      return acc;
+    }, {} as Record<string, any[]>);
   }, [menu, searchTerm]);
 
   const cartTotal = useMemo(() => {
@@ -130,7 +144,6 @@ export default function OrderPage() {
     <div className="pt-14 pb-24">
       <TopNav />
       
-      {/* الشريط العلوي للمكلف بالنزول - جزء من "الرئيسية" */}
       <div className="bg-primary text-primary-foreground py-4 px-4 text-center sticky top-14 z-40 shadow-xl border-b border-white/10">
         <div className="flex flex-col items-center gap-1">
           <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">المكلف بالنزول وتوصيل الطلبات اليوم</p>
@@ -184,9 +197,9 @@ export default function OrderPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        <div className="space-y-8">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-lg font-bold text-slate-800">قائمة الوجبات</h2>
+            <h2 className="text-lg font-bold text-slate-800">قائمة الطعام</h2>
             <div className="relative w-48">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input 
@@ -198,43 +211,65 @@ export default function OrderPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3">
-            {filteredMenu.map((item) => (
-              <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all active:scale-[0.98] bg-white">
-                <CardContent className="p-4 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-bold text-slate-800">{item.itemName}</h3>
-                    <p className="text-primary font-bold text-sm">
-                      {item.price.toLocaleString()} ريال
-                    </p>
+          {Object.keys(groupedMenu).length === 0 ? (
+            <div className="text-center py-10 text-slate-400">لا توجد أصناف مطابقة للبحث</div>
+          ) : (
+            ["sandwich", "drink", "add-on"].map(catKey => {
+              const items = groupedMenu[catKey];
+              if (!items || items.length === 0) return null;
+              
+              const CategoryIcon = CATEGORY_MAP[catKey].icon;
+              
+              return (
+                <div key={catKey} className="space-y-4">
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="bg-primary/10 p-1.5 rounded-lg">
+                      <CategoryIcon className="h-4 w-4 text-primary" />
+                    </div>
+                    <h3 className="font-black text-primary text-sm uppercase tracking-wider">
+                      {CATEGORY_MAP[catKey].label}
+                    </h3>
+                    <div className="h-px bg-slate-100 flex-1 ml-2" />
                   </div>
-                  <div className="flex items-center gap-4 bg-slate-50 p-1 rounded-full border border-slate-100">
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10"
-                      onClick={() => updateCart(item.id, -1)}
-                      disabled={!cart[item.id]}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-4 text-center font-bold text-slate-700 text-sm">{cart[item.id] || 0}</span>
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
-                      onClick={() => updateCart(item.id, 1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                  
+                  <div className="grid grid-cols-1 gap-3">
+                    {items.map((item) => (
+                      <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all active:scale-[0.98] bg-white group">
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div className="space-y-1">
+                            <h3 className="font-bold text-slate-800 group-hover:text-primary transition-colors">{item.itemName}</h3>
+                            <p className="text-primary font-bold text-sm">
+                              {item.price.toLocaleString()} ريال
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-4 bg-slate-50 p-1 rounded-full border border-slate-100">
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10"
+                              onClick={() => updateCart(item.id, -1)}
+                              disabled={!cart[item.id]}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                            <span className="w-4 text-center font-bold text-slate-700 text-sm">{cart[item.id] || 0}</span>
+                            <Button 
+                              size="icon" 
+                              variant="ghost" 
+                              className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                              onClick={() => updateCart(item.id, 1)}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-            {filteredMenu.length === 0 && (
-              <div className="text-center py-10 text-slate-400">لا توجد أصناف مطابقة للبحث</div>
-            )}
-          </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </main>
 
