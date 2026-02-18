@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
   
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -33,6 +35,8 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setNetworkError(false);
+
     try {
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
@@ -44,6 +48,8 @@ export default function LoginPage() {
       }
 
       const email = `${phone.trim()}_${emailSuffix}@bank.com`;
+      
+      // محاولة تسجيل الدخول
       await signInWithEmailAndPassword(auth, email, password);
       
       setUserRole(role);
@@ -62,13 +68,16 @@ export default function LoginPage() {
       
       router.push("/admin");
     } catch (err: any) {
-      console.error("Login error:", err);
+      console.error("Login process error:", err);
       let errorMessage = "يرجى التأكد من صحة رقم الهاتف وكلمة المرور.";
       
       if (err.code === 'auth/network-request-failed') {
+        setNetworkError(true);
         errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت الخاص بك أو التأكد من عدم وجود حظر لخدمات Google.";
       } else if (err.code === 'auth/invalid-credential') {
         errorMessage = "بيانات الدخول غير صحيحة. تأكد من إنشاء الحساب في لوحة تحكم Firebase.";
+      } else if (err.code === 'auth/too-many-requests') {
+        errorMessage = "تم حظر الدخول مؤقتاً بسبب محاولات خاطئة كثيرة. حاول لاحقاً.";
       }
 
       toast({ 
@@ -111,6 +120,16 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="pb-8 space-y-4">
             
+            {networkError && (
+              <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+                <WifiOff className="h-4 w-4" />
+                <AlertTitle className="text-xs font-bold">مشكلة في الشبكة</AlertTitle>
+                <AlertDescription className="text-[10px]">
+                  يبدو أنك تواجه مشكلة في الاتصال بخوادم Firebase. تأكد من تشغيل الإنترنت أو استخدام VPN إذا كانت الخدمات محظورة.
+                </AlertDescription>
+              </Alert>
+            )}
+
             <Alert className="bg-blue-50 border-blue-200 text-blue-800">
               <Info className="h-4 w-4 text-blue-600" />
               <AlertTitle className="text-xs font-bold">تنبيه للمستخدم</AlertTitle>
