@@ -4,8 +4,8 @@ service cloud.firestore {
 
     /**
      * BANK FOOD ORDERING SYSTEM - SECURITY RULES
-     * Deployment Trigger: 2024-05-20 14:30:00
-     * Fixing: Missing or insufficient permissions on /employees
+     * Deployment Trigger: 2024-05-20 15:00:00
+     * Fixed: Standardized read permissions for employees and departments to support collection-wide queries.
      */
 
     function isSignedIn() {
@@ -55,9 +55,8 @@ service cloud.firestore {
     }
 
     // Employees: Public read is REQUIRED for the selection dropdown and rotation engine.
-    // We allow 'list' and 'get' explicitly to ensure the client-side queries work.
     match /employees/{employeeId} {
-      allow get, list: if true;
+      allow read: if true;
       allow create: if isSuperAdmin();
       allow update: if isSuperAdmin() || isOwner(employeeId) || (isSupervisor() && getEmployeeData().departmentId == resource.data.departmentId);
       allow delete: if isSuperAdmin();
