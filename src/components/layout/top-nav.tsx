@@ -35,12 +35,6 @@ export function TopNav() {
     setUserRole(null);
   };
 
-  const getRoleIcon = () => {
-    if (userRole === "ADMIN") return <ShieldCheck className="h-6 w-6 text-primary" strokeWidth={1.5} />;
-    if (userRole === "SUPERVISOR") return <UserCog className="h-6 w-6 text-secondary" strokeWidth={1.5} />;
-    return <User className="h-6 w-6 text-slate-400" strokeWidth={1.5} />;
-  };
-
   const getRoleLabel = () => {
     if (userRole === "ADMIN") return "مدير النظام";
     if (userRole === "SUPERVISOR") return "مشرف قسم";
@@ -75,9 +69,6 @@ export function TopNav() {
             <div className="p-10 bg-premium-gradient text-white relative overflow-hidden">
               <div className="absolute inset-0 bg-waves opacity-20" />
               <SheetHeader className="text-right relative z-10 space-y-4">
-                <div className="bg-white/20 p-4 rounded-[22px] w-fit backdrop-blur-md border border-white/10">
-                  {getRoleIcon()}
-                </div>
                 <div>
                   <SheetTitle className="text-3xl font-black text-white font-headline">
                     {getRoleLabel()}
