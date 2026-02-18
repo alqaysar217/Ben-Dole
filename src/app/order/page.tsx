@@ -159,7 +159,7 @@ export default function OrderPage() {
                   <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} /> القسم
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
-                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow text-right">
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow text-right flex-row-reverse">
                     <SelectValue placeholder="اختر القسم" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-none premium-shadow">
@@ -172,7 +172,7 @@ export default function OrderPage() {
                   <User className="h-4 w-4 text-primary" strokeWidth={1.5} /> اسم الموظف
                 </label>
                 <Select value={selectedEmployeeId || ""} onValueChange={setSelectedEmployeeId} disabled={!selectedDepartmentId}>
-                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow text-right">
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow text-right flex-row-reverse">
                     <SelectValue placeholder="اختر اسمك" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-none premium-shadow">
