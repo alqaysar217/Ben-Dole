@@ -179,7 +179,7 @@ export default function AdminPage() {
           <TabsContent value="employees" className="space-y-6">
             <Card className="border-none shadow-sm bg-white">
               <CardHeader className="bg-slate-50 border-b pb-4">
-                <CardTitle className="text-sm flex items-center gap-2">
+                <CardTitle className="text-sm flex items-center gap-2 flex-row-reverse">
                   <UserPlus className="h-4 w-4" /> 
                   {isAdmin ? "إضافة موظف أو مشرف جديد" : "تسجيل موظف جديد"}
                 </CardTitle>
