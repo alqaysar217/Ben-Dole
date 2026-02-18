@@ -4,7 +4,7 @@ import { useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking, useAuth, initiateAnonymousSignIn } from "@/firebase";
-import { collection, query, orderBy, where, doc } from "firebase/firestore";
+import { collection, query, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronRight, UserMinus, UserCheck, RefreshCcw } from "lucide-react";
@@ -25,12 +25,11 @@ export default function RotationPage() {
     }
   }, [user, isUserLoading, auth]);
 
-  // Wait for auth check AND user to be present
-  const ready = !isUserLoading && !!user;
+  // Wait for auth check AND user to be present and stable
+  const ready = !isUserLoading && user !== null;
 
   const empsQuery = useMemoFirebase(() => {
     if (!ready) return null;
-    // Simplified query for robustness against permission/indexing errors
     return query(collection(db, "employees"), where("canRotate", "==", true));
   }, [db, ready]);
   

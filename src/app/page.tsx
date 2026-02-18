@@ -5,7 +5,7 @@ import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useUIStore } from "@/lib/store";
 import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, useAuth, useUser, initiateAnonymousSignIn } from "@/firebase";
-import { collection, query, where, orderBy, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,8 +36,8 @@ export default function Home() {
     }
   }, [user, isUserLoading, auth]);
 
-  // Wait for auth to be fully ready
-  const ready = !isUserLoading && !!user;
+  // Wait for auth to be fully ready and stable
+  const ready = !isUserLoading && user !== null;
 
   const deptsQuery = useMemoFirebase(() => 
     ready ? collection(db, "departments") : null, [db, ready]);
@@ -53,7 +53,6 @@ export default function Home() {
     ready ? collection(db, "menu_items") : null, [db, ready]);
   const { data: menu } = useCollection(menuQuery);
 
-  // Simplified rotation query to prevent indexing/permission race conditions
   const rotationQuery = useMemoFirebase(() => 
     ready ? query(collection(db, "employees"), where("canRotate", "==", true)) : null, [db, ready]);
   const { data: allRotationEmployees } = useCollection(rotationQuery);

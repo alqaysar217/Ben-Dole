@@ -4,8 +4,8 @@ service cloud.firestore {
 
     /**
      * BANK FOOD ORDERING SYSTEM - SECURITY RULES
-     * Deployment Trigger: 2024-05-20 18:45:00
-     * Status: Explicitly allowing public read for all core collections to resolve listing issues.
+     * Deployment Trigger: 2024-05-21 10:15:00 (Forced Refresh)
+     * Status: Explicitly splitting read into get/list to resolve collection listing denials.
      */
 
     function isSignedIn() {
@@ -14,30 +14,30 @@ service cloud.firestore {
 
     // Branches & Departments: Publicly readable for navigation
     match /branches/{id} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSignedIn();
     }
 
     match /departments/{id} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSignedIn();
     }
 
     // Menu Items: Publicly readable for ordering
     match /menu_items/{id} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSignedIn();
     }
 
     // Employees: Public read is REQUIRED for the selection dropdown and rotation engine.
     match /employees/{id} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSignedIn();
     }
 
     // Orders: Anyone can create (requires anonymous auth for context)
     match /orders/{id} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSignedIn();
       allow update, delete: if isSignedIn();
     }
