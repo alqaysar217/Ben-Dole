@@ -96,11 +96,7 @@ export default function RotationPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-end">
-                <div className="space-y-1">
-                  <p className="text-[9px] font-bold opacity-60">رقم الموظف</p>
-                  <p className="font-mono text-sm tracking-widest">**** **** {currentPerson.id.slice(-4)}</p>
-                </div>
+              <div className="flex justify-end items-end">
                 <div className="text-right">
                   <p className="text-[9px] font-bold opacity-60">الهاتف</p>
                   <p className="font-bold">{currentPerson.phone}</p>
