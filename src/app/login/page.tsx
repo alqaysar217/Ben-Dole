@@ -123,21 +123,6 @@ export default function LoginPage() {
               </Alert>
             )}
 
-            <Alert className="bg-[#F4F6FA] border-none text-primary rounded-2xl p-4">
-              <div className="flex gap-4">
-                <div className="bg-primary/10 p-2.5 rounded-xl h-fit">
-                  <Info className="h-4 w-4" />
-                </div>
-                <div className="space-y-1">
-                   <AlertTitle className="text-[10px] font-black uppercase tracking-widest">ملاحظات تسجيل الدخول</AlertTitle>
-                   <AlertDescription className="text-[10px] leading-relaxed opacity-70">
-                    كلمة مرور المدير: <code className="bg-white/80 px-1.5 py-0.5 rounded font-mono">adminha892019</code><br/>
-                    كلمة مرور المشرف: <code className="bg-white/80 px-1.5 py-0.5 rounded font-mono">123456</code>
-                  </AlertDescription>
-                </div>
-              </div>
-            </Alert>
-
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
                 <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
