@@ -209,7 +209,6 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                {/* تعديل مكان الزر والنص ليكون جهة اليمين مع تقديم الزر */}
                 <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start">
                   <Checkbox 
                     id="canRotate" 
@@ -390,7 +389,8 @@ export default function AdminPage() {
                         <SelectItem value="add-on" className="text-right">إضافات</SelectItem>
                       </SelectContent>
                     </Select>
-                  </>
+                  </div>
+                </>
               )}
 
               {editType === "department" && editingEntity && (
@@ -410,4 +410,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
