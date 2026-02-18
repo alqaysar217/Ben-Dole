@@ -1,0 +1,264 @@
+{
+  "entities": {
+    "Branch": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Branch",
+      "type": "object",
+      "description": "Represents a bank branch within the organization.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Branch entity."
+        },
+        "branchName": {
+          "type": "string",
+          "description": "The official name of the bank branch."
+        }
+      },
+      "required": [
+        "id",
+        "branchName"
+      ]
+    },
+    "Department": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Department",
+      "type": "object",
+      "description": "Represents a specific department within a bank branch.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Department entity."
+        },
+        "branchId": {
+          "type": "string",
+          "description": "Reference to the Branch this department belongs to. (Relationship: Branch 1:N Department)"
+        },
+        "deptName": {
+          "type": "string",
+          "description": "The name of the department."
+        }
+      },
+      "required": [
+        "id",
+        "branchId",
+        "deptName"
+      ]
+    },
+    "Employee": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Employee",
+      "type": "object",
+      "description": "Represents an employee with their details and role within the system.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Employee entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the employee."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The employee's phone number, used for identification and assumed unique."
+        },
+        "departmentId": {
+          "type": "string",
+          "description": "Reference to the Department the employee belongs to. (Relationship: Department 1:N Employee)"
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the employee within the application (e.g., 'Super Admin', 'Department Supervisor', 'Employee')."
+        },
+        "canRotate": {
+          "type": "boolean",
+          "description": "Indicates whether the employee is eligible to be part of the delivery rotation system."
+        },
+        "isDone": {
+          "type": "boolean",
+          "description": "Indicates whether the employee has completed their delivery turn in the current rotation cycle."
+        },
+        "rotationPriority": {
+          "type": "number",
+          "description": "An integer representing the employee's current priority in the delivery rotation queue. Lower numbers indicate higher priority."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "phone",
+        "departmentId",
+        "role",
+        "canRotate",
+        "isDone",
+        "rotationPriority"
+      ]
+    },
+    "MenuItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MenuItem",
+      "type": "object",
+      "description": "Represents a single item available for order on the menu.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MenuItem entity."
+        },
+        "itemName": {
+          "type": "string",
+          "description": "The name of the menu item (e.g., 'Chips Plain', 'Lemon Juice')."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the menu item in YR (ريال يمني)."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category the menu item belongs to (e.g., 'sandwich', 'drink', 'add-on')."
+        }
+      },
+      "required": [
+        "id",
+        "itemName",
+        "price",
+        "category"
+      ]
+    },
+    "Order": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Order",
+      "type": "object",
+      "description": "Represents a single food order placed by an employee.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Order entity."
+        },
+        "employeeId": {
+          "type": "string",
+          "description": "Reference to the Employee who placed this order. (Relationship: Employee 1:N Order)"
+        },
+        "items": {
+          "type": "array",
+          "description": "An array of items included in the order, each specifying the menu item and quantity.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "The total calculated price of all items in the order in YR (ريال يمني)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the order (e.g., 'pending', 'completed', 'cancelled')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the order was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "employeeId",
+        "items",
+        "totalPrice",
+        "status",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/branches/{branchId}",
+        "definition": {
+          "entityName": "Branch",
+          "schema": {
+            "$ref": "#/backend/entities/Branch"
+          },
+          "description": "Top-level collection for bank branches. Readable by all authenticated users for context; full CRUD access for Super Admins.",
+          "params": [
+            {
+              "name": "branchId",
+              "description": "The unique identifier for a bank branch."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/departments/{departmentId}",
+        "definition": {
+          "entityName": "Department",
+          "schema": {
+            "$ref": "#/backend/entities/Department"
+          },
+          "description": "Top-level collection for departments within branches. Includes 'branchId' for logical linking. Readable by all authenticated users; full CRUD access for Super Admins.",
+          "params": [
+            {
+              "name": "departmentId",
+              "description": "The unique identifier for a department."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/employees/{employeeId}",
+        "definition": {
+          "entityName": "Employee",
+          "schema": {
+            "$ref": "#/backend/entities/Employee"
+          },
+          "description": "Stores all employee data. The 'employeeId' must correspond to the Firebase Authentication UID of the user. This document is central for authorization, containing 'departmentId' and 'role'. Super Admins have full CRUD. Supervisors can update 'isDone' and 'rotationPriority' for employees in their department. Employees can read their own document.",
+          "params": [
+            {
+              "name": "employeeId",
+              "description": "The unique identifier for an employee, corresponding to their Firebase Authentication UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/menu_items/{menuItemId}",
+        "definition": {
+          "entityName": "MenuItem",
+          "schema": {
+            "$ref": "#/backend/entities/MenuItem"
+          },
+          "description": "Global collection for all available menu items. Readable by all authenticated users for ordering purposes; full CRUD access for Super Admins.",
+          "params": [
+            {
+              "name": "menuItemId",
+              "description": "The unique identifier for a menu item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": {
+            "$ref": "#/backend/entities/Order"
+          },
+          "description": "Stores all food orders. Includes denormalized 'employeeId', 'departmentId', and 'branchId' for authorization independence and efficient querying. The 'items' array, while generically typed as string[] in the schema, is expected to contain structured objects like {itemId: string, itemName: string, price: number, quantity: number} for each ordered menu item.",
+          "params": [
+            {
+              "name": "orderId",
+              "description": "The unique identifier for an order."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to be secure, scalable, and debuggable, strictly adhering to the core design principles and strategic mandates. Authorization Independence (CRITICAL) & QAPs: 1. Employee Authorization: The /employees/{employeeId} collection serves as the central hub for user authorization. Each employeeId will correspond to a Firebase uid. The Employee document stores the user's role and departmentId. Authorization rules will primarily rely on get(/employees/$(request.auth.uid)) to determine the requesting user's role and departmentId. This is an acceptable get() usage, as it retrieves the user's own identity profile rather than traversing arbitrary data for authorization. This enables QAPs for employees to query where('id', '==', request.auth.uid). For supervisors, QAPs involve where('departmentId', '==', userDepartmentId) for listing employees within their department. 2. Order Authorization: For /orders/{orderId}, authorization independence is achieved by denormalizing employeeId, departmentId, and branchId directly into each Order document. This ensures that security rules for orders do not need to perform get() operations on parent employee or department documents to verify access. An employee can read/write their own orders (resource.data.employeeId == request.auth.uid), and a supervisor can manage orders within their department (resource.data.departmentId == userDepartmentId) without complex cross-document checks. This design fully supports QAPs, allowing efficient queries like db.collection('orders').where('employeeId', '==', currentUserId) or db.collection('orders').where('departmentId', '==', currentDepartmentId). Structural Segregation (Homogeneous Security Posture): Global Metadata: /branches/{branchId}, /departments/{departmentId}, and /menu_items/{menuItemId} are top-level collections. These store global metadata that is largely readable by all authenticated users and fully managed (CRUD) by Super Admins. This separation ensures their security rules are straightforward and uniform. User-Specific Data & Roles: The /employees/{employeeId} collection is for managing individual employee profiles, including their rotation status and roles. Access is segmented by role: Super Admins have full CRUD, Supervisors can update rotation-related fields for employees in their department, and employees can read their own profile. Transactional Data: The /orders/{orderId} collection is dedicated to order transactions, with specific read/write permissions based on the denormalized employeeId and departmentId fields, as described above. All documents in this collection share this access model. Access Modeling & DBAC: Path-Based Ownership: While not strictly hierarchical in all cases, the employeeId field in Order documents functions as path-based ownership for employees accessing their own data. Collaborative Data: Supervisor access to department-specific orders and employee rotation status is managed through departmentId matching, retrieved from their own Employee document, facilitating a collaborative model. Global Roles (DBAC): Roles (Super Admin, Supervisor, Employee) are stored within the role field of the /employees/{employeeId} document. This allows request.auth.uid to directly map to an employee's profile, and rules can evaluate resource.data.role or resource.data.departmentId for authorization checks, adhering to DBAC principles without requiring custom claims. Data Clarity and Predictability: Consistent naming conventions (branchId, departmentId, employeeId, menuItemId) are used throughout. Explicit state modeling is utilized for order status and employee isDone and canRotate fields, ensuring clarity. The items array in the Order schema, while currently typed as string[], is expected to contain a structured object for each item ({itemId: string, quantity: number, price: number, itemName: string}) to maintain schema predictability and facilitate application logic."
+  }
+}
