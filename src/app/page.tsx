@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -38,7 +37,7 @@ export default function LandingPage() {
               height={140} 
               className="rounded-[2.5rem]"
               priority
-              data-ai-hint="شعار البنك"
+              data-ai-hint="bank logo"
             />
           </div>
         </div>
@@ -46,7 +45,7 @@ export default function LandingPage() {
         <div className="mt-16 text-center space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="space-y-2">
             <h1 className="text-5xl font-black text-primary font-headline tracking-tighter">طلبات</h1>
-            <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">تجربة مصرفية متميزة</p>
+            <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">نظام طلبات الطعام الذكي</p>
           </div>
           <div className="flex items-center justify-center gap-3 bg-slate-50 px-6 py-2.5 rounded-full w-fit mx-auto border border-slate-100 shadow-sm">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
@@ -72,7 +71,7 @@ export default function LandingPage() {
             width={90} 
             height={90} 
             className="rounded-[2rem]"
-            data-ai-hint="شعار البنك"
+            data-ai-hint="bank logo"
           />
         </div>
         <div className="space-y-2">

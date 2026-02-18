@@ -51,7 +51,7 @@ export function TopNav() {
             width={28} 
             height={28} 
             className="rounded-xl"
-            data-ai-hint="شعار البنك"
+            data-ai-hint="bank logo"
           />
         </div>
         <h1 className="text-2xl font-black text-primary tracking-tight font-headline">طلبات</h1>
@@ -65,39 +65,39 @@ export function TopNav() {
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] p-0 flex flex-col h-full border-none rounded-l-[32px] premium-shadow overflow-hidden bg-[#F4F6FA]">
-            {/* الهيدر المدمج */}
-            <div className="p-8 bg-premium-gradient text-white relative overflow-hidden shrink-0">
+            {/* الهيدر العلوي - حجم متوسط */}
+            <div className="p-6 bg-premium-gradient text-white relative overflow-hidden shrink-0">
               <div className="absolute inset-0 bg-waves opacity-10" />
               <SheetHeader className="text-right relative z-10">
-                <SheetTitle className="text-xl font-black text-white font-headline">
+                <SheetTitle className="text-lg font-black text-white font-headline">
                   {getRoleLabel()}
                 </SheetTitle>
-                <SheetDescription className="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-0.5 truncate">
+                <SheetDescription className="text-white/70 text-[9px] font-bold uppercase tracking-widest mt-0.5 truncate">
                   {user?.email || "لم يتم تسجيل الدخول"}
                 </SheetDescription>
               </SheetHeader>
             </div>
 
-            {/* منطقة الأزرار */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            {/* منطقة الأزرار - مرنة لتشغل المساحة */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-5">
               <div className="space-y-2">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 mb-1">الوصول السريع</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-2 mb-1">الوصول السريع</p>
                 <div className="grid grid-cols-1 gap-2">
-                  <Link href="/order" className="flex items-center justify-between p-3.5 rounded-2xl bg-white premium-shadow hover:bg-primary/5 transition-all group border border-white">
+                  <Link href="/order" className="flex items-center justify-between p-3 rounded-2xl bg-white premium-shadow hover:bg-primary/5 transition-all group border border-white">
                     <div className="flex items-center gap-3">
                       <div className="bg-green-50 p-2 rounded-xl text-green-600"><User className="h-4 w-4" /></div>
                       <span className="font-bold text-sm text-slate-700">دخول كموظف</span>
                     </div>
                     <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-primary transition-colors" />
                   </Link>
-                  <Link href="/login" className="flex items-center justify-between p-3.5 rounded-2xl bg-white premium-shadow hover:bg-secondary/5 transition-all group border border-white">
+                  <Link href="/login" className="flex items-center justify-between p-3 rounded-2xl bg-white premium-shadow hover:bg-secondary/5 transition-all group border border-white">
                     <div className="flex items-center gap-3">
                       <div className="bg-blue-50 p-2 rounded-xl text-blue-600"><UserCog className="h-4 w-4" /></div>
                       <span className="font-bold text-sm text-slate-700">دخول كمشرف</span>
                     </div>
                     <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-secondary transition-colors" />
                   </Link>
-                  <Link href="/login" className="flex items-center justify-between p-3.5 rounded-2xl bg-white premium-shadow hover:bg-primary/5 transition-all group border border-white">
+                  <Link href="/login" className="flex items-center justify-between p-3 rounded-2xl bg-white premium-shadow hover:bg-primary/5 transition-all group border border-white">
                     <div className="flex items-center gap-3">
                       <div className="bg-primary/10 p-2 rounded-xl text-primary"><ShieldCheck className="h-4 w-4" /></div>
                       <span className="font-bold text-sm text-slate-700">دخول كمدير</span>
@@ -111,7 +111,7 @@ export function TopNav() {
                 <div className="pt-2">
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 font-black p-3.5 h-auto rounded-2xl gap-3 bg-white premium-shadow border border-white transition-all active:scale-95"
+                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 font-black p-3 h-auto rounded-2xl gap-3 bg-white premium-shadow border border-white transition-all active:scale-95"
                     onClick={handleLogout}
                   >
                     <div className="bg-red-50 p-2 rounded-xl"><LogOut className="h-4 w-4" /></div>
@@ -121,18 +121,15 @@ export function TopNav() {
               )}
             </div>
 
-            {/* قسم المطور المطور في الأسفل */}
-            <div className="p-6 bg-white/60 border-t border-white/50 mt-auto">
-              <div className="flex flex-col gap-4 bg-white p-5 rounded-[24px] premium-shadow border border-white relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -mr-10 -mt-10 blur-2xl" />
+            {/* قسم المطور - تم تكبيره ليشغل المساحة المتبقية */}
+            <div className="p-4 bg-white/60 border-t border-white/50 mt-auto">
+              <div className="flex flex-col gap-4 bg-white p-6 rounded-[24px] premium-shadow border border-white relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300 min-h-[160px] justify-center">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
                 
-                <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center justify-between relative z-10 flex-row-reverse">
                   <div className="flex flex-col text-right">
-                    <span className="text-sm font-black text-slate-800 font-headline">م/ محمود الحساني</span>
+                    <span className="text-base font-black text-slate-800 font-headline">م/ محمود الحساني</span>
                     <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] opacity-60">Software Engineer</span>
-                  </div>
-                  <div className="bg-slate-50 p-2.5 rounded-2xl">
-                    <User className="h-5 w-5 text-slate-400" strokeWidth={1.5} />
                   </div>
                 </div>
 
@@ -140,7 +137,7 @@ export function TopNav() {
                   <Link 
                     href="https://wa.me/967775258830" 
                     target="_blank" 
-                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 transition-all font-bold text-[10px]"
+                    className="flex-1 flex items-center justify-center gap-2 p-3.5 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 transition-all font-bold text-xs"
                   >
                     <MessageCircle className="h-4 w-4" />
                     واتساب
@@ -148,7 +145,7 @@ export function TopNav() {
                   <Link 
                     href="https://instagram.com/mahmoud_codes" 
                     target="_blank" 
-                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-all font-bold text-[10px]"
+                    className="flex-1 flex items-center justify-center gap-2 p-3.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-all font-bold text-xs"
                   >
                     <Instagram className="h-4 w-4" />
                     انستقرام
