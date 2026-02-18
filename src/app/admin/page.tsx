@@ -171,7 +171,7 @@ export default function AdminPage() {
 
         <Tabs defaultValue="employees" className="w-full">
           <TabsList className="w-full bg-slate-100 p-1 mb-6">
-            <TabsTrigger value="employees" className="flex-1 gap-2"><Users className="h-4 w-4" /> الموظفين</TabsTrigger>
+            <TabsTrigger value="employees" className="flex-1 gap-2"><Users className="h-4 w-4" /> המوظفين</TabsTrigger>
             {isAdmin && <TabsTrigger value="menu" className="flex-1 gap-2"><UtensilsCrossed className="h-4 w-4" /> الأصناف</TabsTrigger>}
             {isAdmin && <TabsTrigger value="departments" className="flex-1 gap-2"><Building2 className="h-4 w-4" /> الأقسام</TabsTrigger>}
           </TabsList>
@@ -223,8 +223,20 @@ export default function AdminPage() {
             <div className="space-y-2">
               <h3 className="text-sm font-bold text-slate-500 px-1 text-right">قائمة الموظفين</h3>
               {employees?.map(emp => (
-                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
-                  <div className="flex gap-1 flex-row-reverse">
+                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col text-right">
+                      <p className="font-bold flex items-center gap-2">
+                        {emp.name}
+                        {emp.role === 'Supervisor' && <span className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0 rounded font-bold">مشرف</span>}
+                        {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {departments?.find(d => d.id === emp.departmentId)?.deptName || "بدون قسم"} • {emp.canRotate ? "مكلف بالنزول" : "معفي من النزول"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
                     {isAdmin && (
                       <>
                         <Button variant="ghost" size="icon" onClick={() => startEdit(emp, "employee")} title="تعديل">
@@ -235,18 +247,6 @@ export default function AdminPage() {
                         </Button>
                       </>
                     )}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col text-left">
-                      <p className="font-bold flex items-center gap-2">
-                        {emp.name}
-                        {emp.role === 'Supervisor' && <span className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0 rounded font-bold">مشرف</span>}
-                        {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
-                      </p>
-                      <p className="text-[10px] text-slate-500">
-                        {departments?.find(d => d.id === emp.departmentId)?.deptName || "بدون قسم"} • {emp.canRotate ? "مكلف بالنزول" : "معفي من النزول"}
-                      </p>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -278,18 +278,18 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {menu?.map(item => (
-                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
-                      <div className="flex gap-1 flex-row-reverse">
+                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                      <div className="text-right">
+                        <p className="font-bold">{item.itemName}</p>
+                        <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
+                      </div>
+                      <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => startEdit(item, "menu")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, "menu_items")} title="حذف">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
-                      </div>
-                      <div className="text-left">
-                        <p className="font-bold">{item.itemName}</p>
-                        <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
                       </div>
                     </div>
                   ))}
@@ -308,8 +308,9 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {departments?.map(dept => (
-                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
-                      <div className="flex gap-1 flex-row-reverse">
+                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                      <p className="font-bold text-right w-full">{dept.deptName}</p>
+                      <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
                         </Button>
@@ -317,7 +318,6 @@ export default function AdminPage() {
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
-                      <p className="font-bold text-left w-full">{dept.deptName}</p>
                     </div>
                   ))}
                 </div>
