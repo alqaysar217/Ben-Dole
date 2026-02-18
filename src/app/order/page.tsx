@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils, Sandwich, Coffee, Pizza, Sparkles, MapPin } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza, Sparkles, MapPin, ChevronLeft } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -19,11 +19,12 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
-  { id: "sandwich", label: "سندوتشات", icon: Sandwich, color: "text-orange-500" },
-  { id: "drink", label: "مشروبات", icon: Coffee, color: "text-blue-500" },
-  { id: "add-on", label: "إضافات", icon: Pizza, color: "text-red-500" }
+  { id: "sandwich", label: "سندوتشات", icon: Sandwich, color: "text-orange-500", bg: "bg-orange-50" },
+  { id: "drink", label: "مشروبات", icon: Coffee, color: "text-blue-500", bg: "bg-blue-50" },
+  { id: "add-on", label: "إضافات", icon: Pizza, color: "text-red-500", bg: "bg-red-50" }
 ];
 
 export default function OrderPage() {
@@ -59,7 +60,6 @@ export default function OrderPage() {
     ready ? collection(db, "menu_items") : null, [db, ready]);
   const { data: menu } = useCollection(menuQuery);
 
-  // جلب الشخص المكلف بالنزول من قاعدة البيانات (نفس منطق صفحة التدوير)
   const rotationQuery = useMemoFirebase(() => 
     ready ? query(collection(db, "employees"), where("canRotate", "==", true)) : null, [db, ready]);
   const { data: rotationList } = useCollection(rotationQuery);
@@ -135,46 +135,51 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="pt-14 pb-24">
+    <div className="pt-16 pb-28 min-h-screen bg-[#F4F6FA]">
       <TopNav />
       
-      {/* عرض الشخص المكلف بالنزول في أعلى الصفحة */}
-      <div className="bg-primary text-white py-3 px-4 flex items-center justify-between sticky top-14 z-40 shadow-lg border-b border-white/10">
-        <div className="flex items-center gap-2">
-          <div className="bg-yellow-400 p-1.5 rounded-lg">
-            <MapPin className="h-4 w-4 text-primary" />
+      {/* Premium Notification Bar */}
+      <div className="bg-premium-gradient text-white py-4 px-6 flex items-center justify-between sticky top-14 z-40 shadow-xl rounded-b-[28px] overflow-hidden">
+        <div className="absolute inset-0 bg-waves opacity-20 pointer-events-none" />
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="bg-white/20 p-2.5 rounded-[18px] backdrop-blur-md border border-white/10">
+            <MapPin className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] uppercase font-black opacity-80 tracking-tighter">المكلف بالنزول اليوم</span>
-            <span className="text-sm font-bold font-headline">{assignedPerson}</span>
+            <span className="text-[10px] font-black uppercase opacity-60 tracking-[0.1em]">On Duty Today</span>
+            <span className="text-lg font-black font-headline tracking-tight">{assignedPerson}</span>
           </div>
         </div>
-        <Sparkles className="h-5 w-5 text-yellow-300 animate-pulse" />
+        <Sparkles className="h-6 w-6 text-yellow-300 animate-pulse" />
       </div>
 
-      <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        <Card className="border-none shadow-sm bg-white">
-          <CardContent className="p-5 space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <main className="p-6 space-y-8 max-w-2xl mx-auto">
+        <Card className="border-none premium-shadow bg-white rounded-[28px]">
+          <CardContent className="p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold flex items-center gap-2 text-slate-500 px-1">
-                  <Building2 className="h-3.5 w-3.5 text-primary" /> القسم البنكي
+                <label className="text-[11px] font-black flex items-center gap-2 text-slate-400 px-1 uppercase tracking-widest">
+                  <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} /> Department
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
-                  <SelectTrigger className="bg-slate-50 border-slate-200"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
-                  <SelectContent>
-                    {departments?.map(dept => <SelectItem key={dept.id} value={dept.id}>{dept.deptName}</SelectItem>)}
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow">
+                    <SelectValue placeholder="اختر القسم" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-none premium-shadow">
+                    {departments?.map(dept => <SelectItem key={dept.id} value={dept.id} className="rounded-xl">{dept.deptName}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold flex items-center gap-2 text-slate-500 px-1">
-                  <User className="h-3.5 w-3.5 text-primary" /> اسم الموظف
+                <label className="text-[11px] font-black flex items-center gap-2 text-slate-400 px-1 uppercase tracking-widest">
+                  <User className="h-4 w-4 text-primary" strokeWidth={1.5} /> Employee Name
                 </label>
                 <Select value={selectedEmployeeId || ""} onValueChange={setSelectedEmployeeId} disabled={!selectedDepartmentId}>
-                  <SelectTrigger className="bg-slate-50 border-slate-200"><SelectValue placeholder="اختر اسمك" /></SelectTrigger>
-                  <SelectContent>
-                    {employees?.map(emp => <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>)}
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow">
+                    <SelectValue placeholder="اختر اسمك" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-none premium-shadow">
+                    {employees?.map(emp => <SelectItem key={emp.id} value={emp.id} className="rounded-xl">{emp.name}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -182,14 +187,17 @@ export default function OrderPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">قائمة الطعام</h2>
-            <div className="relative w-40">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <div className="space-y-6">
+          <div className="flex items-end justify-between px-2">
+            <div className="space-y-1">
+              <h2 className="text-3xl font-black text-slate-800 font-headline">القائمة المختارة</h2>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Daily Premium Menu</p>
+            </div>
+            <div className="relative group">
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 transition-colors group-focus-within:text-primary" />
               <Input 
-                placeholder="بحث سريع..." 
-                className="pr-9 h-9 rounded-full bg-white text-xs"
+                placeholder="Search..." 
+                className="pr-10 h-12 w-48 rounded-full bg-white border-none premium-shadow text-sm input-glow"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -197,32 +205,52 @@ export default function OrderPage() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-12 bg-slate-100 p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-3 h-16 bg-white/50 backdrop-blur-sm p-2 rounded-[22px] premium-shadow mb-6">
               {CATEGORIES.map(cat => (
-                <TabsTrigger key={cat.id} value={cat.id} className="gap-2 font-bold text-xs rounded-lg">
-                  <cat.icon className={`h-4 w-4 ${cat.color}`} />
+                <TabsTrigger 
+                  key={cat.id} 
+                  value={cat.id} 
+                  className="gap-3 font-bold text-xs rounded-2xl data-[state=active]:bg-premium-gradient data-[state=active]:text-white data-[state=active]:shadow-xl transition-all duration-500"
+                >
+                  <cat.icon className={cn("h-5 w-5", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={1.5} />
                   {cat.label}
                 </TabsTrigger>
               ))}
             </TabsList>
 
             {CATEGORIES.map(cat => (
-              <TabsContent key={cat.id} value={cat.id} className="mt-4 grid grid-cols-1 gap-3">
+              <TabsContent key={cat.id} value={cat.id} className="mt-4 grid grid-cols-1 gap-4 outline-none">
                 {filteredMenu.map((item) => (
-                  <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white overflow-hidden relative">
-                    <div className={`absolute right-0 top-0 bottom-0 w-1 ${cat.color.replace('text', 'bg')}`} />
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-slate-50 p-2 rounded-lg"><cat.icon className={`h-5 w-5 ${cat.color}`} /></div>
-                        <div>
-                          <h3 className="font-bold text-sm">{item.itemName}</h3>
-                          <p className="text-primary font-black text-xs font-headline">{item.price} ريال</p>
+                  <Card key={item.id} className="border-none premium-shadow bg-white rounded-[24px] group hover:scale-[1.01] transition-all duration-300">
+                    <CardContent className="p-5 flex items-center justify-between">
+                      <div className="flex items-center gap-5">
+                        <div className={cn("p-4 rounded-[20px] transition-colors group-hover:bg-primary/5", cat.bg)}>
+                          <cat.icon className={cn("h-7 w-7", cat.color)} strokeWidth={1} />
+                        </div>
+                        <div className="space-y-1">
+                          <h3 className="font-bold text-lg text-slate-800">{item.itemName}</h3>
+                          <p className="text-primary font-black text-sm font-headline tracking-tighter">{item.price} <span className="text-[10px] font-normal text-slate-400">ريال</span></p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 bg-slate-50 p-1 rounded-full border border-slate-100">
-                        <Button size="icon" variant="ghost" className="h-7 w-7 rounded-full" onClick={() => updateCart(item.id, -1)} disabled={!cart[item.id]}><Minus className="h-3 w-3" /></Button>
-                        <span className="w-4 text-center font-bold text-xs">{cart[item.id] || 0}</span>
-                        <Button size="icon" variant="ghost" className="h-7 w-7 rounded-full text-primary" onClick={() => updateCart(item.id, 1)}><Plus className="h-3 w-3" /></Button>
+                      <div className="flex items-center gap-4 bg-[#F4F6FA] p-2 rounded-2xl border border-white">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-10 w-10 rounded-xl bg-white shadow-sm text-slate-400 hover:text-destructive hover:bg-white" 
+                          onClick={() => updateCart(item.id, -1)} 
+                          disabled={!cart[item.id]}
+                        >
+                          <Minus className="h-4 w-4" strokeWidth={3} />
+                        </Button>
+                        <span className="w-6 text-center font-black text-lg text-primary">{cart[item.id] || 0}</span>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-10 w-10 rounded-xl bg-white shadow-sm text-primary hover:bg-white hover:text-primary-foreground" 
+                          onClick={() => updateCart(item.id, 1)}
+                        >
+                          <Plus className="h-4 w-4" strokeWidth={3} />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -234,10 +262,20 @@ export default function OrderPage() {
       </main>
 
       {cartTotal > 0 && (
-        <div className="fixed bottom-20 left-4 right-4 max-w-2xl mx-auto z-50">
-          <Button className="w-full h-14 bg-primary text-white rounded-2xl shadow-2xl flex items-center justify-between px-6 font-bold text-lg" onClick={handlePlaceOrder}>
-            <div className="flex items-center gap-3"><ShoppingCart className="h-5 w-5" /> إرسال الطلب</div>
-            <div className="font-headline">{cartTotal} ريال</div>
+        <div className="fixed bottom-24 left-6 right-6 max-w-2xl mx-auto z-50 animate-in slide-in-from-bottom-10 duration-500">
+          <Button 
+            className="w-full h-16 bg-glossy-gradient text-white rounded-[24px] shadow-[0_15px_40px_rgba(15,31,179,0.3)] flex items-center justify-between px-8 font-black text-xl transition-all active:scale-95" 
+            onClick={handlePlaceOrder}
+          >
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
+                <ShoppingCart className="h-6 w-6" strokeWidth={1.5} />
+              </div>
+              تأكيد الطلب
+            </div>
+            <div className="font-headline tracking-tighter bg-white/10 px-4 py-1.5 rounded-xl backdrop-blur-sm">
+              {cartTotal} <span className="text-xs font-normal opacity-80">ريال</span>
+            </div>
           </Button>
         </div>
       )}

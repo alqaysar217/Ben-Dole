@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Slate-50 equivalent */
+    --background: 220 33% 98%; /* #F4F6FA */
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 221 72% 40%; /* #1E40AF Deep Blue */
+    --primary: 234 85% 38%; /* #0F1FB3 Deep Royal Blue */
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11.2%;
-    --muted: 210 40% 96.1%;
+    --secondary: 235 100% 58%; /* #2A3BFF Indigo */
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 14% 94%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11.2%;
+    --accent: 234 85% 38%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221 72% 40%;
-    --radius: 0.5rem;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 234 85% 38%;
+    --radius: 1.5rem; /* 24px */
   }
 }
 
@@ -39,8 +39,50 @@
 
 .font-headline {
   font-family: 'Inter', sans-serif;
+  @apply font-semibold tracking-tight;
 }
 
 .font-body {
   font-family: 'Inter', sans-serif;
+}
+
+/* Neo-Banking Custom Classes */
+.bg-premium-gradient {
+  background: linear-gradient(135deg, #0F1FB3 0%, #2A3BFF 100%);
+}
+
+.bg-glossy-gradient {
+  background: linear-gradient(90deg, #0F1FB3 0%, #2A3BFF 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-glossy-gradient::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+}
+
+.bg-waves {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cpath d='M0 100 C 50 150, 150 50, 200 100 S 350 150, 400 100 V 400 H 0 Z' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E");
+  background-size: cover;
+}
+
+.premium-shadow {
+  box-shadow: 0 8px 24px rgba(15, 31, 179, 0.08);
+}
+
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.input-glow:focus {
+  box-shadow: 0 0 0 4px rgba(15, 31, 179, 0.1);
 }

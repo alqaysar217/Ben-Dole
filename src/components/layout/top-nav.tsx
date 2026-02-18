@@ -8,8 +8,8 @@ import {
   Menu, 
   MessageCircle, 
   Instagram, 
-  ExternalLink,
-  ChevronLeft
+  ChevronLeft,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth } from "@/firebase";
@@ -38,9 +38,9 @@ export function TopNav() {
   };
 
   const getRoleIcon = () => {
-    if (userRole === "ADMIN") return <ShieldCheck className="h-5 w-5 text-primary" />;
-    if (userRole === "SUPERVISOR") return <UserCog className="h-5 w-5 text-blue-500" />;
-    return <User className="h-5 w-5 text-slate-400" />;
+    if (userRole === "ADMIN") return <ShieldCheck className="h-6 w-6 text-primary" strokeWidth={1.5} />;
+    if (userRole === "SUPERVISOR") return <UserCog className="h-6 w-6 text-secondary" strokeWidth={1.5} />;
+    return <User className="h-6 w-6 text-slate-400" strokeWidth={1.5} />;
   };
 
   const getRoleLabel = () => {
@@ -50,111 +50,115 @@ export function TopNav() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-14 bg-white text-slate-900 flex items-center justify-between px-4 z-50 shadow-sm border-b border-slate-200">
-      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <div className="bg-primary/10 p-1.5 rounded-lg">
+    <header className="fixed top-0 left-0 right-0 h-16 glass-morphism flex items-center justify-between px-6 z-50 border-b border-white/20 premium-shadow">
+      <Link href="/" className="flex items-center gap-3 group">
+        <div className="bg-white p-1.5 rounded-2xl premium-shadow border border-white transition-transform group-hover:scale-105">
           <Image 
             src="https://picsum.photos/seed/banklogo/200/200" 
             alt="Bank Logo" 
-            width={24} 
-            height={24} 
-            className="rounded"
+            width={28} 
+            height={28} 
+            className="rounded-xl"
             data-ai-hint="bank logo"
           />
         </div>
-        <h1 className="text-xl font-bold text-primary tracking-tight">طلبات</h1>
+        <h1 className="text-2xl font-black text-primary tracking-tight font-headline">طلبات</h1>
       </Link>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 hover:bg-slate-100">
-              <Menu className="h-6 w-6 text-slate-600" />
+            <Button variant="ghost" size="icon" className="rounded-2xl h-11 w-11 bg-white premium-shadow border border-white text-slate-600 hover:text-primary transition-all active:scale-90">
+              <Menu className="h-6 w-6" strokeWidth={2} />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[350px] p-0 flex flex-col h-full border-l">
-            {/* Header Info */}
-            <div className="p-6 bg-slate-50 border-b">
-              <SheetHeader className="text-right">
-                <SheetTitle className="flex items-center gap-3 text-primary text-2xl font-black">
+          <SheetContent side="right" className="w-[320px] p-0 flex flex-col h-full border-none rounded-l-[40px] premium-shadow overflow-hidden bg-[#F4F6FA]">
+            {/* Header with Waves */}
+            <div className="p-10 bg-premium-gradient text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-waves opacity-20" />
+              <SheetHeader className="text-right relative z-10 space-y-4">
+                <div className="bg-white/20 p-4 rounded-[22px] w-fit backdrop-blur-md border border-white/10">
                   {getRoleIcon()}
-                  {getRoleLabel()}
-                </SheetTitle>
-                <SheetDescription className="text-slate-500 text-xs mt-1 truncate">
-                  {user?.email || "غير مسجل"}
-                </SheetDescription>
+                </div>
+                <div>
+                  <SheetTitle className="text-3xl font-black text-white font-headline">
+                    {getRoleLabel()}
+                  </SheetTitle>
+                  <SheetDescription className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-1">
+                    {user?.email || "NOT AUTHENTICATED"}
+                  </SheetDescription>
+                </div>
               </SheetHeader>
             </div>
 
-            {/* Navigation Links */}
-            <div className="flex-1 overflow-y-auto py-4">
-              <div className="px-4 space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 mb-2">الدخول كـ</p>
-                <Link href="/order" className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-green-100 p-2 rounded-lg text-green-600"><User className="h-5 w-5" /></div>
-                    <span className="font-bold text-slate-700">موظف</span>
-                  </div>
-                  <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-primary" />
-                </Link>
-                <Link href="/login" className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2 rounded-lg text-blue-600"><UserCog className="h-5 w-5" /></div>
-                    <span className="font-bold text-slate-700">مشرف قسم</span>
-                  </div>
-                  <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-primary" />
-                </Link>
-                <Link href="/login" className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors group">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 p-2 rounded-lg text-primary"><ShieldCheck className="h-5 w-5" /></div>
-                    <span className="font-bold text-slate-700">مدير النظام</span>
-                  </div>
-                  <ChevronLeft className="h-4 w-4 text-slate-300 group-hover:text-primary" />
-                </Link>
+            {/* Content Area */}
+            <div className="flex-1 overflow-y-auto py-8 px-6 space-y-8">
+              <div className="space-y-3">
+                <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] px-3">Switch Role</p>
+                <div className="grid grid-cols-1 gap-2">
+                  <Link href="/order" className="flex items-center justify-between p-4 rounded-[22px] bg-white premium-shadow hover:bg-primary/5 transition-all group border border-white">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-green-50 p-2.5 rounded-xl text-green-600"><User className="h-5 w-5" strokeWidth={1.5} /></div>
+                      <span className="font-bold text-slate-700">موظف</span>
+                    </div>
+                    <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-primary transition-colors" />
+                  </Link>
+                  <Link href="/login" className="flex items-center justify-between p-4 rounded-[22px] bg-white premium-shadow hover:bg-secondary/5 transition-all group border border-white">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600"><UserCog className="h-5 w-5" strokeWidth={1.5} /></div>
+                      <span className="font-bold text-slate-700">مشرف قسم</span>
+                    </div>
+                    <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-secondary transition-colors" />
+                  </Link>
+                  <Link href="/login" className="flex items-center justify-between p-4 rounded-[22px] bg-white premium-shadow hover:bg-primary/5 transition-all group border border-white">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-primary/10 p-2.5 rounded-xl text-primary"><ShieldCheck className="h-5 w-5" strokeWidth={1.5} /></div>
+                      <span className="font-bold text-slate-700">مدير النظام</span>
+                    </div>
+                    <ChevronLeft className="h-5 w-5 text-slate-300 group-hover:text-primary transition-colors" />
+                  </Link>
+                </div>
               </div>
 
-              <Separator className="my-4 mx-4 w-auto" />
-
-              {/* Logout Option */}
               {user && (
-                <div className="px-4">
+                <div className="px-1">
                   <Button 
                     variant="ghost" 
-                    className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/5 font-bold p-3 h-auto rounded-xl gap-3"
+                    className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 font-black p-4 h-auto rounded-[22px] gap-4 bg-white premium-shadow border border-white transition-all active:scale-95"
                     onClick={handleLogout}
                   >
-                    <div className="bg-destructive/10 p-2 rounded-lg"><LogOut className="h-5 w-5" /></div>
-                    تسجيل الخروج
+                    <div className="bg-red-50 p-2.5 rounded-xl"><LogOut className="h-5 w-5" /></div>
+                    Sign Out Securely
                   </Button>
                 </div>
               )}
             </div>
 
-            {/* Developer Contact Footer */}
-            <div className="p-6 bg-slate-50 border-t mt-auto">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">تواصل مع المطور</p>
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+            {/* Developer Section */}
+            <div className="p-8 bg-white/50 backdrop-blur-md border-t border-white">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Developer Contact</p>
+              <div className="bg-white p-6 rounded-[28px] premium-shadow border border-white space-y-4">
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-slate-800">م/ محمود الحساني</span>
-                  <span className="text-[10px] text-slate-500">Fullstack Web Developer</span>
+                  <span className="text-sm font-black text-slate-800">م/ محمود الحساني</span>
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Fullstack Engineer</span>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   <Link 
                     href="https://wa.me/967775258830" 
                     target="_blank" 
-                    className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white p-2 rounded-xl hover:bg-green-600 transition-colors"
+                    className="flex items-center justify-center gap-2 bg-green-500 text-white py-3 rounded-2xl hover:bg-green-600 transition-all premium-shadow active:scale-95"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span className="text-[10px] font-bold">واتساب</span>
+                    <span className="text-xs font-bold">واتساب</span>
                   </Link>
                   <Link 
                     href="https://instagram.com/mahmoud_codes" 
                     target="_blank" 
-                    className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white p-2 rounded-xl hover:opacity-90 transition-opacity"
+                    className="flex items-center justify-center gap-2 bg-premium-gradient text-white py-3 rounded-2xl hover:opacity-90 transition-all premium-shadow active:scale-95"
                   >
                     <Instagram className="h-4 w-4" />
-                    <span className="text-[10px] font-bold">إنستجرام</span>
+                    <span className="text-xs font-bold">إنستجرام</span>
                   </Link>
                 </div>
               </div>

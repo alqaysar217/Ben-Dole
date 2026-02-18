@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -12,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Info, ShieldCheck, WifiOff } from "lucide-react";
+import { ArrowRight, Info, ShieldCheck, WifiOff, Lock, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -41,20 +40,15 @@ export default function LoginPage() {
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
 
-      // تحديد الدور بناءً على كلمة المرور
       if (password === "adminha892019") {
         emailSuffix = "admin";
         role = "ADMIN";
       }
 
       const email = `${phone.trim()}_${emailSuffix}@bank.com`;
-      
-      // محاولة تسجيل الدخول - تم تحسين المعالجة لمنع انهيار NextJS
       await signInWithEmailAndPassword(auth, email, password);
-      
       setUserRole(role);
 
-      // إذا كان مشرفاً ويستخدم كلمة السر الافتراضية
       if (role === "SUPERVISOR" && password === "123456") {
         setShowChangePassword(true);
         setLoading(false);
@@ -68,7 +62,6 @@ export default function LoginPage() {
       
       router.push("/admin");
     } catch (err: any) {
-      // لا نستخدم console.error هنا لتجنب ظهور شاشة الخطأ في بيئة التطوير
       let errorMessage = "يرجى التأكد من صحة البيانات.";
       
       if (err.code === 'auth/network-request-failed') {
@@ -76,8 +69,6 @@ export default function LoginPage() {
         errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من الإنترنت.";
       } else if (err.code === 'auth/invalid-credential') {
         errorMessage = "بيانات الدخول غير صحيحة. تأكد من وجود الحساب في لوحة تحكم Firebase.";
-      } else if (err.code === 'auth/too-many-requests') {
-        errorMessage = "تم حظر الدخول مؤقتاً. حاول لاحقاً.";
       }
 
       toast({ 
@@ -106,74 +97,86 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="pt-14 pb-20 flex items-center justify-center min-h-screen bg-slate-50">
+    <div className="pt-16 pb-28 min-h-screen bg-[#F4F6FA] flex items-center justify-center p-6">
       <TopNav />
-      <main className="p-4 w-full max-w-sm">
-        <Card className="border-none shadow-2xl bg-white overflow-hidden">
-          <div className="h-2 bg-primary w-full" />
-          <CardHeader className="text-center space-y-2 pt-8">
-            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
-              <ShieldCheck className="h-8 w-8 text-primary" />
+      <main className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-700">
+        <Card className="border-none premium-shadow bg-white rounded-[32px] overflow-hidden">
+          <div className="h-3 bg-premium-gradient w-full" />
+          <CardHeader className="text-center space-y-4 pt-10">
+            <div className="mx-auto bg-primary/10 p-5 rounded-[24px] w-fit shadow-inner">
+              <ShieldCheck className="h-10 w-10 text-primary" strokeWidth={1.5} />
             </div>
-            <CardTitle className="text-2xl font-bold text-primary">تسجيل الدخول</CardTitle>
-            <p className="text-xs text-slate-500">لوحة تحكم المدراء ومشرفي الأقسام</p>
+            <div className="space-y-1">
+              <CardTitle className="text-3xl font-black text-slate-800 font-headline">تسجيل الدخول</CardTitle>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Authorized Personnel Only</p>
+            </div>
           </CardHeader>
-          <CardContent className="pb-8 space-y-4">
+          <CardContent className="pb-10 space-y-6 px-8">
             
             {networkError && (
-              <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+              <Alert variant="destructive" className="bg-red-50 border-none text-red-600 rounded-2xl">
                 <WifiOff className="h-4 w-4" />
-                <AlertTitle className="text-xs font-bold">مشكلة في الاتصال</AlertTitle>
-                <AlertDescription className="text-[10px]">
-                  يبدو أن هناك مشكلة في الاتصال بخدمات Firebase. يرجى التحقق من الإنترنت أو استخدام VPN.
+                <AlertTitle className="text-xs font-black uppercase">Network Issue</AlertTitle>
+                <AlertDescription className="text-[10px] font-medium leading-relaxed">
+                  فشل الاتصال بخدمات Firebase. يرجى التأكد من استقرار الإنترنت.
                 </AlertDescription>
               </Alert>
             )}
 
-            <Alert className="bg-blue-50 border-blue-200 text-blue-800">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-xs font-bold">تذكير بكلمات السر</AlertTitle>
-              <AlertDescription className="text-[10px] leading-relaxed">
-                المدير: <code className="bg-white px-1">adminha892019</code><br/>
-                المشرف: <code className="bg-white px-1">ha892019</code> أو <code className="bg-white px-1">123456</code>
-              </AlertDescription>
+            <Alert className="bg-[#F4F6FA] border-none text-primary rounded-2xl p-4">
+              <div className="flex gap-4">
+                <div className="bg-primary/10 p-2.5 rounded-xl h-fit">
+                  <Info className="h-4 w-4" />
+                </div>
+                <div className="space-y-1">
+                   <AlertTitle className="text-[10px] font-black uppercase tracking-widest">Authentication Notes</AlertTitle>
+                   <AlertDescription className="text-[10px] leading-relaxed opacity-70">
+                    كلمة مرور المدير: <code className="bg-white/80 px-1.5 py-0.5 rounded font-mono">adminha892019</code><br/>
+                    كلمة مرور المشرف: <code className="bg-white/80 px-1.5 py-0.5 rounded font-mono">123456</code>
+                  </AlertDescription>
+                </div>
+              </div>
             </Alert>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-600 px-1">رقم الهاتف</label>
+                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
+                  <Smartphone className="h-3.5 w-3.5" /> Phone Number
+                </label>
                 <Input 
                   type="text" 
                   value={phone} 
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="مثال: 775258830"
+                  placeholder="Example: 77XXXXXXX"
                   required
-                  className="bg-slate-50 border-slate-200 h-12 text-left"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-widest input-glow"
                   dir="ltr"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-600 px-1">كلمة المرور</label>
+                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
+                  <Lock className="h-3.5 w-3.5" /> Password
+                </label>
                 <Input 
                   type="password" 
                   value={password} 
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="******"
+                  placeholder="••••••••"
                   required
-                  className="bg-slate-50 border-slate-200 h-12 text-left"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-[0.4em] input-glow"
                   dir="ltr"
                 />
               </div>
-              <Button type="submit" className="w-full h-12 font-bold text-lg shadow-lg shadow-primary/20" disabled={loading}>
-                {loading ? "جاري التحقق..." : "تسجيل الدخول"}
+              <Button type="submit" className="w-full h-16 bg-glossy-gradient rounded-[22px] font-black text-lg premium-shadow transition-all active:scale-95" disabled={loading}>
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Secure Login"}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
+            <div className="pt-4 text-center">
               <Link href="/">
-                <Button variant="ghost" size="sm" className="text-slate-500 hover:text-primary transition-colors">
+                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-primary transition-all rounded-full px-6">
                   <ArrowRight className="h-4 w-4 ml-2" />
-                  العودة للرئيسية
+                  <span className="font-bold">العودة للرئيسية</span>
                 </Button>
               </Link>
             </div>
@@ -181,28 +184,31 @@ export default function LoginPage() {
         </Card>
 
         <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-center text-primary">تغيير كلمة المرور</DialogTitle>
-              <DialogDescription className="text-center">
-                يجب عليك تغيير كلمة المرور الافتراضية لأسباب أمنية.
+          <DialogContent className="sm:max-w-md rounded-[32px] border-none premium-shadow p-8">
+            <DialogHeader className="text-center space-y-4">
+              <div className="bg-primary/10 p-4 rounded-[22px] w-fit mx-auto">
+                <Lock className="h-8 w-8 text-primary" strokeWidth={1.5} />
+              </div>
+              <DialogTitle className="text-2xl font-black text-primary font-headline">تحديث كلمة المرور</DialogTitle>
+              <DialogDescription className="font-medium text-slate-500">
+                لأمان حسابك، يرجى تغيير كلمة المرور الافتراضية الآن.
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-6 py-6">
               <div className="space-y-2">
-                <Label>كلمة المرور الجديدة</Label>
+                <Label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">New Password</Label>
                 <Input 
                   type="password" 
                   value={newPassword} 
                   onChange={e => setNewPassword(e.target.value)} 
                   placeholder="أدخل 6 أحرف على الأقل"
-                  className="text-left"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-[0.3em] input-glow"
                   dir="ltr"
                 />
               </div>
             </div>
             <DialogFooter>
-              <Button className="w-full font-bold" onClick={handleUpdatePassword}>تحديث ومتابعة</Button>
+              <Button className="w-full h-14 bg-glossy-gradient rounded-2xl font-black text-lg premium-shadow transition-all active:scale-95" onClick={handleUpdatePassword}>تحديث ومتابعة</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

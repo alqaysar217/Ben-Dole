@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -11,23 +10,18 @@ export function BottomNav() {
   const pathname = usePathname();
   const { userRole } = useUIStore();
 
-  // العناصر الأساسية للموظفين (تسمية "الرئيسية" تشير لصفحة الطلب حسب طلب المستخدم)
   const navItems = [
     { label: "الرئيسية", icon: LayoutDashboard, href: "/order" },
     { label: "الطلبات", icon: ListOrdered, href: "/orders" },
     { label: "التدوير", icon: RefreshCw, href: "/rotation" },
   ];
 
-  // يظهر تبويب الإدارة فقط للمدير أو المشرف المسجل دخوله
   if (userRole === "ADMIN" || userRole === "SUPERVISOR") {
     navItems.push({ label: "الإدارة", icon: ShieldAlert, href: "/admin" });
   }
-
-  // إذا كنا في صفحة الهبوط، قد لا نحتاج لعرض البار السفلي أو نعرضه بشكل بسيط
-  // لكن سنبقيه للسهولة مع تمييز الصفحة النشطة
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t h-16 flex items-center justify-around px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+    <nav className="fixed bottom-0 left-0 right-0 glass-morphism border-t border-white/20 h-20 flex items-center justify-around px-6 z-50 rounded-t-[32px] premium-shadow">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;
@@ -36,15 +30,17 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center gap-1 transition-all duration-200 flex-1 h-full px-1",
-              isActive ? "text-primary scale-110" : "text-muted-foreground hover:text-slate-600"
+              "flex flex-col items-center justify-center gap-1.5 transition-all duration-500 relative flex-1 h-full px-1",
+              isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"
             )}
           >
-            <Icon className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
-            <span className={cn("text-[9px] font-bold whitespace-nowrap", isActive ? "opacity-100" : "opacity-80")}>
+            {isActive && (
+              <div className="absolute top-0 h-1.5 w-8 bg-primary rounded-full animate-in fade-in zoom-in duration-500" />
+            )}
+            <Icon className={cn("h-6 w-6", isActive ? "stroke-[2.5px]" : "stroke-[1.5px]")} />
+            <span className={cn("text-[10px] font-black uppercase tracking-widest", isActive ? "opacity-100" : "opacity-60")}>
               {item.label}
             </span>
-            {isActive && <div className="h-1 w-4 bg-primary rounded-full mt-0.5" />}
           </Link>
         );
       })}
