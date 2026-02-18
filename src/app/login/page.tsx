@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
+import { ArrowRight, WifiOff, Lock, Smartphone, Loader2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -41,7 +41,6 @@ export default function LoginPage() {
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
 
-      // تحكم بسيط في الأدوار بناءً على كلمة المرور للتجربة
       if (password === "adminha892019") {
         emailSuffix = "admin";
         role = "ADMIN";
@@ -106,29 +105,21 @@ export default function LoginPage() {
           {/* SVG Infographic Hero Section */}
           <div className="relative w-full h-64 bg-slate-50 flex items-center justify-center p-4">
             <svg viewBox="0 0 240 240" className="w-full h-full max-w-[220px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Background Shapes */}
               <circle cx="120" cy="120" r="100" fill="url(#login_grad_bg)" fillOpacity="0.05"/>
-              
-              {/* Card Illustration */}
               <rect x="50" y="90" width="140" height="90" rx="16" fill="white" stroke="#0F1FB3" strokeWidth="1.5" className="animate-pulse duration-[4000ms] shadow-lg"/>
               <rect x="65" y="105" width="30" height="20" rx="4" fill="#F4F6FA"/>
               <rect x="65" y="145" width="80" height="8" rx="4" fill="#F4F6FA"/>
               <rect x="160" y="145" width="20" height="20" rx="10" fill="#2A3BFF" fillOpacity="0.2"/>
-
-              {/* Security Shield */}
               <path d="M120 40L155 60V110C155 141.25 120 160 120 160C120 160 85 141.25 85 110V60L120 40Z" fill="url(#login_grad_shield)" stroke="white" strokeWidth="2.5" className="drop-shadow-xl"/>
               <path d="M110 100L117 107L132 92" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-              
-              {/* Floating Decorative Elements */}
               <circle cx="200" cy="80" r="8" fill="#0F1FB3" fillOpacity="0.1" className="animate-bounce duration-[3000ms]"/>
               <rect x="40" y="60" width="12" height="12" rx="3" fill="#2A3BFF" fillOpacity="0.1" transform="rotate(15 40 60)" className="animate-bounce duration-[2500ms]"/>
-
               <defs>
                 <linearGradient id="login_grad_bg" x1="20" y1="20" x2="220" y2="220" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#0F1FB3"/>
                   <stop offset="1" stopColor="#2A3BFF"/>
                 </linearGradient>
-                <linearGradient id="login_grad_shield" x1="85" y1="40" x2="155" x2="160" gradientUnits="userSpaceOnUse">
+                <linearGradient id="login_grad_shield" x1="85" y1="40" x2="155" y2="160" gradientUnits="userSpaceOnUse">
                   <stop stopColor="#0F1FB3"/>
                   <stop offset="1" stopColor="#2A3BFF"/>
                 </linearGradient>
@@ -158,7 +149,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2 text-right">
-                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
+                <label className="text-[11px] font-black text-primary px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
                   رقم الهاتف <Smartphone className="h-3.5 w-3.5" />
                 </label>
                 <Input 
@@ -167,12 +158,12 @@ export default function LoginPage() {
                   onChange={e => setPhone(e.target.value)}
                   placeholder="777111222"
                   required
-                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-right font-mono font-bold tracking-widest input-glow"
-                  dir="rtl"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-widest input-glow"
+                  dir="ltr"
                 />
               </div>
               <div className="space-y-2 text-right">
-                <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
+                <label className="text-[11px] font-black text-primary px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
                   كلمة المرور <Lock className="h-3.5 w-3.5" />
                 </label>
                 <Input 
@@ -205,7 +196,7 @@ export default function LoginPage() {
           <DialogContent className="sm:max-w-md rounded-[32px] border-none premium-shadow p-8">
             <DialogHeader className="text-center space-y-4">
               <div className="bg-primary/10 p-4 rounded-[22px] w-fit mx-auto">
-                <Lock className="h-8 w-8 text-primary" strokeWidth={1.5} />
+                <ShieldCheck className="h-8 w-8 text-primary" strokeWidth={1.5} />
               </div>
               <DialogTitle className="text-2xl font-black text-primary font-headline">تحديث كلمة المرور</DialogTitle>
               <DialogDescription className="font-medium text-slate-500">
@@ -214,7 +205,7 @@ export default function LoginPage() {
             </DialogHeader>
             <div className="space-y-6 py-6">
               <div className="space-y-2 text-right">
-                <Label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">كلمة المرور الجديدة</Label>
+                <Label className="text-[11px] font-black uppercase tracking-widest text-primary px-1">كلمة المرور الجديدة</Label>
                 <Input 
                   type="password" 
                   value={newPassword} 
