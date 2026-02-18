@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -12,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Info, ShieldCheck } from "lucide-react";
+import { ArrowRight, Info, ShieldCheck, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -63,9 +62,18 @@ export default function LoginPage() {
       
       router.push("/admin");
     } catch (err: any) {
+      console.error("Login error:", err);
+      let errorMessage = "يرجى التأكد من صحة رقم الهاتف وكلمة المرور.";
+      
+      if (err.code === 'auth/network-request-failed') {
+        errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت الخاص بك أو التأكد من عدم وجود حظر لخدمات Google.";
+      } else if (err.code === 'auth/invalid-credential') {
+        errorMessage = "بيانات الدخول غير صحيحة. تأكد من إنشاء الحساب في لوحة تحكم Firebase.";
+      }
+
       toast({ 
         title: "خطأ في الدخول", 
-        description: "يرجى التأكد من صحة رقم الهاتف وكلمة المرور. الافتراضية للمشرف هي 123456", 
+        description: errorMessage, 
         variant: "destructive" 
       });
     } finally {
