@@ -203,15 +203,20 @@ export default function OrderPage() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-16 bg-white/50 backdrop-blur-sm p-1.5 rounded-[22px] premium-shadow mb-6">
+            <TabsList className="flex w-full gap-3 h-auto bg-transparent p-0 mb-6">
               {CATEGORIES.map(cat => (
                 <TabsTrigger 
                   key={cat.id} 
                   value={cat.id} 
-                  className="h-full flex items-center justify-center gap-2 font-bold text-xs rounded-[18px] transition-all duration-500 data-[state=active]:bg-premium-gradient data-[state=active]:text-white data-[state=active]:shadow-xl z-20 relative overflow-hidden"
+                  className={cn(
+                    "flex-1 flex flex-col items-center justify-center gap-2 h-20 rounded-[22px] transition-all duration-300 relative border-none",
+                    activeTab === cat.id 
+                      ? "bg-premium-gradient text-white shadow-[0_10px_25px_rgba(15,31,179,0.3)] scale-[1.05]" 
+                      : "bg-white text-slate-500 premium-shadow hover:bg-slate-50"
+                  )}
                 >
-                  <cat.icon className={cn("h-4 w-4 relative z-30 transition-colors", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2} />
-                  <span className="relative z-30">{cat.label}</span>
+                  <cat.icon className={cn("h-5 w-5", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2} />
+                  <span className="font-bold text-[10px]">{cat.label}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
