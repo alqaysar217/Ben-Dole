@@ -163,9 +163,9 @@ export default function AdminPage() {
     <div className="pt-14 pb-20">
       <TopNav />
       <main className="p-4 space-y-6 max-w-2xl mx-auto text-right">
-        {/* الهيدر العلوي - معكوس الاتجاه */}
-        <div className="flex items-center justify-end gap-3">
-          <div className="text-left">
+        {/* الهيدر العلوي - محاذاة لليمين */}
+        <div className="flex items-center justify-start gap-3">
+          <div className="text-right">
             <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
             <p className="text-[10px] text-slate-500">{isAdmin ? "صلاحية: مدير تطبيق" : "صلاحية: مشرف قسم"}</p>
           </div>
@@ -209,8 +209,8 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                {/* تعديل مكان الزر والنص ليكون جهة اليسار مع تقديم الزر */}
-                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start" dir="ltr">
+                {/* تعديل مكان الزر والنص ليكون جهة اليمين مع تقديم الزر */}
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start">
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
@@ -226,8 +226,8 @@ export default function AdminPage() {
             <div className="space-y-2">
               <h3 className="text-sm font-bold text-slate-500 px-1 text-right">قائمة الموظفين</h3>
               {employees?.map(emp => (
-                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                  <div className="flex items-center gap-3">
+                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                  <div className="flex items-center gap-3 flex-row-reverse">
                     <div className="flex flex-col text-right">
                       <p className="font-bold flex items-center gap-2 flex-row-reverse">
                         {emp.name}
@@ -390,8 +390,7 @@ export default function AdminPage() {
                         <SelectItem value="add-on" className="text-right">إضافات</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                </>
+                  </>
               )}
 
               {editType === "department" && editingEntity && (
@@ -411,3 +410,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
