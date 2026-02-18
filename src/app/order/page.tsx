@@ -141,9 +141,7 @@ export default function OrderPage() {
       <div className="bg-premium-gradient text-white py-4 px-6 flex items-center justify-between sticky top-14 z-40 shadow-xl rounded-b-[28px] overflow-hidden">
         <div className="absolute inset-0 bg-waves opacity-20 pointer-events-none" />
         <div className="flex items-center gap-4 relative z-10">
-          <div className="bg-white/20 p-2.5 rounded-[18px] backdrop-blur-md border border-white/10">
-            <User className="h-5 w-5 text-white" />
-          </div>
+          <User className="h-5 w-5 text-white opacity-80" />
           <div className="flex flex-col">
             <span className="text-[10px] font-bold uppercase opacity-60 tracking-[0.1em]">المكلف بالنزول اليوم</span>
             <span className="text-lg font-black font-headline tracking-tight">{assignedPerson}</span>
@@ -187,7 +185,7 @@ export default function OrderPage() {
 
         <div className="space-y-6">
           <div className="flex items-end justify-between px-2">
-            <div className="space-y-1">
+            <div className="space-y-1 text-right">
               <h2 className="text-3xl font-black text-slate-800 font-headline">قائمة الطعام</h2>
               <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">قائمة الأصناف المختارة</p>
             </div>
@@ -195,7 +193,7 @@ export default function OrderPage() {
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 transition-colors group-focus-within:text-primary" />
               <Input 
                 placeholder="بحث..." 
-                className="pr-10 h-12 w-48 rounded-full bg-white border-none premium-shadow text-sm input-glow"
+                className="pr-10 h-12 w-48 rounded-full bg-white border-none premium-shadow text-sm input-glow text-right"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -211,7 +209,7 @@ export default function OrderPage() {
                   className={cn(
                     "flex-1 flex flex-col items-center justify-center gap-2 h-20 rounded-[22px] transition-all duration-300 relative border-none",
                     activeTab === cat.id 
-                      ? "bg-premium-gradient text-white shadow-[0_10px_25px_rgba(15,31,179,0.3)] scale-[1.05]" 
+                      ? "bg-premium-gradient text-white shadow-[0_10px_25px_rgba(15,31,179,0.3)] scale-[1.05] z-10" 
                       : "bg-white text-slate-500 premium-shadow hover:bg-slate-50"
                   )}
                 >
@@ -225,12 +223,12 @@ export default function OrderPage() {
               <TabsContent key={cat.id} value={cat.id} className="mt-4 grid grid-cols-1 gap-4 outline-none">
                 {filteredMenu.map((item) => (
                   <Card key={item.id} className="border-none premium-shadow bg-white rounded-[24px] group hover:scale-[1.01] transition-all duration-300">
-                    <CardContent className="p-5 flex items-center justify-between">
-                      <div className="flex items-center gap-5">
+                    <CardContent className="p-5 flex items-center justify-between flex-row-reverse">
+                      <div className="flex items-center gap-5 flex-row-reverse">
                         <div className={cn("p-4 rounded-[20px] transition-colors group-hover:bg-primary/5", cat.bg)}>
                           <cat.icon className={cn("h-7 w-7", cat.color)} strokeWidth={1} />
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-1 text-right">
                           <h3 className="font-bold text-lg text-slate-800">{item.itemName}</h3>
                           <p className="text-primary font-black text-sm font-headline tracking-tighter">{item.price} <span className="text-[10px] font-normal text-slate-400">ريال</span></p>
                         </div>
