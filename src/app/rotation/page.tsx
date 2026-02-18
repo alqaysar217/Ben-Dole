@@ -7,7 +7,7 @@ import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNo
 import { collection, query, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, UserMinus, UserCheck, RefreshCcw, Info, Sparkles, CreditCard } from "lucide-react";
+import { CheckCircle2, UserMinus, UserCheck, RefreshCcw, Info, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +83,7 @@ export default function RotationPage() {
           <Card className="border-none premium-shadow bg-premium-gradient text-white rounded-[32px] overflow-hidden relative">
             <div className="absolute inset-0 bg-waves opacity-20" />
             <div className="absolute top-6 left-6 opacity-40">
-              <CreditCard className="h-10 w-10" strokeWidth={1} />
+              <User className="h-10 w-10" strokeWidth={1.5} />
             </div>
             <CardContent className="p-8 space-y-12 relative z-10 text-right">
               <div className="flex justify-between items-start">
