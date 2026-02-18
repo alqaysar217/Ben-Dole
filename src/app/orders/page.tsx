@@ -10,7 +10,7 @@ import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Clock, User, Trash2, ReceiptText, CalendarDays, History, CheckCircle, XCircle } from "lucide-react";
+import { Copy, Clock, User, Trash2, ReceiptText, CalendarDays, History, CheckCircle, XCircle, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -22,9 +22,10 @@ export default function OrdersPage() {
   const { toast } = useToast();
   
   const isAdmin = userRole === "ADMIN";
-  const canManage = isAdmin || userRole === "SUPERVISOR";
+  const isSupervisor = userRole === "SUPERVISOR";
+  const canManage = isAdmin || isSupervisor;
 
-  // ضمان وجود جلسة دخول (حتى لو مجهولة) للتمكن من إجراء عمليات الحذف والتعديل
+  // ضمان وجود جلسة دخول للتمكن من إجراء العمليات
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
@@ -47,7 +48,7 @@ export default function OrdersPage() {
     return d;
   }, []);
 
-  // فلترة طلبات اليوم (المعلقة والنشطة)
+  // فلترة طلبات اليوم (النشطة فقط)
   const todayOrders = useMemo(() => {
     if (!allOrders) return [];
     return allOrders.filter(o => {
@@ -102,10 +103,10 @@ export default function OrdersPage() {
 
   const handleClearTodayOrders = () => {
     if (!isAdmin) {
-      toast({ title: "صلاحية مرفوضة", description: "فقط مدير النظام يمكنه مسح الطلبات", variant: "destructive" });
+      toast({ title: "صلاحية مرفوضة", description: "فقط مدير النظام يمكنه مسح كافة الطلبات", variant: "destructive" });
       return;
     }
-    if (!confirm("هل أنت متأكد من مسح جميع طلبات اليوم المعلقة؟ سيتم حذفها نهائياً.")) return;
+    if (!confirm("هل أنت متأكد من مسح جميع طلبات اليوم المعلقة نهائياً؟")) return;
     
     todayOrders.forEach(order => {
       deleteDocumentNonBlocking(doc(db, "orders", order.id));
@@ -115,7 +116,10 @@ export default function OrdersPage() {
   };
 
   const handleDeleteOrder = (orderId: string) => {
-    if (!canManage) return;
+    if (!canManage) {
+      toast({ title: "صلاحية مرفوضة", description: "ليس لديك صلاحية الحذف", variant: "destructive" });
+      return;
+    }
     if (!confirm("هل تريد حذف هذا الطلب نهائياً؟")) return;
     deleteDocumentNonBlocking(doc(db, "orders", orderId));
     toast({ title: "تم الحذف", description: "تمت إزالة الطلب بنجاح" });
@@ -129,7 +133,7 @@ export default function OrdersPage() {
       updateDocumentNonBlocking(doc(db, "orders", order.id), { status: "completed" });
     });
     
-    toast({ title: "تمت الأرشفة", description: "تم نقل الطلبات إلى سجل التاريخ" });
+    toast({ title: "تمت الأرشفة", description: "تم نقل الطلبات إلى سجل التاريخ بنجاح" });
   };
 
   const getEmployeeName = (empId: string) => {
@@ -148,7 +152,7 @@ export default function OrdersPage() {
             <div className="flex flex-col">
               <span className="text-sm">{getEmployeeName(order.employeeId)}</span>
               <span className="text-[9px] text-slate-400 font-normal">
-                {order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleString('ar-YE', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'numeric' }) : 'الآن'}
+                {order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleString('ar-YE', { hour: '2-digit', minute: '2-digit' }) : 'الآن'}
               </span>
             </div>
           </div>
@@ -158,10 +162,11 @@ export default function OrdersPage() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="h-7 w-7 text-slate-300 hover:text-destructive" 
+                className="h-8 w-8 text-slate-300 hover:text-destructive hover:bg-destructive/5 transition-colors" 
                 onClick={() => handleDeleteOrder(order.id)}
+                title="حذف الطلب"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-4 w-4" />
               </Button>
             )}
           </div>
@@ -199,16 +204,21 @@ export default function OrdersPage() {
                 <ReceiptText className="h-5 w-5" />
                 إدارة الطلبات
               </h1>
-              <p className="text-[10px] text-slate-500 font-medium">متابعة طلبات اليوم وسجلات التاريخ</p>
+              {canManage && (
+                <div className="flex items-center gap-1 mt-1">
+                  <ShieldCheck className="h-3 w-3 text-green-600" />
+                  <span className="text-[9px] text-green-600 font-bold uppercase">نمط {isAdmin ? "المدير" : "المشرف"} مفعل</span>
+                </div>
+              )}
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {isAdmin && todayOrders.length > 0 && (
-                <Button size="icon" variant="destructive" onClick={handleClearTodayOrders} title="حذف كافة طلبات اليوم نهائياً">
+                <Button size="icon" variant="destructive" className="h-9 w-9 shadow-sm" onClick={handleClearTodayOrders} title="حذف كافة طلبات اليوم نهائياً">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               )}
               {canManage && todayOrders.length > 0 && (
-                <Button size="icon" variant="outline" className="text-green-600 border-green-200" onClick={handleCompleteAll} title="أرشفة الكل">
+                <Button size="icon" variant="outline" className="h-9 w-9 text-green-600 border-green-200 bg-green-50/50 hover:bg-green-50 shadow-sm" onClick={handleCompleteAll} title="أرشفة كافة طلبات اليوم">
                   <CheckCircle className="h-4 w-4" />
                 </Button>
               )}
@@ -217,10 +227,10 @@ export default function OrdersPage() {
 
           <Tabs defaultValue="today" className="w-full">
             <TabsList className="grid w-full grid-cols-2 h-11 bg-slate-50 p-1">
-              <TabsTrigger value="today" className="gap-2 font-bold text-xs">
+              <TabsTrigger value="today" className="gap-2 font-bold text-xs data-[state=active]:bg-white">
                 <CalendarDays className="h-3.5 w-3.5" /> طلبات اليوم ({todayOrders.length})
               </TabsTrigger>
-              <TabsTrigger value="history" className="gap-2 font-bold text-xs">
+              <TabsTrigger value="history" className="gap-2 font-bold text-xs data-[state=active]:bg-white">
                 <History className="h-3.5 w-3.5" /> السجل ({historyOrders.length})
               </TabsTrigger>
             </TabsList>
@@ -229,7 +239,7 @@ export default function OrdersPage() {
               {canManage && todayOrders.length > 0 && (
                 <Button 
                   onClick={handleCopySummary} 
-                  className="w-full gap-2 font-bold bg-primary shadow-lg shadow-primary/20 h-11"
+                  className="w-full gap-2 font-bold bg-primary shadow-lg shadow-primary/20 h-12 rounded-xl transition-transform active:scale-95"
                 >
                   <Copy className="h-4 w-4" />
                   نسخ ملخص طلبات اليوم للواتساب
@@ -238,11 +248,13 @@ export default function OrdersPage() {
 
               {todayOrders.length === 0 ? (
                 <div className="text-center py-20 text-slate-400">
-                  <Clock className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                  <p className="font-medium text-sm">لا توجد طلبات معلقة لهذا اليوم</p>
+                  <div className="bg-slate-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                    <Clock className="h-8 w-8 opacity-20" />
+                  </div>
+                  <p className="font-medium text-sm">لا توجد طلبات نشطة لهذا اليوم</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
                   {todayOrders.map(order => renderOrderCard(order))}
                 </div>
               )}
@@ -251,11 +263,13 @@ export default function OrdersPage() {
             <TabsContent value="history" className="space-y-4 pt-4">
               {historyOrders.length === 0 ? (
                 <div className="text-center py-20 text-slate-400">
-                  <History className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                  <p className="font-medium text-sm">السجل فارغ حالياً</p>
+                  <div className="bg-slate-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                    <History className="h-8 w-8 opacity-20" />
+                  </div>
+                  <p className="font-medium text-sm">سجل الطلبات فارغ حالياً</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 animate-in fade-in">
                   {historyOrders.map(order => renderOrderCard(order))}
                 </div>
               )}
