@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, Pencil, Trash2 } from "lucide-react";
+import { Plus, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { 
@@ -192,22 +192,22 @@ export default function AdminPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Select value={newEmp.deptId} onValueChange={id => setNewEmp({...newEmp, deptId: id})}>
-                    <SelectTrigger className="text-right"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
-                    <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
+                    <SelectTrigger className="text-right flex-row-reverse"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
+                    <SelectContent className="text-right">{departments?.map(d => <SelectItem key={d.id} value={d.id} className="text-right">{d.deptName}</SelectItem>)}</SelectContent>
                   </Select>
 
                   {isAdmin && (
                     <Select value={newEmp.role} onValueChange={val => setNewEmp({...newEmp, role: val})}>
-                      <SelectTrigger className="text-right"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Employee">موظف</SelectItem>
-                        <SelectItem value="Supervisor">مشرف قسم</SelectItem>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
+                      <SelectContent className="text-right">
+                        <SelectItem value="Employee" className="text-right">موظف</SelectItem>
+                        <SelectItem value="Supervisor" className="text-right">مشرف قسم</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
                 </div>
                 
-                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg justify-start">
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start">
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
@@ -264,13 +264,13 @@ export default function AdminPage() {
                       <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} className="text-right" />
                     </div>
                     <Select value={newItem.category} onValueChange={val => setNewItem({...newItem, category: val})}>
-                      <SelectTrigger className="w-full text-right">
+                      <SelectTrigger className="w-full text-right flex-row-reverse">
                         <SelectValue placeholder="الفئة" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sandwich">سندوتشات</SelectItem>
-                        <SelectItem value="drink">مشروبات</SelectItem>
-                        <SelectItem value="add-on">إضافات</SelectItem>
+                      <SelectContent className="text-right">
+                        <SelectItem value="sandwich" className="text-right">سندوتشات</SelectItem>
+                        <SelectItem value="drink" className="text-right">مشروبات</SelectItem>
+                        <SelectItem value="add-on" className="text-right">إضافات</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button className="w-full font-bold" onClick={handleAddItem}>حفظ الصنف</Button>
@@ -346,21 +346,21 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <Label>القسم</Label>
                     <Select value={editingEntity.departmentId} onValueChange={id => setEditingEntity({...editingEntity, departmentId: id})}>
-                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
-                      <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
+                      <SelectContent className="text-right">{departments?.map(d => <SelectItem key={d.id} value={d.id} className="text-right">{d.deptName}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>الدور</Label>
                     <Select value={editingEntity.role} onValueChange={val => setEditingEntity({...editingEntity, role: val})}>
-                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Employee">موظف</SelectItem>
-                        <SelectItem value="Supervisor">مشرف قسم</SelectItem>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
+                      <SelectContent className="text-right">
+                        <SelectItem value="Employee" className="text-right">موظف</SelectItem>
+                        <SelectItem value="Supervisor" className="text-right">مشرف قسم</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center gap-3 justify-start">
+                  <div className="flex items-center gap-2 justify-start">
                     <Checkbox id="editRotate" checked={editingEntity.canRotate} onCheckedChange={checked => setEditingEntity({...editingEntity, canRotate: !!checked})} />
                     <Label htmlFor="editRotate" className="cursor-pointer">مكلف بالنزول</Label>
                   </div>
@@ -380,11 +380,11 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <Label>الفئة</Label>
                     <Select value={editingEntity.category} onValueChange={val => setEditingEntity({...editingEntity, category: val})}>
-                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sandwich">سندوتشات</SelectItem>
-                        <SelectItem value="drink">مشروبات</SelectItem>
-                        <SelectItem value="add-on">إضافات</SelectItem>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
+                      <SelectContent className="text-right">
+                        <SelectItem value="sandwich" className="text-right">سندوتشات</SelectItem>
+                        <SelectItem value="drink" className="text-right">مشروبات</SelectItem>
+                        <SelectItem value="add-on" className="text-right">إضافات</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -408,4 +408,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
