@@ -162,13 +162,10 @@ export default function AdminPage() {
     <div className="pt-14 pb-20">
       <TopNav />
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-primary" />
-            <div className="text-right">
-              <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
-              <p className="text-[10px] text-slate-500">{isAdmin ? "صلاحية: مدير تطبيق" : "صلاحية: مشرف قسم"}</p>
-            </div>
+        <div className="flex items-center justify-start gap-3">
+          <div className="text-right">
+            <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
+            <p className="text-[10px] text-slate-500">{isAdmin ? "صلاحية: مدير تطبيق" : "صلاحية: مشرف قسم"}</p>
           </div>
         </div>
 
@@ -210,13 +207,13 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
-                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
+                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg justify-start">
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
                     onCheckedChange={(checked) => setNewEmp({...newEmp, canRotate: checked as boolean})} 
                   />
+                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
                 </div>
 
                 <Button className="w-full font-bold" onClick={handleAddEmp}><Save className="h-4 w-4 ml-2" /> حفظ البيانات</Button>
@@ -363,9 +360,9 @@ export default function AdminPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="editRotate">مكلف بالنزول</Label>
+                  <div className="flex items-center gap-3 justify-start">
                     <Checkbox id="editRotate" checked={editingEntity.canRotate} onCheckedChange={checked => setEditingEntity({...editingEntity, canRotate: !!checked})} />
+                    <Label htmlFor="editRotate" className="cursor-pointer">مكلف بالنزول</Label>
                   </div>
                 </>
               )}
@@ -411,3 +408,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
