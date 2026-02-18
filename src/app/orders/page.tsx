@@ -3,16 +3,15 @@
 import { useState, useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, useAuth, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Clock, User, Trash2, ReceiptText, CalendarDays, History, CheckCircle, ShieldCheck, AlertCircle } from "lucide-react";
+import { Copy, Clock, User, ReceiptText, CalendarDays, History, CheckCircle, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function OrdersPage() {
   const db = useFirestore();
@@ -91,20 +90,6 @@ export default function OrdersPage() {
     });
   };
 
-  const handleClearTodayOrders = () => {
-    if (!confirm("هل أنت متأكد من مسح جميع طلبات اليوم المعلقة نهائياً؟")) return;
-    todayOrders.forEach(order => {
-      deleteDocumentNonBlocking(doc(db, "orders", order.id));
-    });
-    toast({ title: "تم المسح", description: "جاري مسح طلبات اليوم..." });
-  };
-
-  const handleDeleteOrder = (orderId: string) => {
-    if (!confirm("هل تريد حذف هذا الطلب نهائياً؟")) return;
-    deleteDocumentNonBlocking(doc(db, "orders", orderId));
-    toast({ title: "تم الحذف", description: "تمت إزالة الطلب بنجاح" });
-  };
-
   const handleCompleteAll = () => {
     if (!confirm("هل تريد أرشفة كافة طلبات اليوم ونقلها للسجل؟")) return;
     todayOrders.forEach(order => {
@@ -135,16 +120,6 @@ export default function OrdersPage() {
           </div>
           <div className="flex items-center gap-2">
             {order.status === 'completed' && <CheckCircle className="h-4 w-4 text-green-500" />}
-            {canManage && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 text-slate-300 hover:text-destructive hover:bg-destructive/5 transition-colors" 
-                onClick={() => handleDeleteOrder(order.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
           </div>
         </div>
         
@@ -188,11 +163,6 @@ export default function OrdersPage() {
               )}
             </div>
             <div className="flex gap-2">
-              {isAdmin && todayOrders.length > 0 && (
-                <Button size="icon" variant="destructive" className="h-9 w-9 shadow-sm" onClick={handleClearTodayOrders} title="حذف كافة طلبات اليوم">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
               {canManage && todayOrders.length > 0 && (
                 <Button size="icon" variant="outline" className="h-9 w-9 text-green-600 border-green-200 bg-green-50/50 hover:bg-green-50 shadow-sm" onClick={handleCompleteAll} title="أرشفة كافة طلبات اليوم">
                   <CheckCircle className="h-4 w-4" />

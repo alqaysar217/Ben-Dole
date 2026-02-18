@@ -4,7 +4,6 @@ import {
   setDoc,
   addDoc,
   updateDoc,
-  deleteDoc,
   CollectionReference,
   DocumentReference,
   SetOptions,
@@ -61,18 +60,4 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
         })
       )
     });
-}
-
-/**
- * Initiates a deleteDoc operation for a document reference.
- * Simplified and direct call to ensure it works across all entities.
- */
-export function deleteDocumentNonBlocking(docRef: DocumentReference) {
-  deleteDoc(docRef).catch((error) => {
-    const contextualError = new FirestorePermissionError({
-      path: docRef.path,
-      operation: 'delete',
-    });
-    errorEmitter.emit('permission-error', contextualError);
-  });
 }

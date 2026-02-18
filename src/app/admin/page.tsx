@@ -1,17 +1,16 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, doc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, RefreshCcw, UserCog, Pencil } from "lucide-react";
+import { Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { 
@@ -39,7 +38,6 @@ export default function AdminPage() {
   const router = useRouter();
 
   const isAdmin = userRole === "ADMIN";
-  const isSupervisor = userRole === "SUPERVISOR";
 
   // Redirect if not logged in
   useEffect(() => {
@@ -110,16 +108,6 @@ export default function AdminPage() {
     toast({ title: "تم الحفظ", description: `تمت إضافة الموظف بصفة ${roleToSave === 'Supervisor' ? 'مشرف' : 'موظف'}` });
   };
 
-  const handleDelete = (col: string, id: string) => {
-    if (!isAdmin) {
-      toast({ title: "صلاحية مرفوضة", description: "فقط مدير التطبيق يمكنه حذف السجلات", variant: "destructive" });
-      return;
-    }
-    if (!confirm("هل أنت متأكد من عملية الحذف؟")) return;
-    deleteDocumentNonBlocking(doc(db, col, id));
-    toast({ title: "تم الحذف", description: "تمت إزالة السجل بنجاح" });
-  };
-
   const startEdit = (entity: any, type: "employee" | "menu" | "department") => {
     if (!isAdmin) return;
     setEditingEntity({ ...entity });
@@ -159,11 +147,6 @@ export default function AdminPage() {
     setEditingEntity(null);
     setEditType(null);
     toast({ title: "تم التحديث", description: "تم حفظ التعديلات بنجاح" });
-  };
-
-  const toggleRotation = (emp: any) => {
-    if (!isAdmin) return;
-    updateDocumentNonBlocking(doc(db, "employees", emp.id), { canRotate: !emp.canRotate });
   };
 
   return (
@@ -249,14 +232,9 @@ export default function AdminPage() {
                   </div>
                   <div className="flex gap-1">
                     {isAdmin && (
-                      <>
-                        <Button variant="ghost" size="icon" onClick={() => startEdit(emp, "employee")} title="تعديل">
-                          <Pencil className="h-4 w-4 text-blue-600" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("employees", emp.id)} title="حذف">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
+                      <Button variant="ghost" size="icon" onClick={() => startEdit(emp, "employee")} title="تعديل">
+                        <Pencil className="h-4 w-4 text-blue-600" />
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -298,7 +276,6 @@ export default function AdminPage() {
                         <Button variant="ghost" size="icon" onClick={() => startEdit(item, "menu")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("menu_items", item.id)} title="حذف"><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   ))}
@@ -323,7 +300,6 @@ export default function AdminPage() {
                         <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("departments", dept.id)} title="حذف"><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   ))}
