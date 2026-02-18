@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, ShieldCheck, UserCog, Banknote } from "lucide-react";
+import { User, ShieldCheck, UserCog } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -12,8 +12,15 @@ export default function LandingPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 space-y-8">
       {/* Logo & Welcome */}
       <div className="text-center space-y-4">
-        <div className="mx-auto bg-primary/10 p-6 rounded-3xl w-fit shadow-inner">
-          <Banknote className="h-16 w-16 text-primary" />
+        <div className="mx-auto bg-primary/10 p-2 rounded-3xl w-fit shadow-inner overflow-hidden">
+          <Image 
+            src="https://picsum.photos/seed/banklogo/200/200" 
+            alt="Logo" 
+            width={80} 
+            height={80} 
+            className="rounded-2xl"
+            data-ai-hint="bank logo"
+          />
         </div>
         <div className="space-y-1">
           <h1 className="text-4xl font-black text-primary tracking-tight font-headline">طلبات البنك</h1>
