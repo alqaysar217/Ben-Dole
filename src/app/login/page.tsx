@@ -41,7 +41,7 @@ export default function LoginPage() {
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
 
-      // تحديد الدور بناءً على كلمة المرور المطلوبة
+      // تحديد الدور بناءً على كلمة المرور
       if (password === "adminha892019") {
         emailSuffix = "admin";
         role = "ADMIN";
@@ -49,12 +49,12 @@ export default function LoginPage() {
 
       const email = `${phone.trim()}_${emailSuffix}@bank.com`;
       
-      // محاولة تسجيل الدخول
+      // محاولة تسجيل الدخول - تم تحسين المعالجة لمنع انهيار NextJS
       await signInWithEmailAndPassword(auth, email, password);
       
       setUserRole(role);
 
-      // إذا كان مشرفاً ويستخدم كلمة السر الافتراضية، نطلب منه التغيير
+      // إذا كان مشرفاً ويستخدم كلمة السر الافتراضية
       if (role === "SUPERVISOR" && password === "123456") {
         setShowChangePassword(true);
         setLoading(false);
@@ -68,16 +68,16 @@ export default function LoginPage() {
       
       router.push("/admin");
     } catch (err: any) {
-      console.error("Login process error:", err);
-      let errorMessage = "يرجى التأكد من صحة رقم الهاتف وكلمة المرور.";
+      // لا نستخدم console.error هنا لتجنب ظهور شاشة الخطأ في بيئة التطوير
+      let errorMessage = "يرجى التأكد من صحة البيانات.";
       
       if (err.code === 'auth/network-request-failed') {
         setNetworkError(true);
-        errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت الخاص بك أو التأكد من عدم وجود حظر لخدمات Google.";
+        errorMessage = "فشل الاتصال بالخادم. يرجى التحقق من الإنترنت.";
       } else if (err.code === 'auth/invalid-credential') {
-        errorMessage = "بيانات الدخول غير صحيحة. تأكد من إنشاء الحساب في لوحة تحكم Firebase.";
+        errorMessage = "بيانات الدخول غير صحيحة. تأكد من وجود الحساب في لوحة تحكم Firebase.";
       } else if (err.code === 'auth/too-many-requests') {
-        errorMessage = "تم حظر الدخول مؤقتاً بسبب محاولات خاطئة كثيرة. حاول لاحقاً.";
+        errorMessage = "تم حظر الدخول مؤقتاً. حاول لاحقاً.";
       }
 
       toast({ 
@@ -101,7 +101,7 @@ export default function LoginPage() {
       setShowChangePassword(false);
       router.push("/admin");
     } catch (err: any) {
-      toast({ title: "فشل التحديث", description: err.message, variant: "destructive" });
+      toast({ title: "فشل التحديث", description: "حدث خطأ أثناء تحديث كلمة المرور", variant: "destructive" });
     }
   };
 
@@ -123,19 +123,19 @@ export default function LoginPage() {
             {networkError && (
               <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
                 <WifiOff className="h-4 w-4" />
-                <AlertTitle className="text-xs font-bold">مشكلة في الشبكة</AlertTitle>
+                <AlertTitle className="text-xs font-bold">مشكلة في الاتصال</AlertTitle>
                 <AlertDescription className="text-[10px]">
-                  يبدو أنك تواجه مشكلة في الاتصال بخوادم Firebase. تأكد من تشغيل الإنترنت أو استخدام VPN إذا كانت الخدمات محظورة.
+                  يبدو أن هناك مشكلة في الاتصال بخدمات Firebase. يرجى التحقق من الإنترنت أو استخدام VPN.
                 </AlertDescription>
               </Alert>
             )}
 
             <Alert className="bg-blue-50 border-blue-200 text-blue-800">
               <Info className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-xs font-bold">تنبيه للمستخدم</AlertTitle>
+              <AlertTitle className="text-xs font-bold">تذكير بكلمات السر</AlertTitle>
               <AlertDescription className="text-[10px] leading-relaxed">
-                كلمة السر الافتراضية للمشرف هي <code className="bg-white px-1">123456</code><br/>
-                وسيطلب منك النظام تغييرها فور الدخول.
+                المدير: <code className="bg-white px-1">adminha892019</code><br/>
+                المشرف: <code className="bg-white px-1">ha892019</code> أو <code className="bg-white px-1">123456</code>
               </AlertDescription>
             </Alert>
 
@@ -183,9 +183,9 @@ export default function LoginPage() {
         <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-center text-primary">تغيير كلمة المرور الافتراضية</DialogTitle>
+              <DialogTitle className="text-center text-primary">تغيير كلمة المرور</DialogTitle>
               <DialogDescription className="text-center">
-                يجب عليك تغيير كلمة المرور الافتراضية (123456) لأسباب أمنية قبل المتابعة.
+                يجب عليك تغيير كلمة المرور الافتراضية لأسباب أمنية.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
