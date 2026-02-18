@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Info, ShieldCheck, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
+import { ArrowRight, ShieldCheck, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -132,10 +132,10 @@ export default function LoginPage() {
                   type="text" 
                   value={phone} 
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="مثال: 77XXXXXXX"
+                  placeholder="777111222"
                   required
-                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-widest input-glow"
-                  dir="ltr"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-right font-mono font-bold tracking-widest input-glow"
+                  dir="rtl"
                 />
               </div>
               <div className="space-y-2">
