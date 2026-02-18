@@ -85,7 +85,7 @@ export default function RotationPage() {
             <div className="absolute top-6 left-6 opacity-40">
               <CreditCard className="h-10 w-10" strokeWidth={1} />
             </div>
-            <CardContent className="p-8 space-y-8 relative z-10 text-right">
+            <CardContent className="p-8 space-y-12 relative z-10 text-right">
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">الموظف المكلف حالياً</p>
@@ -93,13 +93,6 @@ export default function RotationPage() {
                 </div>
                 <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
                   <Shield className="h-6 w-6" />
-                </div>
-              </div>
-
-              <div className="flex justify-end items-end">
-                <div className="text-right">
-                  <p className="text-[9px] font-bold opacity-60">الهاتف</p>
-                  <p className="font-bold">{currentPerson.phone}</p>
                 </div>
               </div>
               
