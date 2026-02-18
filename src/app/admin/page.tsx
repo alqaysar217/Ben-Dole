@@ -223,10 +223,10 @@ export default function AdminPage() {
             <div className="space-y-2">
               <h3 className="text-sm font-bold text-slate-500 px-1 text-right">قائمة الموظفين</h3>
               {employees?.map(emp => (
-                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col text-right">
-                      <p className="font-bold flex items-center gap-2">
+                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                  <div className="flex items-center gap-3 flex-row-reverse">
+                    <div className="flex flex-col text-left">
+                      <p className="font-bold flex items-center gap-2 flex-row-reverse">
                         {emp.name}
                         {emp.role === 'Supervisor' && <span className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0 rounded font-bold">مشرف</span>}
                         {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
@@ -278,8 +278,8 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {menu?.map(item => (
-                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                      <div className="text-right">
+                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                      <div className="text-left">
                         <p className="font-bold">{item.itemName}</p>
                         <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
                       </div>
@@ -308,8 +308,8 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {departments?.map(dept => (
-                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                      <p className="font-bold">{dept.deptName}</p>
+                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                      <p className="font-bold text-left w-full">{dept.deptName}</p>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
