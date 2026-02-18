@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza, MapPin } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -143,7 +143,7 @@ export default function OrderPage() {
         <div className="absolute inset-0 bg-waves opacity-20 pointer-events-none" />
         <div className="flex items-center gap-4 relative z-10">
           <div className="bg-white/20 p-2.5 rounded-[18px] backdrop-blur-md border border-white/10">
-            <MapPin className="h-5 w-5 text-white" />
+            <User className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col">
             <span className="text-[10px] font-bold uppercase opacity-60 tracking-[0.1em]">المكلف بالنزول اليوم</span>
