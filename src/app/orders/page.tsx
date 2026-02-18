@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, useAuth, deleteDocumentNonBlocking, updateDocumentNonBlocking, initiateAnonymousSignIn } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,12 +16,20 @@ import { cn } from "@/lib/utils";
 
 export default function OrdersPage() {
   const db = useFirestore();
-  const { user } = useUser();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const { userRole } = useUIStore();
   const { toast } = useToast();
   
   const isAdmin = userRole === "ADMIN";
   const canManage = isAdmin || userRole === "SUPERVISOR";
+
+  // ضمان وجود جلسة دخول (حتى لو مجهولة) للتمكن من إجراء عمليات الحذف والتعديل
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [user, isUserLoading, auth]);
 
   // جلب كافة الموظفين لربط المعرفات بالأسماء
   const empsQuery = useMemoFirebase(() => collection(db, "employees"), [db]);
