@@ -138,7 +138,6 @@ export default function OrderPage() {
     <div className="pt-16 pb-28 min-h-screen bg-[#F4F6FA]">
       <TopNav />
       
-      {/* شريط الإشعارات المميز */}
       <div className="bg-premium-gradient text-white py-4 px-6 flex items-center justify-between sticky top-14 z-40 shadow-xl rounded-b-[28px] overflow-hidden">
         <div className="absolute inset-0 bg-waves opacity-20 pointer-events-none" />
         <div className="flex items-center gap-4 relative z-10">
@@ -204,15 +203,15 @@ export default function OrderPage() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-16 bg-white/50 backdrop-blur-sm p-2 rounded-[22px] premium-shadow mb-6">
+            <TabsList className="grid w-full grid-cols-3 h-16 bg-white/50 backdrop-blur-sm p-1.5 rounded-[22px] premium-shadow mb-6">
               {CATEGORIES.map(cat => (
                 <TabsTrigger 
                   key={cat.id} 
                   value={cat.id} 
-                  className="gap-3 font-bold text-xs rounded-2xl data-[state=active]:bg-premium-gradient data-[state=active]:text-white data-[state=active]:shadow-xl transition-all duration-500"
+                  className="h-full flex items-center justify-center gap-2 font-bold text-xs rounded-[18px] transition-all duration-300 data-[state=active]:bg-premium-gradient data-[state=active]:text-white data-[state=active]:shadow-lg"
                 >
-                  <cat.icon className={cn("h-5 w-5", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={1.5} />
-                  {cat.label}
+                  <cat.icon className={cn("h-4 w-4", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2} />
+                  <span>{cat.label}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
