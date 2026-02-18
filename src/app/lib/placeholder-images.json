@@ -1,0 +1,23 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "logo",
+      "description": "Bank Talabat Logo",
+      "imageUrl": "https://picsum.photos/seed/banklogo/200/200",
+      "imageHint": "bank logo"
+    },
+    {
+      "id": "sandwich",
+      "description": "Delicious Sandwich",
+      "imageUrl": "https://picsum.photos/seed/sandwich/400/300",
+      "imageHint": "sandwich food"
+    },
+    {
+      "id": "drink",
+      "description": "Cold Lemon Juice",
+      "imageUrl": "https://picsum.photos/seed/juice/400/300",
+      "imageHint": "lemon juice"
+    }
+  ]
+}
