@@ -10,7 +10,7 @@ import {
   SetOptions,
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
-import {FirestorePermissionError} from '@/firebase/errors';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * Initiates a setDoc operation for a document reference.
@@ -27,7 +27,6 @@ export function setDocumentNonBlocking(docRef: DocumentReference, data: any, opt
     )
   })
 }
-
 
 /**
  * Initiates an addDoc operation for a collection reference.
@@ -47,7 +46,6 @@ export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
     });
 }
 
-
 /**
  * Initiates an updateDoc operation for a document reference.
  */
@@ -65,21 +63,16 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
     });
 }
 
-
 /**
  * Initiates a deleteDoc operation for a document reference.
- * Essential fix: Ensure deleteDoc is awaited correctly and handled via emitter.
+ * Simplified and direct call to ensure it works across all entities.
  */
 export function deleteDocumentNonBlocking(docRef: DocumentReference) {
-  deleteDoc(docRef)
-    .then(() => {
-      // Success - no action needed for non-blocking
-    })
-    .catch((error) => {
-      const contextualError = new FirestorePermissionError({
-        path: docRef.path,
-        operation: 'delete',
-      });
-      errorEmitter.emit('permission-error', contextualError);
+  deleteDoc(docRef).catch((error) => {
+    const contextualError = new FirestorePermissionError({
+      path: docRef.path,
+      operation: 'delete',
     });
+    errorEmitter.emit('permission-error', contextualError);
+  });
 }
