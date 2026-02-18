@@ -78,7 +78,7 @@ export default function LandingPage() {
           <div className="flex items-center justify-center gap-3">
             <h1 className="text-5xl font-black text-primary tracking-tight font-headline">طلبات</h1>
           </div>
-          <p className="text-slate-500 font-medium">نظام تدوير وتوصيل الطعام الذكي</p>
+          <p className="text-slate-500 font-medium">نظام تدوير وتوصيل الطعام الذكي لموظفي البنك</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export default function LandingPage() {
       <div className="grid grid-cols-1 gap-5 w-full max-sm px-4">
         <Link href="/order" className="group">
           <Card className="border-none premium-shadow hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 bg-white rounded-[28px] overflow-hidden">
-            <CardContent className="p-7 flex items-center gap-6 flex-row-reverse">
+            <CardContent className="p-7 flex items-center gap-6">
               <div className="bg-[#F4F6FA] p-5 rounded-[22px] group-hover:bg-primary group-hover:text-white transition-colors duration-500">
                 <User className="h-9 w-9 text-primary group-hover:text-white" strokeWidth={1.5} />
               </div>
@@ -100,7 +100,7 @@ export default function LandingPage() {
 
         <Link href="/login" className="group">
           <Card className="border-none premium-shadow hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 bg-white rounded-[28px] overflow-hidden">
-            <CardContent className="p-7 flex items-center gap-6 flex-row-reverse">
+            <CardContent className="p-7 flex items-center gap-6">
               <div className="bg-[#F4F6FA] p-5 rounded-[22px] group-hover:bg-secondary group-hover:text-white transition-colors duration-500">
                 <UserCog className="h-9 w-9 text-secondary group-hover:text-white" strokeWidth={1.5} />
               </div>
@@ -114,7 +114,7 @@ export default function LandingPage() {
 
         <Link href="/login" className="group">
           <Card className="border-none premium-shadow hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 bg-white rounded-[28px] overflow-hidden">
-            <CardContent className="p-7 flex items-center gap-6 flex-row-reverse">
+            <CardContent className="p-7 flex items-center gap-6">
               <div className="bg-[#F4F6FA] p-5 rounded-[22px] group-hover:bg-primary group-hover:text-white transition-colors duration-500">
                 <ShieldCheck className="h-9 w-9 text-primary group-hover:text-white" strokeWidth={1.5} />
               </div>
