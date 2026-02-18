@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -11,11 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, ShieldCheck, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
+import { ArrowRight, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -30,6 +33,8 @@ export default function LoginPage() {
   
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+
+  const loginHero = PlaceHolderImages.find(img => img.id === "login-hero");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,17 +105,29 @@ export default function LoginPage() {
     <div className="pt-16 pb-28 min-h-screen bg-[#F4F6FA] flex items-center justify-center p-6">
       <TopNav />
       <main className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-700">
-        <Card className="border-none premium-shadow bg-white rounded-[32px] overflow-hidden">
-          <div className="h-3 bg-premium-gradient w-full" />
-          <CardHeader className="text-center space-y-4 pt-10">
-            <div className="mx-auto bg-primary/10 p-5 rounded-[24px] w-fit shadow-inner">
-              <ShieldCheck className="h-10 w-10 text-primary" strokeWidth={1.5} />
-            </div>
+        <Card className="border-none premium-shadow bg-white rounded-[40px] overflow-hidden">
+          {/* الصورة الإنفوجرافيك التعبيرية */}
+          <div className="relative w-full h-48 bg-primary/5">
+            {loginHero && (
+              <Image
+                src={loginHero.imageUrl}
+                alt={loginHero.description}
+                fill
+                className="object-cover opacity-90 transition-all hover:scale-105 duration-700"
+                priority
+                data-ai-hint={loginHero.imageHint}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+          </div>
+
+          <CardHeader className="text-center space-y-2 -mt-8 relative z-10 px-8">
             <div className="space-y-1">
               <CardTitle className="text-3xl font-black text-slate-800 font-headline">تسجيل الدخول</CardTitle>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">للموظفين المصرح لهم فقط</p>
             </div>
           </CardHeader>
+          
           <CardContent className="pb-10 space-y-6 px-8">
             
             {networkError && (

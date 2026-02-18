@@ -18,6 +18,12 @@
       "description": "Cold Lemon Juice",
       "imageUrl": "https://picsum.photos/seed/juice/400/300",
       "imageHint": "lemon juice"
+    },
+    {
+      "id": "login-hero",
+      "description": "Banking Security Infographic",
+      "imageUrl": "https://picsum.photos/seed/banksecure/600/400",
+      "imageHint": "bank security"
     }
   ]
 }
