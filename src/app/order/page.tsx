@@ -10,6 +10,7 @@ import { collection, query, where, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils, Sandwich, Coffee, Pizza } from "lucide-react";
 import { 
   Select, 
@@ -20,11 +21,11 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
-const CATEGORY_MAP: Record<string, { label: string, icon: any }> = {
-  "sandwich": { label: "سندوتشات", icon: Sandwich },
-  "drink": { label: "مشروبات", icon: Coffee },
-  "add-on": { label: "إضافات", icon: Pizza }
-};
+const CATEGORIES = [
+  { id: "sandwich", label: "سندوتشات", icon: Sandwich },
+  { id: "drink", label: "مشروبات", icon: Coffee },
+  { id: "add-on", label: "إضافات", icon: Pizza }
+];
 
 export default function OrderPage() {
   const db = useFirestore();
@@ -35,6 +36,7 @@ export default function OrderPage() {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
+  const [activeTab, setActiveTab] = useState("sandwich");
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -70,20 +72,13 @@ export default function OrderPage() {
     return pending[0]?.name || "الكل مكتمل اليوم";
   }, [allRotationEmployees]);
 
-  const groupedMenu = useMemo(() => {
-    if (!menu) return {};
-    
-    const filtered = menu.filter(item => 
+  const filteredMenu = useMemo(() => {
+    if (!menu) return [];
+    return menu.filter(item => 
+      item.category === activeTab &&
       item.itemName.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
-    return filtered.reduce((acc, item) => {
-      const cat = item.category || "sandwich";
-      if (!acc[cat]) acc[cat] = [];
-      acc[cat].push(item);
-      return acc;
-    }, {} as Record<string, any[]>);
-  }, [menu, searchTerm]);
+  }, [menu, activeTab, searchTerm]);
 
   const cartTotal = useMemo(() => {
     if (!menu) return 0;
@@ -197,13 +192,13 @@ export default function OrderPage() {
           </CardContent>
         </Card>
 
-        <div className="space-y-8">
+        <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-lg font-bold text-slate-800">قائمة الطعام</h2>
-            <div className="relative w-48">
+            <div className="relative w-40 sm:w-48">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input 
-                placeholder="بحث سريع..." 
+                placeholder="بحث..." 
                 className="pr-9 h-9 rounded-full bg-white border-slate-200 shadow-sm text-right text-xs"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -211,29 +206,33 @@ export default function OrderPage() {
             </div>
           </div>
 
-          {Object.keys(groupedMenu).length === 0 ? (
-            <div className="text-center py-10 text-slate-400">لا توجد أصناف مطابقة للبحث</div>
-          ) : (
-            ["sandwich", "drink", "add-on"].map(catKey => {
-              const items = groupedMenu[catKey];
-              if (!items || items.length === 0) return null;
-              
-              const CategoryIcon = CATEGORY_MAP[catKey].icon;
-              
-              return (
-                <div key={catKey} className="space-y-4">
-                  <div className="flex items-center gap-2 px-1">
-                    <div className="bg-primary/10 p-1.5 rounded-lg">
-                      <CategoryIcon className="h-4 w-4 text-primary" />
-                    </div>
-                    <h3 className="font-black text-primary text-sm uppercase tracking-wider">
-                      {CATEGORY_MAP[catKey].label}
-                    </h3>
-                    <div className="h-px bg-slate-100 flex-1 ml-2" />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 h-12 bg-slate-100 p-1 rounded-xl">
+              {CATEGORIES.map(cat => {
+                const Icon = cat.icon;
+                return (
+                  <TabsTrigger 
+                    key={cat.id} 
+                    value={cat.id} 
+                    className="flex items-center gap-2 font-bold text-xs data-[state=active]:bg-white data-[state=active]:text-primary rounded-lg transition-all"
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{cat.label}</span>
+                    <span className="sm:hidden">{cat.label.slice(0, 6)}</span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+
+            {CATEGORIES.map(cat => (
+              <TabsContent key={cat.id} value={cat.id} className="mt-4 space-y-3">
+                {filteredMenu.length === 0 ? (
+                  <div className="text-center py-10 text-slate-400 text-sm">
+                    لا توجد أصناف في هذا القسم حالياً
                   </div>
-                  
+                ) : (
                   <div className="grid grid-cols-1 gap-3">
-                    {items.map((item) => (
+                    {filteredMenu.map((item) => (
                       <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all active:scale-[0.98] bg-white group">
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="space-y-1">
@@ -266,10 +265,10 @@ export default function OrderPage() {
                       </Card>
                     ))}
                   </div>
-                </div>
-              );
-            })
-          )}
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
         </div>
       </main>
 
