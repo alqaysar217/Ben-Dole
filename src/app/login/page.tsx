@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight, AlertCircle } from "lucide-react";
+import { Lock, ArrowRight, AlertCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -39,10 +39,8 @@ export default function LoginPage() {
       console.error("Login error:", err);
       let message = "يرجى التحقق من رقم الهاتف وكلمة المرور.";
       
-      if (err.code === 'auth/invalid-credential') {
-        message = "بيانات الدخول غير صحيحة. تأكد من إنشاء الحساب في لوحة تحكم Firebase وتفعيل موفر تسجيل الدخول (Email/Password).";
-      } else if (err.code === 'auth/user-not-found') {
-        message = "المستخدم غير موجود. يرجى التواصل مع المسؤول.";
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+        message = "بيانات الدخول غير موجودة. هل قمت بإضافة المستخدم في Firebase Console؟";
       } else if (err.code === 'auth/wrong-password') {
         message = "كلمة المرور خاطئة.";
       }
@@ -72,10 +70,20 @@ export default function LoginPage() {
             <p className="text-xs text-slate-500">لوحة التحكم وإدارة الطلبات والتدوير</p>
           </CardHeader>
           <CardContent className="pb-8 space-y-4">
+            
+            <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertTitle className="text-xs font-bold">تنبيه للمطور</AlertTitle>
+              <AlertDescription className="text-[10px] leading-relaxed">
+                يجب إضافة المستخدم يدويًا في <b>Firebase Console</b> تحت قسم <b>Authentication</b> باستخدام البريد الإلكتروني: <br/>
+                <code className="bg-white px-1 rounded">775258830@bank.com</code>
+              </AlertDescription>
+            </Alert>
+
             {error && (
               <Alert variant="destructive" className="text-xs">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>تنبيه</AlertTitle>
+                <AlertTitle>خطأ في الدخول</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -89,7 +97,8 @@ export default function LoginPage() {
                   onChange={e => setPhone(e.target.value)}
                   placeholder="77XXXXXXX"
                   required
-                  className="bg-slate-50 border-slate-200 h-12"
+                  className="bg-slate-50 border-slate-200 h-12 text-left"
+                  dir="ltr"
                 />
               </div>
               <div className="space-y-2">
@@ -100,7 +109,8 @@ export default function LoginPage() {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="******"
                   required
-                  className="bg-slate-50 border-slate-200 h-12"
+                  className="bg-slate-50 border-slate-200 h-12 text-left"
+                  dir="ltr"
                 />
               </div>
               <Button type="submit" className="w-full h-12 font-bold text-lg shadow-lg shadow-primary/20" disabled={loading}>
