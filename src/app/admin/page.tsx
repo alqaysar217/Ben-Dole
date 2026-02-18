@@ -208,7 +208,7 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-end flex-row-reverse">
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start">
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
