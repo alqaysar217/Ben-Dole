@@ -159,7 +159,7 @@ export default function OrderPage() {
                   <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} /> القسم
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
-                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow flex-row-reverse text-right">
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow text-right">
                     <SelectValue placeholder="اختر القسم" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-none premium-shadow">
@@ -172,7 +172,7 @@ export default function OrderPage() {
                   <User className="h-4 w-4 text-primary" strokeWidth={1.5} /> اسم الموظف
                 </label>
                 <Select value={selectedEmployeeId || ""} onValueChange={setSelectedEmployeeId} disabled={!selectedDepartmentId}>
-                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow flex-row-reverse text-right">
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow text-right">
                     <SelectValue placeholder="اختر اسمك" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-none premium-shadow">
@@ -224,8 +224,8 @@ export default function OrderPage() {
               <TabsContent key={cat.id} value={cat.id} className="mt-4 grid grid-cols-1 gap-4 outline-none">
                 {filteredMenu.map((item) => (
                   <Card key={item.id} className="border-none premium-shadow bg-white rounded-[24px] group hover:scale-[1.01] transition-all duration-300">
-                    <CardContent className="p-5 flex items-center justify-between flex-row-reverse">
-                      <div className="flex items-center gap-5 flex-row-reverse">
+                    <CardContent className="p-5 flex items-center justify-between">
+                      <div className="flex items-center gap-5">
                         <div className={cn("p-4 rounded-[20px] transition-colors group-hover:bg-primary/5", cat.bg)}>
                           <cat.icon className={cn("h-7 w-7", cat.color)} strokeWidth={1} />
                         </div>

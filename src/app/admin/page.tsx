@@ -162,8 +162,8 @@ export default function AdminPage() {
     <div className="pt-14 pb-20">
       <TopNav />
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between flex-row-reverse">
-          <div className="flex items-center gap-3 flex-row-reverse">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <ShieldCheck className="h-8 w-8 text-primary" />
             <div className="text-right">
               <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
@@ -182,7 +182,7 @@ export default function AdminPage() {
           <TabsContent value="employees" className="space-y-6">
             <Card className="border-none shadow-sm bg-white">
               <CardHeader className="bg-slate-50 border-b pb-4">
-                <CardTitle className="text-sm flex items-center gap-2 flex-row-reverse">
+                <CardTitle className="text-sm flex items-center gap-2">
                   <UserPlus className="h-4 w-4" /> 
                   {isAdmin ? "إضافة موظف أو مشرف جديد" : "تسجيل موظف جديد"}
                 </CardTitle>
@@ -195,13 +195,13 @@ export default function AdminPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Select value={newEmp.deptId} onValueChange={id => setNewEmp({...newEmp, deptId: id})}>
-                    <SelectTrigger className="text-right flex-row-reverse"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
+                    <SelectTrigger className="text-right"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
                     <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                   </Select>
 
                   {isAdmin && (
                     <Select value={newEmp.role} onValueChange={val => setNewEmp({...newEmp, role: val})}>
-                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Employee">موظف</SelectItem>
                         <SelectItem value="Supervisor">مشرف قسم</SelectItem>
@@ -210,7 +210,7 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg flex-row-reverse">
+                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
                   <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
                   <Checkbox 
                     id="canRotate" 
@@ -226,10 +226,10 @@ export default function AdminPage() {
             <div className="space-y-2">
               <h3 className="text-sm font-bold text-slate-500 px-1 text-right">قائمة الموظفين</h3>
               {employees?.map(emp => (
-                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
-                  <div className="flex items-center gap-3 flex-row-reverse">
+                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                  <div className="flex items-center gap-3">
                     <div className="flex flex-col text-right">
-                      <p className="font-bold flex items-center gap-2 flex-row-reverse">
+                      <p className="font-bold flex items-center gap-2">
                         {emp.name}
                         {emp.role === 'Supervisor' && <span className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0 rounded font-bold">مشرف</span>}
                         {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
@@ -260,14 +260,14 @@ export default function AdminPage() {
             <>
               <TabsContent value="menu" className="space-y-6">
                 <Card className="border-none shadow-sm bg-white">
-                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2 flex-row-reverse"><Plus className="h-4 w-4" /> إضافة صنف طعام</CardTitle></CardHeader>
+                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة صنف طعام</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6 text-right">
                     <div className="grid grid-cols-2 gap-3">
                       <Input placeholder="اسم الصنف" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="text-right" />
                       <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} className="text-right" />
                     </div>
                     <Select value={newItem.category} onValueChange={val => setNewItem({...newItem, category: val})}>
-                      <SelectTrigger className="w-full text-right flex-row-reverse">
+                      <SelectTrigger className="w-full text-right">
                         <SelectValue placeholder="الفئة" />
                       </SelectTrigger>
                       <SelectContent>
@@ -281,7 +281,7 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {menu?.map(item => (
-                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
                       <div className="text-right">
                         <p className="font-bold">{item.itemName}</p>
                         <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
@@ -301,9 +301,9 @@ export default function AdminPage() {
 
               <TabsContent value="departments" className="space-y-6">
                 <Card className="border-none shadow-sm bg-white">
-                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2 flex-row-reverse"><Plus className="h-4 w-4" /> إضافة قسم بنكي جديد</CardTitle></CardHeader>
+                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة قسم بنكي جديد</CardTitle></CardHeader>
                   <CardContent className="space-y-4 pt-6 text-right">
-                    <div className="flex gap-2 flex-row-reverse">
+                    <div className="flex gap-2">
                       <Input placeholder="اسم القسم" value={newDept} onChange={e => setNewDept(e.target.value)} className="text-right" />
                       <Button onClick={handleAddDept}>إضافة</Button>
                     </div>
@@ -311,7 +311,7 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {departments?.map(dept => (
-                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
                       <p className="font-bold">{dept.deptName}</p>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
@@ -349,21 +349,21 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <Label>القسم</Label>
                     <Select value={editingEntity.departmentId} onValueChange={id => setEditingEntity({...editingEntity, departmentId: id})}>
-                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
                       <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>الدور</Label>
                     <Select value={editingEntity.role} onValueChange={val => setEditingEntity({...editingEntity, role: val})}>
-                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Employee">موظف</SelectItem>
                         <SelectItem value="Supervisor">مشرف قسم</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center justify-between flex-row-reverse">
+                  <div className="flex items-center justify-between">
                     <Label htmlFor="editRotate">مكلف بالنزول</Label>
                     <Checkbox id="editRotate" checked={editingEntity.canRotate} onCheckedChange={checked => setEditingEntity({...editingEntity, canRotate: !!checked})} />
                   </div>
@@ -383,7 +383,7 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <Label>الفئة</Label>
                     <Select value={editingEntity.category} onValueChange={val => setEditingEntity({...editingEntity, category: val})}>
-                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="sandwich">سندوتشات</SelectItem>
                         <SelectItem value="drink">مشروبات</SelectItem>
