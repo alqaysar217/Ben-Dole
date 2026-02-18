@@ -66,7 +66,7 @@ export function TopNav() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] p-0 flex flex-col h-full border-none rounded-l-[32px] premium-shadow overflow-hidden bg-[#F4F6FA]">
             {/* الهيدر المدمج */}
-            <div className="p-8 bg-premium-gradient text-white relative overflow-hidden">
+            <div className="p-8 bg-premium-gradient text-white relative overflow-hidden shrink-0">
               <div className="absolute inset-0 bg-waves opacity-10" />
               <SheetHeader className="text-right relative z-10">
                 <SheetTitle className="text-xl font-black text-white font-headline">
@@ -121,19 +121,37 @@ export function TopNav() {
               )}
             </div>
 
-            {/* قسم المطور المصغر في الأسفل */}
-            <div className="p-4 bg-white/40 border-t border-white/50">
-              <div className="flex items-center justify-between bg-white p-3 rounded-2xl premium-shadow border border-white">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-slate-800">م/ محمود الحساني</span>
-                  <span className="text-[8px] font-bold text-primary uppercase tracking-widest opacity-60">Software Engineer</span>
+            {/* قسم المطور المطور في الأسفل */}
+            <div className="p-6 bg-white/60 border-t border-white/50 mt-auto">
+              <div className="flex flex-col gap-4 bg-white p-5 rounded-[24px] premium-shadow border border-white relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full -mr-10 -mt-10 blur-2xl" />
+                
+                <div className="flex items-center justify-between relative z-10">
+                  <div className="flex flex-col text-right">
+                    <span className="text-sm font-black text-slate-800 font-headline">م/ محمود الحساني</span>
+                    <span className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] opacity-60">Software Engineer</span>
+                  </div>
+                  <div className="bg-slate-50 p-2.5 rounded-2xl">
+                    <User className="h-5 w-5 text-slate-400" strokeWidth={1.5} />
+                  </div>
                 </div>
-                <div className="flex gap-1.5">
-                  <Link href="https://wa.me/967775258830" target="_blank" className="p-2 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
-                    <MessageCircle className="h-3.5 w-3.5" />
+
+                <div className="flex gap-2 relative z-10">
+                  <Link 
+                    href="https://wa.me/967775258830" 
+                    target="_blank" 
+                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 transition-all font-bold text-[10px]"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    واتساب
                   </Link>
-                  <Link href="https://instagram.com/mahmoud_codes" target="_blank" className="p-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
-                    <Instagram className="h-3.5 w-3.5" />
+                  <Link 
+                    href="https://instagram.com/mahmoud_codes" 
+                    target="_blank" 
+                    className="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-all font-bold text-[10px]"
+                  >
+                    <Instagram className="h-4 w-4" />
+                    انستقرام
                   </Link>
                 </div>
               </div>
