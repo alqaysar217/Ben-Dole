@@ -14,11 +14,11 @@ export default function LandingPage() {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // إخفاء شاشة الترحيب بعد 2 ثانية
+    // إخفاء شاشة الترحيب بعد 2.5 ثانية لإعطاء شعور بالتطبيق الأصلي
     const timer = setTimeout(() => {
       setFadeOut(true);
-      setTimeout(() => setShowSplash(false), 500); // وقت إضافي لتأثير التلاشي
-    }, 2000);
+      setTimeout(() => setShowSplash(false), 500);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -26,34 +26,37 @@ export default function LandingPage() {
   if (showSplash) {
     return (
       <div className={cn(
-        "fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white transition-opacity duration-500",
+        "fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white transition-opacity duration-700 ease-in-out",
         fadeOut ? "opacity-0" : "opacity-100"
       )}>
         <div className="relative">
-          <div className="absolute -inset-4 bg-primary/5 rounded-full animate-ping" />
-          <div className="relative bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 animate-bounce">
+          <div className="absolute -inset-8 bg-primary/10 rounded-full animate-ping duration-1000" />
+          <div className="relative bg-white p-6 rounded-[2.5rem] shadow-2xl border border-slate-50 transform transition-transform duration-500 hover:scale-105">
             <Image 
-              src="https://picsum.photos/seed/banklogo/200/200" 
+              src="https://picsum.photos/seed/banklogo/256/256" 
               alt="Bank Logo" 
-              width={100} 
-              height={100} 
-              className="rounded-2xl"
+              width={120} 
+              height={120} 
+              className="rounded-[1.5rem]"
               priority
               data-ai-hint="bank logo"
             />
           </div>
         </div>
         
-        <div className="mt-8 text-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-          <h1 className="text-3xl font-black text-primary font-headline">طلبات البنك</h1>
-          <div className="flex items-center justify-center gap-2 text-slate-400">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <p className="text-sm font-medium">جاري تجهيز طلبك...</p>
+        <div className="mt-12 text-center space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-black text-primary font-headline tracking-tighter">طلبات البنك</h1>
+            <p className="text-slate-400 text-sm font-medium">نظام التدوير الذكي v2.0</p>
+          </div>
+          <div className="flex items-center justify-center gap-3 bg-slate-50 px-4 py-2 rounded-full w-fit mx-auto border border-slate-100">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">جاري التحميل</p>
           </div>
         </div>
 
         <div className="absolute bottom-12 text-center">
-          <p className="text-xs text-slate-300 font-bold tracking-widest uppercase">مرحباً بك في نظامنا الذكي</p>
+          <p className="text-[10px] text-slate-300 font-black tracking-[0.2em] uppercase">Powered by SmartRotation™</p>
         </div>
       </div>
     );
