@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, RefreshCcw, UserCog } from "lucide-react";
+import { Trash2, Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, RefreshCcw, UserCog, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { 
@@ -23,6 +23,13 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function AdminPage() {
   const db = useFirestore();
@@ -45,6 +52,10 @@ export default function AdminPage() {
   const [newItem, setNewItem] = useState({ name: "", price: "", category: "sandwich" });
   const [newDept, setNewDept] = useState("");
   const [newEmp, setNewEmp] = useState({ name: "", phone: "", deptId: "", role: "Employee", canRotate: true });
+
+  // Edit States
+  const [editingEntity, setEditingEntity] = useState<any>(null);
+  const [editType, setEditType] = useState<"employee" | "menu" | "department" | null>(null);
 
   const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
   const { data: menu } = useCollection(menuQuery);
@@ -83,7 +94,6 @@ export default function AdminPage() {
       return;
     }
 
-    // للمشرف: الدور دائماً موظف. للمدير: حسب الاختيار.
     const roleToSave = isAdmin ? newEmp.role : "Employee";
 
     addDocumentNonBlocking(collection(db, "employees"), {
@@ -105,23 +115,55 @@ export default function AdminPage() {
       toast({ title: "صلاحية مرفوضة", description: "فقط مدير التطبيق يمكنه حذف السجلات", variant: "destructive" });
       return;
     }
+    if (!confirm("هل أنت متأكد من عملية الحذف؟")) return;
     deleteDocumentNonBlocking(doc(db, col, id));
     toast({ title: "تم الحذف", description: "تمت إزالة السجل بنجاح" });
   };
 
-  const toggleRotation = (emp: any) => {
-    if (!isAdmin) {
-      toast({ title: "صلاحية مرفوضة", description: "فقط مدير التطبيق يمكنه تعديل حالة التدوير", variant: "destructive" });
-      return;
-    }
-    updateDocumentNonBlocking(doc(db, "employees", emp.id), { canRotate: !emp.canRotate });
+  const startEdit = (entity: any, type: "employee" | "menu" | "department") => {
+    if (!isAdmin) return;
+    setEditingEntity({ ...entity });
+    setEditType(type);
   };
 
-  const toggleRole = (emp: any) => {
+  const handleUpdate = () => {
+    if (!isAdmin || !editingEntity || !editType) return;
+
+    let collectionName = "";
+    let dataToUpdate = {};
+
+    if (editType === "employee") {
+      collectionName = "employees";
+      dataToUpdate = {
+        name: editingEntity.name,
+        phone: editingEntity.phone,
+        departmentId: editingEntity.departmentId,
+        role: editingEntity.role,
+        canRotate: editingEntity.canRotate
+      };
+    } else if (editType === "menu") {
+      collectionName = "menu_items";
+      dataToUpdate = {
+        itemName: editingEntity.itemName,
+        price: parseInt(editingEntity.price),
+        category: editingEntity.category
+      };
+    } else if (editType === "department") {
+      collectionName = "departments";
+      dataToUpdate = {
+        deptName: editingEntity.deptName
+      };
+    }
+
+    updateDocumentNonBlocking(doc(db, collectionName, editingEntity.id), dataToUpdate);
+    setEditingEntity(null);
+    setEditType(null);
+    toast({ title: "تم التحديث", description: "تم حفظ التعديلات بنجاح" });
+  };
+
+  const toggleRotation = (emp: any) => {
     if (!isAdmin) return;
-    const nextRole = emp.role === "Supervisor" ? "Employee" : "Supervisor";
-    updateDocumentNonBlocking(doc(db, "employees", emp.id), { role: nextRole });
-    toast({ title: "تم التغيير", description: `تم تغيير دور ${emp.name} إلى ${nextRole === 'Supervisor' ? 'مشرف' : 'موظف'}` });
+    updateDocumentNonBlocking(doc(db, "employees", emp.id), { canRotate: !emp.canRotate });
   };
 
   return (
@@ -197,7 +239,7 @@ export default function AdminPage() {
                     <div className="flex flex-col">
                       <p className="font-bold flex items-center gap-2">
                         {emp.name}
-                        {emp.role === 'Supervisor' && <Badge variant="secondary" className="text-[8px] bg-blue-100 text-blue-700">مشرف</Badge>}
+                        {emp.role === 'Supervisor' && <Badge className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0">مشرف</Badge>}
                         {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
                       </p>
                       <p className="text-[10px] text-slate-500">
@@ -208,13 +250,10 @@ export default function AdminPage() {
                   <div className="flex gap-1">
                     {isAdmin && (
                       <>
-                        <Button variant="ghost" size="icon" onClick={() => toggleRole(emp)} title="تغيير الدور" className="text-blue-600">
-                          <UserCog className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(emp, "employee")} title="تعديل">
+                          <Pencil className="h-4 w-4 text-blue-600" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => toggleRotation(emp)} className={emp.canRotate ? "text-green-600" : "text-slate-400"} title="تبديل حالة النزول">
-                          <RefreshCcw className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("employees", emp.id)} title="حذف الموظف">
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("employees", emp.id)} title="حذف">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </>
@@ -255,7 +294,12 @@ export default function AdminPage() {
                         <p className="font-bold">{item.itemName}</p>
                         <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
                       </div>
-                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("menu_items", item.id)}><Trash2 className="h-4 w-4" /></Button>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(item, "menu")} title="تعديل">
+                          <Pencil className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("menu_items", item.id)} title="حذف"><Trash2 className="h-4 w-4" /></Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -275,7 +319,12 @@ export default function AdminPage() {
                   {departments?.map(dept => (
                     <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
                       <p className="font-bold">{dept.deptName}</p>
-                      <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("departments", dept.id)}><Trash2 className="h-4 w-4" /></Button>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
+                          <Pencil className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("departments", dept.id)} title="حذف"><Trash2 className="h-4 w-4" /></Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -283,15 +332,93 @@ export default function AdminPage() {
             </>
           )}
         </Tabs>
+
+        {/* نافذة التعديل المنبثقة */}
+        <Dialog open={!!editingEntity} onOpenChange={(open) => !open && setEditingEntity(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-right">تعديل البيانات</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              {editType === "employee" && editingEntity && (
+                <>
+                  <div className="space-y-2">
+                    <Label>الاسم</Label>
+                    <Input value={editingEntity.name} onChange={e => setEditingEntity({...editingEntity, name: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>الهاتف</Label>
+                    <Input value={editingEntity.phone} onChange={e => setEditingEntity({...editingEntity, phone: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>القسم</Label>
+                    <Select value={editingEntity.departmentId} onValueChange={id => setEditingEntity({...editingEntity, departmentId: id})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>الدور</Label>
+                    <Select value={editingEntity.role} onValueChange={val => setEditingEntity({...editingEntity, role: val})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Employee">موظف</SelectItem>
+                        <SelectItem value="Supervisor">مشرف قسم</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <Checkbox id="editRotate" checked={editingEntity.canRotate} onCheckedChange={checked => setEditingEntity({...editingEntity, canRotate: !!checked})} />
+                    <Label htmlFor="editRotate">مكلف بالنزول</Label>
+                  </div>
+                </>
+              )}
+
+              {editType === "menu" && editingEntity && (
+                <>
+                  <div className="space-y-2">
+                    <Label>اسم الصنف</Label>
+                    <Input value={editingEntity.itemName} onChange={e => setEditingEntity({...editingEntity, itemName: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>السعر</Label>
+                    <Input type="number" value={editingEntity.price} onChange={e => setEditingEntity({...editingEntity, price: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>الفئة</Label>
+                    <Select value={editingEntity.category} onValueChange={val => setEditingEntity({...editingEntity, category: val})}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="sandwich">سندوتشات</SelectItem>
+                        <SelectItem value="drink">مشروبات</SelectItem>
+                        <SelectItem value="add-on">إضافات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
+
+              {editType === "department" && editingEntity && (
+                <div className="space-y-2">
+                  <Label>اسم القسم</Label>
+                  <Input value={editingEntity.deptName} onChange={e => setEditingEntity({...editingEntity, deptName: e.target.value})} />
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button className="w-full" onClick={handleUpdate}>حفظ التعديلات</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
       <BottomNav />
     </div>
   );
 }
 
-function Badge({ children, variant, className }: { children: React.ReactNode, variant?: string, className?: string }) {
+function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
-    <span className={`px-1.5 py-0.5 rounded text-white font-bold ${className}`}>
+    <span className={`px-1.5 py-0.5 rounded font-bold ${className}`}>
       {children}
     </span>
   );
