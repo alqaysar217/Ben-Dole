@@ -18,28 +18,32 @@ export default function RotationPage() {
   const { user, isUserLoading } = useUser();
   const { toast } = useToast();
 
-  // Ensure user is signed in anonymously before data hooks fire to satisfy rules context
+  // Ensure user is signed in anonymously before data hooks fire
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
-  // Real-time Data - Wait for auth check AND user to be present
+  // Wait for auth check AND user to be present
   const ready = !isUserLoading && !!user;
 
   const empsQuery = useMemoFirebase(() => {
     if (!ready) return null;
-    return query(
-      collection(db, "employees"), 
-      where("canRotate", "==", true), 
-      orderBy("rotationPriority", "asc")
-    );
+    // Simplified query for robustness against permission/indexing errors
+    return query(collection(db, "employees"), where("canRotate", "==", true));
   }, [db, ready]);
   
-  const { data: eligibleEmployees } = useCollection(empsQuery);
+  const { data: rotationEmployees } = useCollection(empsQuery);
 
-  const currentPerson = eligibleEmployees?.find(e => !e.isDone);
+  const sortedEmployees = useMemo(() => {
+    if (!rotationEmployees) return [];
+    return [...rotationEmployees].sort((a, b) => (a.rotationPriority || 0) - (b.rotationPriority || 0));
+  }, [rotationEmployees]);
+
+  const currentPerson = useMemo(() => {
+    return sortedEmployees.find(e => !e.isDone);
+  }, [sortedEmployees]);
 
   const handleDone = (employee: any) => {
     updateDocumentNonBlocking(doc(db, "employees", employee.id), { isDone: true });
@@ -47,15 +51,15 @@ export default function RotationPage() {
   };
 
   const handleSkip = (employee: any) => {
-    if (!eligibleEmployees) return;
-    const maxPriority = Math.max(...eligibleEmployees.map(e => e.rotationPriority || 0));
+    if (!rotationEmployees) return;
+    const maxPriority = Math.max(...rotationEmployees.map(e => e.rotationPriority || 0));
     updateDocumentNonBlocking(doc(db, "employees", employee.id), { rotationPriority: maxPriority + 1 });
     toast({ title: "تم التخطي", description: "تم نقل المهمة للموظف التالي" });
   };
 
   const handleReset = () => {
-    if (!eligibleEmployees) return;
-    eligibleEmployees.forEach(emp => {
+    if (!rotationEmployees) return;
+    rotationEmployees.forEach(emp => {
       updateDocumentNonBlocking(doc(db, "employees", emp.id), { isDone: false });
     });
     toast({ title: "تم التصفير", description: "تمت إعادة تعيين الدورة" });
@@ -76,11 +80,11 @@ export default function RotationPage() {
         </div>
 
         <div className="space-y-3">
-          {!eligibleEmployees && ready && (
+          {!rotationEmployees && ready && (
             <div className="text-center py-10 text-slate-400">جاري تحميل قائمة التدوير...</div>
           )}
           
-          {eligibleEmployees?.map((emp, idx) => {
+          {sortedEmployees.map((emp, idx) => {
             const isToday = currentPerson?.id === emp.id;
             const isDone = emp.isDone;
             

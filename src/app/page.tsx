@@ -29,14 +29,14 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
 
-  // Ensure user is signed in anonymously before data hooks fire to satisfy rules context
+  // Ensure user is signed in anonymously before data hooks fire
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
-  // Real-time Data - Wait for auth check AND the user to be present (even if anonymous)
+  // Wait for auth to be fully ready
   const ready = !isUserLoading && !!user;
 
   const deptsQuery = useMemoFirebase(() => 
@@ -53,17 +53,18 @@ export default function Home() {
     ready ? collection(db, "menu_items") : null, [db, ready]);
   const { data: menu } = useCollection(menuQuery);
 
-  // Rotation logic - Current assigned person
+  // Simplified rotation query to prevent indexing/permission race conditions
   const rotationQuery = useMemoFirebase(() => 
-    ready ? query(
-      collection(db, "employees"), 
-      where("canRotate", "==", true),
-      where("isDone", "==", false),
-      orderBy("rotationPriority", "asc")
-    ) : null, [db, ready]);
-  const { data: rotationList } = useCollection(rotationQuery);
+    ready ? query(collection(db, "employees"), where("canRotate", "==", true)) : null, [db, ready]);
+  const { data: allRotationEmployees } = useCollection(rotationQuery);
 
-  const assignedPerson = rotationList?.[0]?.name || "جاري التحميل...";
+  const assignedPerson = useMemo(() => {
+    if (!allRotationEmployees) return "جاري التحميل...";
+    const pending = allRotationEmployees
+      .filter(e => !e.isDone)
+      .sort((a, b) => (a.rotationPriority || 0) - (b.rotationPriority || 0));
+    return pending[0]?.name || "الكل مكتمل اليوم";
+  }, [allRotationEmployees]);
 
   const filteredMenu = useMemo(() => {
     if (!menu) return [];
