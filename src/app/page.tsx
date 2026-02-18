@@ -36,8 +36,8 @@ export default function Home() {
     }
   }, [user, isUserLoading, auth]);
 
-  // Real-time Data - We wait for the auth check to finish before querying
-  const ready = !isUserLoading;
+  // Real-time Data - Wait for auth check AND the user to be present (even if anonymous)
+  const ready = !isUserLoading && !!user;
 
   const deptsQuery = useMemoFirebase(() => 
     ready ? collection(db, "departments") : null, [db, ready]);

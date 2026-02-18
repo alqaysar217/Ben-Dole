@@ -25,8 +25,8 @@ export default function RotationPage() {
     }
   }, [user, isUserLoading, auth]);
 
-  // Real-time Data - Wait for auth check to finish before querying
-  const ready = !isUserLoading;
+  // Real-time Data - Wait for auth check AND user to be present
+  const ready = !isUserLoading && !!user;
 
   const empsQuery = useMemoFirebase(() => {
     if (!ready) return null;
