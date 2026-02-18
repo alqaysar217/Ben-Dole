@@ -178,7 +178,7 @@ export default function OrdersPage() {
 
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-4">
-          <div className="flex items-center justify-between flex-row-reverse">
+          <div className="flex items-center justify-between">
             <div className="text-right">
               <h1 className="text-xl font-bold text-primary flex items-center gap-2">
                 <ReceiptText className="h-5 w-5" />
