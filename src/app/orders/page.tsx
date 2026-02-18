@@ -221,7 +221,7 @@ export default function OrdersPage() {
                   className="w-full gap-2 font-bold bg-primary shadow-lg shadow-primary/20 h-12 rounded-xl transition-transform active:scale-95"
                 >
                   <Copy className="h-4 w-4" />
-                  نسخ ملخص طلبات اليوم للواتساب
+                  نسخ ملخص طلبات اليوم
                 </Button>
               )}
 
