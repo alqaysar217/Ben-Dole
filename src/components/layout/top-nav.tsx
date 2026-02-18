@@ -1,8 +1,10 @@
+
 "use client";
 
-import { UserCircle, LogOut } from "lucide-react";
+import { UserCircle, LogOut, ShieldCheck, UserCog, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth } from "@/firebase";
+import { useUIStore } from "@/lib/store";
 import { signOut } from "firebase/auth";
 import { 
   DropdownMenu, 
@@ -16,10 +18,24 @@ import Image from "next/image";
 
 export function TopNav() {
   const { user } = useUser();
+  const { userRole, setUserRole } = useUIStore();
   const auth = useAuth();
 
   const handleLogout = () => {
     signOut(auth);
+    setUserRole(null);
+  };
+
+  const getRoleIcon = () => {
+    if (userRole === "ADMIN") return <ShieldCheck className="h-4 w-4 text-primary" />;
+    if (userRole === "SUPERVISOR") return <UserCog className="h-4 w-4 text-blue-500" />;
+    return <User className="h-4 w-4 text-slate-400" />;
+  };
+
+  const getRoleLabel = () => {
+    if (userRole === "ADMIN") return "مدير النظام";
+    if (userRole === "SUPERVISOR") return "مشرف قسم";
+    return "موظف / زائر";
   };
 
   return (
@@ -41,15 +57,20 @@ export function TopNav() {
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-100">
-              <UserCircle className="h-6 w-6 text-slate-500" />
+            <Button variant="ghost" size="sm" className="gap-2 px-2 hover:bg-slate-100 rounded-full border border-slate-100">
+              {getRoleIcon()}
+              <span className="text-[10px] font-bold hidden sm:inline">{getRoleLabel()}</span>
+              <UserCircle className="h-5 w-5 text-slate-500" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
-              {user ? user.email?.split('@')[0] : "زائر"}
+              <div className="flex items-center gap-2">
+                {getRoleIcon()}
+                <span>{getRoleLabel()}</span>
+              </div>
               <div className="text-[10px] font-normal text-slate-500 mt-1">
-                {user ? "مشرف" : "موظف"}
+                {user?.email || "غير مسجل"}
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
@@ -61,7 +82,7 @@ export function TopNav() {
             )}
             {!user && (
               <DropdownMenuItem onClick={() => window.location.href = '/login'} className="font-bold text-primary">
-                دخول المشرفين
+                دخول الإدارة
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

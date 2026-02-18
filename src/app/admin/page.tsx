@@ -5,22 +5,37 @@ import { useState, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
-import { collection, doc, query, getDocs, writeBatch } from "firebase/firestore";
+import { useUIStore } from "@/lib/store";
+import { collection, doc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, Settings2, ShieldCheck, Database, Users, Building2, UtensilsCrossed } from "lucide-react";
+import { Trash2, Plus, ShieldCheck, Database, Users, Building2, UtensilsCrossed, UserPlus, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 export default function AdminPage() {
   const db = useFirestore();
   const { user, isUserLoading } = useUser();
+  const { userRole } = useUIStore();
   const { toast } = useToast();
   const router = useRouter();
 
+  const isAdmin = userRole === "ADMIN";
+  const isSupervisor = userRole === "SUPERVISOR";
+
+  // Form States
   const [newItem, setNewItem] = useState({ name: "", price: "", category: "sandwiches" });
+  const [newDept, setNewDept] = useState("");
+  const [newEmp, setNewEmp] = useState({ name: "", phone: "", deptId: "", role: "Employee", canRotate: true });
 
   const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
   const { data: menu } = useCollection(menuQuery);
@@ -41,235 +56,156 @@ export default function AdminPage() {
 
   const handleAddItem = () => {
     if (!newItem.name || !newItem.price) return;
-    
     addDocumentNonBlocking(collection(db, "menu_items"), {
       itemName: newItem.name,
       price: parseInt(newItem.price),
       category: newItem.category
     });
-
     setNewItem({ ...newItem, name: "", price: "" });
-    toast({ title: "تمت الإضافة", description: "تمت إضافة الصنف الجديد للقائمة" });
+    toast({ title: "تم الحفظ", description: "تمت إضافة الصنف الجديد" });
   };
 
-  const handleRemoveItem = (id: string) => {
-    deleteDocumentNonBlocking(doc(db, "menu_items", id));
-    toast({ title: "تم الحذف", description: "تمت إزالة الصنف من القائمة" });
+  const handleAddDept = () => {
+    if (!newDept) return;
+    addDocumentNonBlocking(collection(db, "departments"), { deptName: newDept });
+    setNewDept("");
+    toast({ title: "تم الحفظ", description: "تمت إضافة القسم الجديد" });
   };
 
-  const seedFullSystem = async () => {
-    try {
-      // 1. Seed Menu Items
-      const initialItems = [
-        { itemName: "شيبس (بطاطس)", price: 400, category: "sandwiches" },
-        { itemName: "بيض مسلوق", price: 600, category: "sandwiches" },
-        { itemName: "مربى بالجبن", price: 700, category: "sandwiches" },
-        { itemName: "ليمون نعناع", price: 500, category: "drinks" },
-        { itemName: "ماء معدني", price: 200, category: "drinks" },
-        { itemName: "شطة حارة", price: 100, category: "add-ons" }
-      ];
-
-      for (const item of initialItems) {
-        if (!menu?.find(m => m.itemName === item.itemName)) {
-          addDocumentNonBlocking(collection(db, "menu_items"), item);
-        }
-      }
-
-      // 2. Seed Departments
-      const initialDepts = [
-        { id: "dept_it", deptName: "تقنية المعلومات" },
-        { id: "dept_ops", deptName: "العمليات المصرفية" },
-        { id: "dept_cs", deptName: "خدمة العملاء" }
-      ];
-
-      for (const dept of initialDepts) {
-        if (!departments?.find(d => d.deptName === dept.deptName)) {
-          addDocumentNonBlocking(collection(db, "departments"), { deptName: dept.deptName });
-        }
-      }
-
-      // 3. Seed some Employees (Wait for depts to be available or use dummy logic)
-      toast({ title: "جاري التهيئة", description: "يتم الآن إعداد الأقسام والأصناف..." });
-
-      // Note: For a real demo, we'd wait for IDs, but for MVP we'll just seed basic structure.
-      // If departments are already there, we can map employees to the first one found.
-      if (departments && departments.length > 0) {
-        const firstDeptId = departments[0].id;
-        const initialEmps = [
-          { name: "أحمد محمد (مدير)", phone: "775258830", departmentId: firstDeptId, role: "Admin", canRotate: true, isDone: false, rotationPriority: 1 },
-          { name: "خالد علوي (مشرف)", phone: "771234567", departmentId: firstDeptId, role: "Supervisor", canRotate: true, isDone: false, rotationPriority: 2 },
-          { name: "سعيد صالح (موظف)", phone: "770000000", departmentId: firstDeptId, role: "Employee", canRotate: true, isDone: false, rotationPriority: 3 }
-        ];
-
-        for (const emp of initialEmps) {
-          if (!employees?.find(e => e.name === emp.name)) {
-            addDocumentNonBlocking(collection(db, "employees"), emp);
-          }
-        }
-      }
-
-      toast({ title: "تمت التهيئة بنجاح", description: "النظام جاهز الآن للاختبار بكافة الأدوار" });
-    } catch (err) {
-      toast({ title: "خطأ", description: "فشل في تهيئة البيانات", variant: "destructive" });
+  const handleAddEmp = () => {
+    if (!newEmp.name || !newEmp.phone || !newEmp.deptId) {
+      toast({ title: "خطأ", description: "يرجى إكمال بيانات الموظف", variant: "destructive" });
+      return;
     }
+    addDocumentNonBlocking(collection(db, "employees"), {
+      name: newEmp.name,
+      phone: newEmp.phone,
+      departmentId: newEmp.deptId,
+      role: newEmp.role,
+      canRotate: newEmp.canRotate,
+      isDone: false,
+      rotationPriority: employees ? employees.length + 1 : 1
+    });
+    setNewEmp({ ...newEmp, name: "", phone: "" });
+    toast({ title: "تم الحفظ", description: "تمت إضافة الموظف بنجاح" });
+  };
+
+  const handleDelete = (col: string, id: string) => {
+    if (!isAdmin) {
+      toast({ title: "صلاحية مرفوضة", description: "فقط مدير النظام يمكنه الحذف", variant: "destructive" });
+      return;
+    }
+    deleteDocumentNonBlocking(doc(db, col, id));
+    toast({ title: "تم الحذف", description: "تمت إزالة السجل بنجاح" });
   };
 
   return (
     <div className="pt-14 pb-20">
       <TopNav />
-
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-8 w-8 text-primary" />
-            <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
+            <div>
+              <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
+              <p className="text-[10px] text-slate-500">{isAdmin ? "صلاحية: مدير نظام" : "صلاحية: مشرف قسم"}</p>
+            </div>
           </div>
-          <Button variant="outline" size="sm" onClick={seedFullSystem} className="text-xs bg-white shadow-sm border-primary/20 hover:bg-primary/5">
-            <Database className="h-4 w-4 ml-2 text-primary" />
-            تهيئة النظام بالكامل
-          </Button>
         </div>
 
-        <Tabs defaultValue="menu" className="w-full">
+        <Tabs defaultValue={isAdmin ? "menu" : "employees"} className="w-full">
           <TabsList className="w-full bg-slate-100 p-1 mb-6">
-            <TabsTrigger value="menu" className="flex-1 gap-2">
-              <UtensilsCrossed className="h-4 w-4" /> القائمة
-            </TabsTrigger>
-            <TabsTrigger value="employees" className="flex-1 gap-2">
-              <Users className="h-4 w-4" /> الموظفين
-            </TabsTrigger>
-            <TabsTrigger value="departments" className="flex-1 gap-2">
-              <Building2 className="h-4 w-4" /> الأقسام
-            </TabsTrigger>
+            {isAdmin && <TabsTrigger value="menu" className="flex-1 gap-2"><UtensilsCrossed className="h-4 w-4" /> الأصناف</TabsTrigger>}
+            <TabsTrigger value="employees" className="flex-1 gap-2"><Users className="h-4 w-4" /> الموظفين</TabsTrigger>
+            {isAdmin && <TabsTrigger value="departments" className="flex-1 gap-2"><Building2 className="h-4 w-4" /> الأقسام</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value="menu" className="space-y-6">
-            <Card className="border-none shadow-sm bg-white overflow-hidden">
-              <CardHeader className="bg-slate-50 border-b pb-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Plus className="h-5 w-5 text-primary" /> إضافة صنف جديد
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 mr-1">اسم الصنف</label>
-                    <Input 
-                      placeholder="مثلاً: كبدة" 
-                      value={newItem.name} 
-                      onChange={e => setNewItem({...newItem, name: e.target.value})}
-                      className="bg-slate-50 border-slate-200"
-                    />
+          {isAdmin && (
+            <TabsContent value="menu" className="space-y-6">
+              <Card className="border-none shadow-sm bg-white">
+                <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة صنف طعام</CardTitle></CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Input placeholder="اسم الصنف" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} />
+                    <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-500 mr-1">السعر (ريال)</label>
-                    <Input 
-                      placeholder="800" 
-                      type="number"
-                      value={newItem.price} 
-                      onChange={e => setNewItem({...newItem, price: e.target.value})}
-                      className="bg-slate-50 border-slate-200"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {["sandwiches", "add-ons", "drinks"].map(cat => (
-                    <Button 
-                      key={cat}
-                      size="sm"
-                      variant={newItem.category === cat ? "default" : "outline"}
-                      className="flex-1 text-xs"
-                      onClick={() => setNewItem({...newItem, category: cat})}
-                    >
-                      {cat === "sandwiches" ? "سندويتشات" : cat === "add-ons" ? "إضافات" : "مشروبات"}
-                    </Button>
-                  ))}
-                </div>
-                <Button className="w-full font-bold h-11" onClick={handleAddItem}>
-                  <Plus className="h-4 w-4 ml-2" />
-                  حفظ الصنف
-                </Button>
-              </CardContent>
-            </Card>
-
-            <div className="space-y-4">
-              <h2 className="font-bold text-slate-700 px-1">الأصناف الحالية</h2>
-              <div className="grid grid-cols-1 gap-3">
+                  <Button className="w-full font-bold" onClick={handleAddItem}>حفظ الصنف</Button>
+                </CardContent>
+              </Card>
+              <div className="space-y-2">
                 {menu?.map(item => (
-                  <Card key={item.id} className="border-none shadow-sm bg-white">
-                    <CardContent className="p-3 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-primary/5 p-2 rounded-lg">
-                          <UtensilsCrossed className="h-5 w-5 text-primary/60" />
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-slate-700">{item.itemName}</h3>
-                          <p className="text-primary font-headline font-bold text-sm">{item.price.toLocaleString()} ريال</p>
-                        </div>
-                      </div>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="text-destructive hover:bg-destructive/5"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                    <div><p className="font-bold">{item.itemName}</p><p className="text-xs text-primary">{item.price} ريال</p></div>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("menu_items", item.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
                 ))}
               </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
+          )}
 
-          <TabsContent value="employees">
-            <div className="space-y-4">
+          <TabsContent value="employees" className="space-y-6">
+            <Card className="border-none shadow-sm bg-white">
+              <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><UserPlus className="h-4 w-4" /> تسجيل موظف جديد</CardTitle></CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <Input placeholder="الاسم الكامل" value={newEmp.name} onChange={e => setNewEmp({...newEmp, name: e.target.value})} />
+                  <Input placeholder="رقم الهاتف" value={newEmp.phone} onChange={e => setNewEmp({...newEmp, phone: e.target.value})} />
+                </div>
+                <Select value={newEmp.deptId} onValueChange={id => setNewEmp({...newEmp, deptId: id})}>
+                  <SelectTrigger><SelectValue placeholder="اختر القسم" /></SelectTrigger>
+                  <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
+                </Select>
+                {isAdmin && (
+                  <Select value={newEmp.role} onValueChange={role => setNewEmp({...newEmp, role: role as any})}>
+                    <SelectTrigger><SelectValue placeholder="الدور" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Employee">موظف</SelectItem>
+                      <SelectItem value="Supervisor">مشرف قسم</SelectItem>
+                      <SelectItem value="Admin">مدير نظام</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                <Button className="w-full font-bold" onClick={handleAddEmp}><Save className="h-4 w-4 ml-2" /> حفظ الموظف</Button>
+              </CardContent>
+            </Card>
+            <div className="space-y-2">
               {employees?.map(emp => (
-                <Card key={emp.id} className="border-none shadow-sm bg-white">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-green-50 p-2 rounded-lg">
-                        <Users className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-slate-800">{emp.name}</h3>
-                        <p className="text-xs text-slate-500">{emp.role} • {emp.phone}</p>
-                      </div>
-                    </div>
-                    <Button variant="ghost" size="icon" className="text-destructive">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
+                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                  <div>
+                    <p className="font-bold">{emp.name}</p>
+                    <p className="text-[10px] text-slate-500">
+                      {departments?.find(d => d.id === emp.departmentId)?.deptName || "بدون قسم"} • {emp.role}
+                    </p>
+                  </div>
+                  {isAdmin && <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("employees", emp.id)}><Trash2 className="h-4 w-4" /></Button>}
+                </div>
               ))}
-              {(!employees || employees.length === 0) && (
-                <div className="text-center py-10 text-slate-400">لا يوجد موظفون، استخدم زر التهيئة أعلاه</div>
-              )}
             </div>
           </TabsContent>
 
-          <TabsContent value="departments">
-            <div className="space-y-4">
-              {departments?.map(dept => (
-                <Card key={dept.id} className="border-none shadow-sm bg-white">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-blue-50 p-2 rounded-lg">
-                        <Building2 className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <h3 className="font-bold text-slate-800">{dept.deptName}</h3>
-                    </div>
-                    <Button variant="ghost" size="icon" className="text-destructive">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent value="departments" className="space-y-6">
+              <Card className="border-none shadow-sm bg-white">
+                <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة قسم بنكي جديد</CardTitle></CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <div className="flex gap-2">
+                    <Input placeholder="اسم القسم" value={newDept} onChange={e => setNewDept(e.target.value)} />
+                    <Button onClick={handleAddDept}>إضافة</Button>
+                  </div>
+                </CardContent>
+              </Card>
+              <div className="space-y-2">
+                {departments?.map(dept => (
+                  <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                    <p className="font-bold">{dept.deptName}</p>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("departments", dept.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </main>
-
       <BottomNav />
     </div>
   );

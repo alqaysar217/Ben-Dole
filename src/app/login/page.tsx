@@ -5,50 +5,55 @@ import { useState } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useAuth } from "@/firebase";
+import { useUIStore } from "@/lib/store";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight, AlertCircle, Info } from "lucide-react";
+import { Lock, ArrowRight, Info, ShieldCheck, UserCog } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const auth = useAuth();
+  const { setUserRole } = useUIStore();
   const { toast } = useToast();
   const router = useRouter();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
     try {
-      // Map phone to email for Firebase Auth dummy email approach
-      // Format: 775258830 -> 775258830@bank.com
-      const email = `${phone.trim()}@bank.com`;
+      // Logic to distinguish between Admin and Supervisor accounts in Firebase Auth
+      // We assume two different email mappings for the same phone based on password provided
+      let emailSuffix = "sup";
+      let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
+
+      if (password === "adminha892019") {
+        emailSuffix = "admin";
+        role = "ADMIN";
+      }
+
+      const email = `${phone.trim()}_${emailSuffix}@bank.com`;
       await signInWithEmailAndPassword(auth, email, password);
-      toast({ title: "تم الدخول بنجاح", description: "أهلاً بك في نظام الإدارة" });
+      
+      setUserRole(role);
+      
+      toast({ 
+        title: role === "ADMIN" ? "مرحباً كمدير للنظام" : "مرحباً كمشرف قسم", 
+        description: "تم تسجيل الدخول بنجاح" 
+      });
+      
       router.push("/admin");
     } catch (err: any) {
-      console.error("Login error:", err);
-      let message = "يرجى التحقق من رقم الهاتف وكلمة المرور.";
-      
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
-        message = "بيانات الدخول غير موجودة. هل قمت بإضافة المستخدم في Firebase Console؟";
-      } else if (err.code === 'auth/wrong-password') {
-        message = "كلمة المرور خاطئة.";
-      }
-      
-      setError(message);
       toast({ 
         title: "خطأ في الدخول", 
-        description: message, 
+        description: "يرجى التأكد من صحة رقم الهاتف وكلمة المرور، وتأكد من إنشاء الحسابات في Firebase Console.", 
         variant: "destructive" 
       });
     } finally {
@@ -64,10 +69,10 @@ export default function LoginPage() {
           <div className="h-2 bg-primary w-full" />
           <CardHeader className="text-center space-y-2 pt-8">
             <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
-              <Lock className="h-8 w-8 text-primary" />
+              <ShieldCheck className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold text-primary">دخول المشرفين</CardTitle>
-            <p className="text-xs text-slate-500">لوحة التحكم وإدارة الطلبات والتدوير</p>
+            <CardTitle className="text-2xl font-bold text-primary">تسجيل الدخول</CardTitle>
+            <p className="text-xs text-slate-500">لوحة تحكم المدراء ومشرفي الأقسام</p>
           </CardHeader>
           <CardContent className="pb-8 space-y-4">
             
@@ -75,18 +80,11 @@ export default function LoginPage() {
               <Info className="h-4 w-4 text-blue-600" />
               <AlertTitle className="text-xs font-bold">تنبيه للمطور</AlertTitle>
               <AlertDescription className="text-[10px] leading-relaxed">
-                يجب إضافة المستخدم يدويًا في <b>Firebase Console</b> تحت قسم <b>Authentication</b> باستخدام البريد الإلكتروني: <br/>
-                <code className="bg-white px-1 rounded">775258830@bank.com</code>
+                يجب إنشاء حسابين في <b>Authentication</b>:<br/>
+                1. كمدير: <code className="bg-white px-1">775258830_admin@bank.com</code><br/>
+                2. كمشرف: <code className="bg-white px-1">775258830_sup@bank.com</code>
               </AlertDescription>
             </Alert>
-
-            {error && (
-              <Alert variant="destructive" className="text-xs">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>خطأ في الدخول</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
@@ -95,7 +93,7 @@ export default function LoginPage() {
                   type="text" 
                   value={phone} 
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="77XXXXXXX"
+                  placeholder="775258830"
                   required
                   className="bg-slate-50 border-slate-200 h-12 text-left"
                   dir="ltr"
