@@ -1,18 +1,69 @@
 
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, ShieldCheck, UserCog } from "lucide-react";
+import { User, ShieldCheck, UserCog, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    // إخفاء شاشة الترحيب بعد 2 ثانية
+    const timer = setTimeout(() => {
+      setFadeOut(true);
+      setTimeout(() => setShowSplash(false), 500); // وقت إضافي لتأثير التلاشي
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return (
+      <div className={cn(
+        "fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white transition-opacity duration-500",
+        fadeOut ? "opacity-0" : "opacity-100"
+      )}>
+        <div className="relative">
+          <div className="absolute -inset-4 bg-primary/5 rounded-full animate-ping" />
+          <div className="relative bg-white p-4 rounded-3xl shadow-2xl border border-slate-100 animate-bounce">
+            <Image 
+              src="https://picsum.photos/seed/banklogo/200/200" 
+              alt="Bank Logo" 
+              width={100} 
+              height={100} 
+              className="rounded-2xl"
+              priority
+              data-ai-hint="bank logo"
+            />
+          </div>
+        </div>
+        
+        <div className="mt-8 text-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <h1 className="text-3xl font-black text-primary font-headline">طلبات البنك</h1>
+          <div className="flex items-center justify-center gap-2 text-slate-400">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <p className="text-sm font-medium">جاري تجهيز طلبك...</p>
+          </div>
+        </div>
+
+        <div className="absolute bottom-12 text-center">
+          <p className="text-xs text-slate-300 font-bold tracking-widest uppercase">مرحباً بك في نظامنا الذكي</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 space-y-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 space-y-8 animate-in fade-in duration-700">
       {/* Logo & Welcome */}
       <div className="text-center space-y-4">
-        <div className="mx-auto bg-primary/10 p-2 rounded-3xl w-fit shadow-inner overflow-hidden">
+        <div className="mx-auto bg-primary/10 p-2 rounded-3xl w-fit shadow-inner overflow-hidden border border-white">
           <Image 
             src="https://picsum.photos/seed/banklogo/200/200" 
             alt="Logo" 
@@ -23,7 +74,10 @@ export default function LandingPage() {
           />
         </div>
         <div className="space-y-1">
-          <h1 className="text-4xl font-black text-primary tracking-tight font-headline">طلبات البنك</h1>
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="text-4xl font-black text-primary tracking-tight font-headline">طلبات البنك</h1>
+            <Sparkles className="h-6 w-6 text-yellow-500 animate-pulse" />
+          </div>
           <p className="text-slate-500 font-medium">نظام تدوير وتوصيل الطعام الذكي</p>
         </div>
       </div>
