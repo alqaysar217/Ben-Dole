@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, WifiOff, Lock, Smartphone, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, WifiOff, Lock, Smartphone, Loader2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -149,8 +149,8 @@ export default function LoginPage() {
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2 text-right">
-                <label className="text-[11px] font-black text-primary px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
-                  رقم الهاتف <Smartphone className="h-3.5 w-3.5" />
+                <label className="text-[11px] font-black text-primary px-1 uppercase tracking-widest flex items-center gap-2 justify-start">
+                  <Smartphone className="h-3.5 w-3.5" /> رقم الهاتف
                 </label>
                 <Input 
                   type="text" 
@@ -163,8 +163,8 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2 text-right">
-                <label className="text-[11px] font-black text-primary px-1 uppercase tracking-widest flex items-center gap-2 justify-end">
-                  كلمة المرور <Lock className="h-3.5 w-3.5" />
+                <label className="text-[11px] font-black text-primary px-1 uppercase tracking-widest flex items-center gap-2 justify-start">
+                  <Lock className="h-3.5 w-3.5" /> كلمة المرور
                 </label>
                 <Input 
                   type="password" 
@@ -184,7 +184,7 @@ export default function LoginPage() {
             <div className="pt-4 text-center">
               <Link href="/">
                 <Button variant="ghost" size="sm" className="text-slate-400 hover:text-primary transition-all rounded-full px-6">
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  <ArrowLeft className="h-4 w-4 ml-2" />
                   <span className="font-bold">العودة للرئيسية</span>
                 </Button>
               </Link>
