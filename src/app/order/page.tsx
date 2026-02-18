@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils, Sandwich, Coffee, Pizza } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils, Sandwich, Coffee, Pizza, Sparkles } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -22,9 +22,9 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
-  { id: "sandwich", label: "سندوتشات", icon: Sandwich },
-  { id: "drink", label: "مشروبات", icon: Coffee },
-  { id: "add-on", label: "إضافات", icon: Pizza }
+  { id: "sandwich", label: "سندوتشات", icon: Sandwich, color: "text-orange-500" },
+  { id: "drink", label: "مشروبات", icon: Coffee, color: "text-blue-500" },
+  { id: "add-on", label: "إضافات", icon: Pizza, color: "text-red-500" }
 ];
 
 export default function OrderPage() {
@@ -135,6 +135,12 @@ export default function OrderPage() {
     toast({ title: "تم بنجاح", description: "تم إرسال طلبك بنجاح" });
   };
 
+  const getCategoryIcon = (categoryId: string) => {
+    const cat = CATEGORIES.find(c => c.id === categoryId);
+    if (!cat) return Utensils;
+    return cat.icon;
+  };
+
   return (
     <div className="pt-14 pb-24">
       <TopNav />
@@ -143,7 +149,7 @@ export default function OrderPage() {
         <div className="flex flex-col items-center gap-1">
           <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">المكلف بالنزول وتوصيل الطلبات اليوم</p>
           <p className="text-xl font-black flex items-center justify-center gap-2">
-            <Utensils className="h-5 w-5" />
+            <Sparkles className="h-5 w-5 text-yellow-400 animate-pulse" />
             <span className="underline decoration-wavy decoration-2 underline-offset-4 font-headline">{assignedPerson}</span>
           </p>
         </div>
@@ -155,7 +161,7 @@ export default function OrderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold flex items-center gap-2 text-slate-500 px-1">
-                  <Building2 className="h-3.5 w-3.5" /> القسم البنكي
+                  <Building2 className="h-3.5 w-3.5 text-primary" /> القسم البنكي
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
                   <SelectTrigger className="w-full bg-slate-50 border-slate-200 h-11">
@@ -171,7 +177,7 @@ export default function OrderPage() {
 
               <div className="space-y-2">
                 <label className="text-xs font-bold flex items-center gap-2 text-slate-500 px-1">
-                  <User className="h-3.5 w-3.5" /> اسم الموظف
+                  <User className="h-3.5 w-3.5 text-primary" /> اسم الموظف
                 </label>
                 <Select 
                   value={selectedEmployeeId || ""} 
@@ -194,11 +200,14 @@ export default function OrderPage() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-lg font-bold text-slate-800">قائمة الطعام</h2>
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <Utensils className="h-5 w-5 text-primary" />
+              قائمة الطعام
+            </h2>
             <div className="relative w-40 sm:w-48">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input 
-                placeholder="بحث..." 
+                placeholder="بحث عن صنف..." 
                 className="pr-9 h-9 rounded-full bg-white border-slate-200 shadow-sm text-right text-xs"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -207,18 +216,17 @@ export default function OrderPage() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-12 bg-slate-100 p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-3 h-14 bg-slate-100 p-1 rounded-2xl">
               {CATEGORIES.map(cat => {
                 const Icon = cat.icon;
                 return (
                   <TabsTrigger 
                     key={cat.id} 
                     value={cat.id} 
-                    className="flex items-center gap-2 font-bold text-xs data-[state=active]:bg-white data-[state=active]:text-primary rounded-lg transition-all"
+                    className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 font-bold text-[10px] sm:text-xs data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-xl transition-all h-12"
                   >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{cat.label}</span>
-                    <span className="sm:hidden">{cat.label.slice(0, 6)}</span>
+                    <Icon className={`h-4 w-4 ${cat.color}`} />
+                    <span>{cat.label}</span>
                   </TabsTrigger>
                 );
               })}
@@ -232,38 +240,47 @@ export default function OrderPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-3">
-                    {filteredMenu.map((item) => (
-                      <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all active:scale-[0.98] bg-white group">
-                        <CardContent className="p-4 flex items-center justify-between">
-                          <div className="space-y-1">
-                            <h3 className="font-bold text-slate-800 group-hover:text-primary transition-colors">{item.itemName}</h3>
-                            <p className="text-primary font-bold text-sm">
-                              {item.price.toLocaleString()} ريال
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-4 bg-slate-50 p-1 rounded-full border border-slate-100">
-                            <Button 
-                              size="icon" 
-                              variant="ghost" 
-                              className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10"
-                              onClick={() => updateCart(item.id, -1)}
-                              disabled={!cart[item.id]}
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="w-4 text-center font-bold text-slate-700 text-sm">{cart[item.id] || 0}</span>
-                            <Button 
-                              size="icon" 
-                              variant="ghost" 
-                              className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
-                              onClick={() => updateCart(item.id, 1)}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                    {filteredMenu.map((item) => {
+                      const ItemIcon = getCategoryIcon(item.category);
+                      return (
+                        <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all active:scale-[0.98] bg-white group relative overflow-hidden">
+                          <div className={`absolute right-0 top-0 bottom-0 w-1 ${cat.color.replace('text', 'bg')}`} />
+                          <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className={`p-3 rounded-2xl bg-slate-50 group-hover:bg-white transition-colors border border-slate-100`}>
+                                <ItemIcon className={`h-6 w-6 ${cat.color}`} />
+                              </div>
+                              <div className="space-y-1">
+                                <h3 className="font-bold text-slate-800 group-hover:text-primary transition-colors text-base">{item.itemName}</h3>
+                                <p className="text-primary font-black text-sm font-headline">
+                                  {item.price.toLocaleString()} <span className="text-[10px] font-normal opacity-70">ريال</span>
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 bg-slate-50 p-1 rounded-full border border-slate-100">
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10 transition-colors"
+                                onClick={() => updateCart(item.id, -1)}
+                                disabled={!cart[item.id]}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <span className="w-4 text-center font-bold text-slate-700 text-sm">{cart[item.id] || 0}</span>
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-8 w-8 rounded-full text-primary hover:bg-primary/10 transition-colors"
+                                onClick={() => updateCart(item.id, 1)}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </TabsContent>
