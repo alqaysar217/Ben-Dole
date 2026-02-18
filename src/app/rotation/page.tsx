@@ -87,7 +87,7 @@ export default function RotationPage() {
               <User className="h-10 w-10" strokeWidth={1.5} />
             </div>
             <CardContent className="p-8 space-y-12 relative z-10 text-right">
-              <div className="flex justify-between items-start flex-row-reverse">
+              <div className="flex justify-between items-start">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">الموظف المكلف حالياً</p>
                   <h2 className="text-3xl font-black font-headline tracking-tight">{currentPerson.name}</h2>
@@ -141,8 +141,8 @@ export default function RotationPage() {
                     isDone && "opacity-60 bg-slate-100"
                   )}
                 >
-                  <CardContent className="p-5 flex items-center justify-between flex-row-reverse">
-                    <div className="flex items-center gap-5 flex-row-reverse">
+                  <CardContent className="p-5 flex items-center justify-between">
+                    <div className="flex items-center gap-5">
                       <div className={cn(
                         "h-12 w-12 rounded-[18px] flex items-center justify-center font-black text-lg font-headline transition-colors duration-500",
                         isToday ? "bg-premium-gradient text-white" : (isDone ? "bg-green-100 text-green-600" : "bg-slate-100 text-slate-400")
@@ -155,12 +155,12 @@ export default function RotationPage() {
                       </div>
                     </div>
                     
-                    {isToday && !isDone && (
-                      <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-2">
+                      {isToday && !isDone && (
                         <Badge className="bg-primary/10 text-primary border-none text-[9px] px-2 py-0.5 font-black uppercase">عليه الدور</Badge>
-                      </div>
-                    )}
-                    {isDone && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                      )}
+                      {isDone && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -168,7 +168,7 @@ export default function RotationPage() {
           </div>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[28px] text-[11px] text-slate-500 flex items-start gap-4 border border-white premium-shadow text-right flex-row-reverse">
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[28px] text-[11px] text-slate-500 flex items-start gap-4 border border-white premium-shadow text-right">
           <div className="bg-primary/10 p-2 rounded-xl text-primary shrink-0">
             <Info className="h-4 w-4" />
           </div>
