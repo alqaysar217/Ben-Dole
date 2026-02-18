@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, doc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, Pencil } from "lucide-react";
+import { Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { 
@@ -106,6 +106,14 @@ export default function AdminPage() {
     
     setNewEmp({ name: "", phone: "", deptId: newEmp.deptId, role: "Employee", canRotate: true });
     toast({ title: "تم الحفظ", description: `تمت إضافة الموظف بصفة ${roleToSave === 'Supervisor' ? 'مشرف' : 'موظف'}` });
+  };
+
+  const handleDelete = (id: string, collectionName: string) => {
+    if (!isAdmin) return;
+    if (confirm("هل أنت متأكد من الحذف؟")) {
+      deleteDocumentNonBlocking(doc(db, collectionName, id));
+      toast({ title: "تم الحذف", description: "تمت إزالة السجل بنجاح" });
+    }
   };
 
   const startEdit = (entity: any, type: "employee" | "menu" | "department") => {
@@ -222,7 +230,7 @@ export default function AdminPage() {
                     <div className="flex flex-col">
                       <p className="font-bold flex items-center gap-2">
                         {emp.name}
-                        {emp.role === 'Supervisor' && <Badge className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0">مشرف</Badge>}
+                        {emp.role === 'Supervisor' && <span className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0 rounded font-bold">مشرف</span>}
                         {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
                       </p>
                       <p className="text-[10px] text-slate-500">
@@ -232,9 +240,14 @@ export default function AdminPage() {
                   </div>
                   <div className="flex gap-1">
                     {isAdmin && (
-                      <Button variant="ghost" size="icon" onClick={() => startEdit(emp, "employee")} title="تعديل">
-                        <Pencil className="h-4 w-4 text-blue-600" />
-                      </Button>
+                      <>
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(emp, "employee")} title="تعديل">
+                          <Pencil className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(emp.id, "employees")} title="حذف">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -276,6 +289,9 @@ export default function AdminPage() {
                         <Button variant="ghost" size="icon" onClick={() => startEdit(item, "menu")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
                         </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, "menu_items")} title="حذف">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -299,6 +315,9 @@ export default function AdminPage() {
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
                           <Pencil className="h-4 w-4 text-blue-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(dept.id, "departments")} title="حذف">
+                          <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
                     </div>
@@ -389,13 +408,5 @@ export default function AdminPage() {
       </main>
       <BottomNav />
     </div>
-  );
-}
-
-function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
-  return (
-    <span className={`px-1.5 py-0.5 rounded font-bold ${className}`}>
-      {children}
-    </span>
   );
 }

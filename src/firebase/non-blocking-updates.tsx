@@ -4,6 +4,7 @@ import {
   setDoc,
   addDoc,
   updateDoc,
+  deleteDoc,
   CollectionReference,
   DocumentReference,
   SetOptions,
@@ -57,6 +58,22 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
           path: docRef.path,
           operation: 'update',
           requestResourceData: data,
+        })
+      )
+    });
+}
+
+/**
+ * Initiates a deleteDoc operation for a document reference.
+ */
+export function deleteDocumentNonBlocking(docRef: DocumentReference) {
+  deleteDoc(docRef)
+    .catch(error => {
+      errorEmitter.emit(
+        'permission-error',
+        new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
         })
       )
     });

@@ -3,13 +3,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Clock, User, ReceiptText, CalendarDays, History, CheckCircle, ShieldCheck } from "lucide-react";
+import { Copy, Clock, User, ReceiptText, CalendarDays, History, CheckCircle, ShieldCheck, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -98,6 +98,24 @@ export default function OrdersPage() {
     toast({ title: "تمت الأرشفة", description: "تم نقل الطلبات إلى سجل التاريخ" });
   };
 
+  const handleDeleteOrder = (id: string) => {
+    if (!canManage) return;
+    if (confirm("هل أنت متأكد من حذف هذا الطلب؟")) {
+      deleteDocumentNonBlocking(doc(db, "orders", id));
+      toast({ title: "تم الحذف", description: "تم إزالة الطلب بنجاح" });
+    }
+  };
+
+  const handleClearAll = () => {
+    if (!canManage) return;
+    if (confirm("تحذير: هل تريد مسح كافة طلبات اليوم نهائياً؟")) {
+      todayOrders.forEach(order => {
+        deleteDocumentNonBlocking(doc(db, "orders", order.id));
+      });
+      toast({ title: "تم المسح", description: "تم إفراغ قائمة طلبات اليوم" });
+    }
+  };
+
   const getEmployeeName = (empId: string) => {
     return employees?.find(e => e.id === empId)?.name || "موظف غير معروف";
   };
@@ -119,6 +137,16 @@ export default function OrdersPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {canManage && order.status === 'pending' && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-destructive hover:bg-destructive/10" 
+                onClick={() => handleDeleteOrder(order.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
             {order.status === 'completed' && <CheckCircle className="h-4 w-4 text-green-500" />}
           </div>
         </div>
@@ -164,9 +192,14 @@ export default function OrdersPage() {
             </div>
             <div className="flex gap-2">
               {canManage && todayOrders.length > 0 && (
-                <Button size="icon" variant="outline" className="h-9 w-9 text-green-600 border-green-200 bg-green-50/50 hover:bg-green-50 shadow-sm" onClick={handleCompleteAll} title="أرشفة كافة طلبات اليوم">
-                  <CheckCircle className="h-4 w-4" />
-                </Button>
+                <>
+                  <Button size="icon" variant="outline" className="h-9 w-9 text-green-600 border-green-200 bg-green-50/50 hover:bg-green-50 shadow-sm" onClick={handleCompleteAll} title="أرشفة كافة طلبات اليوم">
+                    <CheckCircle className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="outline" className="h-9 w-9 text-destructive border-destructive/20 bg-destructive/5 hover:bg-destructive/10" onClick={handleClearAll} title="مسح كافة طلبات اليوم">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
               )}
             </div>
           </div>
