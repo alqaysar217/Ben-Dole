@@ -156,10 +156,10 @@ export default function LoginPage() {
                   type="text" 
                   value={phone} 
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="777111222"
+                  placeholder="777777777"
                   required
-                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-widest input-glow"
-                  dir="ltr"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-right font-mono font-bold tracking-widest input-glow"
+                  dir="rtl"
                 />
               </div>
               <div className="space-y-2 text-right">
@@ -172,8 +172,8 @@ export default function LoginPage() {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-[0.4em] input-glow"
-                  dir="ltr"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-right font-mono font-bold tracking-[0.4em] input-glow"
+                  dir="rtl"
                 />
               </div>
               <Button type="submit" className="w-full h-16 bg-glossy-gradient rounded-[22px] font-black text-lg premium-shadow transition-all active:scale-95" disabled={loading}>
@@ -211,8 +211,8 @@ export default function LoginPage() {
                   value={newPassword} 
                   onChange={e => setNewPassword(e.target.value)} 
                   placeholder="أدخل 6 أحرف على الأقل"
-                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-[0.3em] input-glow"
-                  dir="ltr"
+                  className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-right font-mono font-bold tracking-[0.3em] input-glow"
+                  dir="rtl"
                 />
               </div>
             </div>
