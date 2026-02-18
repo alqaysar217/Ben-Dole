@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -128,9 +129,11 @@ export default function LandingPage() {
         </Link>
       </div>
 
-      <div className="flex flex-col items-center gap-2">
-        <p className="text-[11px] text-slate-400 font-bold tracking-widest uppercase">آمن • موثوق • سهل الاستخدام</p>
-        <p className="text-[10px] text-slate-300 font-medium">إصدار 2.0 • 2024</p>
+      <div className="flex flex-col items-center gap-1">
+        <p className="text-[10px] text-slate-400 font-bold tracking-[0.2em] uppercase opacity-70">طُور بواسطة</p>
+        <Link href="https://instagram.com/mahmoud_codes" target="_blank" className="text-xs font-black text-primary hover:scale-110 transition-transform">
+          @mahmoud_codes
+        </Link>
       </div>
     </div>
   );
