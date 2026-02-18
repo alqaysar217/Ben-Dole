@@ -20,9 +20,9 @@
     },
     {
       "id": "login-hero",
-      "description": "Banking Security Infographic",
-      "imageUrl": "https://images.unsplash.com/photo-1582139329536-e7284fece509?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiYW5rJTIwc2VjdXJpdHl8ZW58MHx8fHwxNzcxNDU3MjA1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "bank security"
+      "description": "Banking Security Illustration",
+      "imageUrl": "https://images.unsplash.com/photo-1592698765727-387c9464cd7f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxiYW5raW5nJTIwaWxsdXN0cmF0aW9ufGVufDB8fHx8MTc3MTQ1NzI4NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "banking illustration"
     }
   ]
 }

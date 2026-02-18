@@ -107,14 +107,14 @@ export default function LoginPage() {
       <TopNav />
       <main className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-700">
         <Card className="border-none premium-shadow bg-white rounded-[40px] overflow-hidden">
-          {/* الصورة الإنفوجرافيك التعبيرية */}
-          <div className="relative w-full h-48 bg-primary/5">
+          {/* الصورة الإنفوجرافيك الرسومية */}
+          <div className="relative w-full h-56 bg-primary/5">
             {loginHero && (
               <Image
                 src={loginHero.imageUrl}
                 alt={loginHero.description}
                 fill
-                className="object-cover opacity-90 transition-all hover:scale-105 duration-700"
+                className="object-contain p-6 transition-all hover:scale-105 duration-700"
                 priority
                 data-ai-hint={loginHero.imageHint}
               />
@@ -122,7 +122,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
           </div>
 
-          <CardHeader className="text-center space-y-2 -mt-8 relative z-10 px-8">
+          <CardHeader className="text-center space-y-2 -mt-10 relative z-10 px-8">
             <div className="space-y-1">
               <CardTitle className="text-3xl font-black text-slate-800 font-headline">تسجيل الدخول</CardTitle>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">للموظفين المصرح لهم فقط</p>
