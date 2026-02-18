@@ -10,7 +10,7 @@ import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Copy, Clock, User, Trash2, ReceiptText, CalendarDays, History, CheckCircle } from "lucide-react";
+import { Copy, Clock, User, Trash2, ReceiptText, CalendarDays, History, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -106,6 +106,13 @@ export default function OrdersPage() {
     toast({ title: "تم المسح", description: "تم إفراغ قائمة طلبات اليوم بنجاح" });
   };
 
+  const handleDeleteOrder = (orderId: string) => {
+    if (!canManage) return;
+    if (!confirm("هل تريد حذف هذا الطلب نهائياً؟")) return;
+    deleteDocumentNonBlocking(doc(db, "orders", orderId));
+    toast({ title: "تم الحذف", description: "تمت إزالة الطلب بنجاح" });
+  };
+
   const handleCompleteAll = () => {
     if (!canManage) return;
     if (!confirm("هل تريد أرشفة كافة طلبات اليوم ونقلها للسجل؟")) return;
@@ -122,7 +129,7 @@ export default function OrdersPage() {
   };
 
   const renderOrderCard = (order: any) => (
-    <Card key={order.id} className="border-none shadow-sm bg-white overflow-hidden group hover:shadow-md transition-shadow">
+    <Card key={order.id} className="border-none shadow-sm bg-white overflow-hidden group hover:shadow-md transition-shadow relative">
       <div className={cn("h-1 w-full", order.status === 'completed' ? "bg-green-500" : "bg-primary/20")} />
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center justify-between">
@@ -137,7 +144,19 @@ export default function OrdersPage() {
               </span>
             </div>
           </div>
-          {order.status === 'completed' && <CheckCircle className="h-4 w-4 text-green-500" />}
+          <div className="flex items-center gap-2">
+            {order.status === 'completed' && <CheckCircle className="h-4 w-4 text-green-500" />}
+            {canManage && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 text-slate-300 hover:text-destructive" 
+                onClick={() => handleDeleteOrder(order.id)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            )}
+          </div>
         </div>
         
         <div className="space-y-1.5 border-t pt-3 border-dashed border-slate-100">
@@ -176,7 +195,7 @@ export default function OrdersPage() {
             </div>
             <div className="flex gap-1">
               {isAdmin && todayOrders.length > 0 && (
-                <Button size="icon" variant="destructive" onClick={handleClearTodayOrders} title="حذف طلبات اليوم نهائياً">
+                <Button size="icon" variant="destructive" onClick={handleClearTodayOrders} title="حذف كافة طلبات اليوم نهائياً">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               )}
