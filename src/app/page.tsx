@@ -29,14 +29,14 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
 
-  // Ensure user is signed in anonymously before data hooks fire to satisfy rules context if needed
+  // Ensure user is signed in anonymously before data hooks fire to satisfy rules context
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
-  // Real-time Data - Only fetch if user session is ready or at least attempted
+  // Real-time Data - We wait for the auth check to finish before querying
   const ready = !isUserLoading;
 
   const deptsQuery = useMemoFirebase(() => 
@@ -53,7 +53,7 @@ export default function Home() {
     ready ? collection(db, "menu_items") : null, [db, ready]);
   const { data: menu } = useCollection(menuQuery);
 
-  // Rotation logic
+  // Rotation logic - Current assigned person
   const rotationQuery = useMemoFirebase(() => 
     ready ? query(
       collection(db, "employees"), 

@@ -4,17 +4,18 @@ service cloud.firestore {
 
     /**
      * BANK FOOD ORDERING SYSTEM - SECURITY RULES
-     * Triggering deployment: 2024-05-20
+     * Deployment Trigger: 2024-05-20 14:30:00
+     * Fixing: Missing or insufficient permissions on /employees
      */
 
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Retrieves the current user's profile data safely
+    // Safely retrieves the current user's profile data
     function getEmployeeData() {
       let path = /databases/$(database)/documents/employees/$(request.auth.uid);
-      return exists(path) ? get(path).data : null;
+      return isSignedIn() && exists(path) ? get(path).data : null;
     }
 
     function hasRole(role) {
@@ -36,7 +37,7 @@ service cloud.firestore {
 
     // --- COLLECTION RULES ---
 
-    // Branches & Departments: Public list/get for navigation
+    // Branches & Departments: Publicly readable for navigation
     match /branches/{branchId} {
       allow read: if true;
       allow write: if isSuperAdmin();
@@ -47,22 +48,22 @@ service cloud.firestore {
       allow write: if isSuperAdmin();
     }
 
-    // Menu: Public list/get for ordering
+    // Menu Items: Publicly readable for ordering
     match /menu_items/{menuItemId} {
       allow read: if true;
       allow write: if isSuperAdmin();
     }
 
-    // Employees: Public read for selection and rotation visibility. 
-    // Secure write for admins and supervisors.
+    // Employees: Public read is REQUIRED for the selection dropdown and rotation engine.
+    // We allow 'list' and 'get' explicitly to ensure the client-side queries work.
     match /employees/{employeeId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSuperAdmin();
       allow update: if isSuperAdmin() || isOwner(employeeId) || (isSupervisor() && getEmployeeData().departmentId == resource.data.departmentId);
       allow delete: if isSuperAdmin();
     }
 
-    // Orders: Publicly readable for tracking, anyone can create (anonymous auth required for security context)
+    // Orders: Publicly readable for tracking, anyone can create (requires anonymous auth for context)
     match /orders/{orderId} {
       allow read: if true;
       allow create: if isSignedIn();
@@ -70,6 +71,7 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
+    // Internal configuration
     match /_config_/{configId} {
       allow read, write: if false;
     }
