@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
@@ -158,7 +159,7 @@ export default function OrderPage() {
                   <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} /> القسم
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
-                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow">
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow flex-row-reverse text-right">
                     <SelectValue placeholder="اختر القسم" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-none premium-shadow">
@@ -171,7 +172,7 @@ export default function OrderPage() {
                   <User className="h-4 w-4 text-primary" strokeWidth={1.5} /> اسم الموظف
                 </label>
                 <Select value={selectedEmployeeId || ""} onValueChange={setSelectedEmployeeId} disabled={!selectedDepartmentId}>
-                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow">
+                  <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow flex-row-reverse text-right">
                     <SelectValue placeholder="اختر اسمك" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-none premium-shadow">
@@ -201,20 +202,20 @@ export default function OrderPage() {
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="flex w-full gap-3 h-auto bg-transparent p-0 mb-6">
+            <TabsList className="flex w-full gap-4 h-auto bg-transparent p-0 mb-8">
               {CATEGORIES.map(cat => (
                 <TabsTrigger 
                   key={cat.id} 
                   value={cat.id} 
                   className={cn(
-                    "flex-1 flex flex-col items-center justify-center gap-2 h-20 rounded-[22px] transition-all duration-300 relative border-none",
-                    activeTab === cat.id 
-                      ? "bg-premium-gradient text-white shadow-[0_10px_25px_rgba(15,31,179,0.3)] scale-[1.05] z-10" 
-                      : "bg-white text-slate-500 premium-shadow hover:bg-slate-50"
+                    "flex-1 flex flex-col items-center justify-center gap-3 py-4 rounded-3xl transition-all duration-500 relative border-none premium-shadow bg-white text-slate-500 group overflow-hidden",
+                    activeTab === cat.id && "bg-premium-gradient text-white shadow-[0_15px_30px_rgba(15,31,179,0.3)] scale-[1.05] z-10"
                   )}
                 >
-                  <cat.icon className={cn("h-5 w-5", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2} />
-                  <span className="font-bold text-[10px]">{cat.label}</span>
+                  <div className="relative z-10 flex flex-col items-center gap-2">
+                    <cat.icon className={cn("h-6 w-6", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2.5} />
+                    <span className="font-bold text-[11px] tracking-tight">{cat.label}</span>
+                  </div>
                 </TabsTrigger>
               ))}
             </TabsList>
