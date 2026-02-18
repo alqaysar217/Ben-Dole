@@ -86,3 +86,20 @@
 .input-glow:focus {
   box-shadow: 0 0 0 4px rgba(15, 31, 179, 0.1);
 }
+
+@keyframes soft-pulse {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(15, 31, 179, 0.08);
+  }
+  50% { 
+    opacity: 0.98;
+    transform: scale(0.995);
+    box-shadow: 0 15px 40px rgba(15, 31, 179, 0.2);
+  }
+}
+
+.animate-soft-blink {
+  animation: soft-pulse 4s ease-in-out infinite;
+}

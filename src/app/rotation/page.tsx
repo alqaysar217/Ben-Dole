@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -79,9 +78,9 @@ export default function RotationPage() {
           )}
         </div>
 
-        {/* بطاقة الشخص الحالي بنمط بنكي */}
+        {/* بطاقة الشخص الحالي بنمط بنكي مع وميض هادئ */}
         {currentPerson ? (
-          <Card className="border-none premium-shadow bg-premium-gradient text-white rounded-[32px] overflow-hidden relative">
+          <Card className="border-none premium-shadow bg-premium-gradient text-white rounded-[32px] overflow-hidden relative animate-soft-blink">
             <div className="absolute inset-0 bg-waves opacity-20" />
             <div className="absolute top-6 left-6 opacity-40">
               <User className="h-10 w-10" strokeWidth={1.5} />
@@ -97,7 +96,7 @@ export default function RotationPage() {
               {isManagement && (
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
                    <Button 
-                    className="bg-white text-primary hover:bg-white/90 font-bold rounded-2xl h-12 transition-all active:scale-95"
+                    className="bg-white text-primary hover:bg-white/90 font-bold rounded-2xl h-12 transition-all active:scale-95 shadow-lg"
                     onClick={() => handleDone(currentPerson)}
                   >
                     <UserCheck className="ml-2 h-4 w-4" /> إتمام المهمة
