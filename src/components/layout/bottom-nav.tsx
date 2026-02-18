@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ListOrdered, RefreshCw, ShieldAlert } from "lucide-react";
+import { Home, ListOrdered, RefreshCw, ShieldAlert, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/firebase";
 
@@ -12,12 +12,12 @@ export function BottomNav() {
   const { user } = useUser();
 
   const navItems = [
-    { label: "الرئيسية", icon: Home, href: "/" },
+    { label: "البداية", icon: Home, href: "/" },
+    { label: "الطلب", icon: ShoppingBag, href: "/order" },
     { label: "الطلبات", icon: ListOrdered, href: "/orders" },
     { label: "التدوير", icon: RefreshCw, href: "/rotation" },
   ];
 
-  // In this app, any logged-in user (Admin or Supervisor) can see the Admin tab
   if (user) {
     navItems.push({ label: "الإدارة", icon: ShieldAlert, href: "/admin" });
   }
