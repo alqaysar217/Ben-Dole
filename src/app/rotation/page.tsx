@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -41,7 +42,7 @@ export default function RotationPage() {
 
   const handleDone = (employee: any) => {
     updateDocumentNonBlocking(doc(db, "employees", employee.id), { isDone: true });
-    toast({ title: "تم بنجاح", description: `تم تسجيل إتمام مهمة ${employee.name}` });
+    toast({ title: "تم بنجاح", description: `تم تسجيل إتمام مهمة ${employee.name} بنجاح` });
   };
 
   const handleSkip = (employee: any) => {
@@ -67,12 +68,12 @@ export default function RotationPage() {
 
       <main className="p-6 space-y-8 max-w-2xl mx-auto">
         <div className="flex items-end justify-between px-2">
-          <div className="space-y-1">
+          <div className="space-y-1 text-right">
             <h1 className="text-3xl font-black text-primary font-headline">نظام التدوير</h1>
             <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">إدارة نظام النزول والمهام اليومية</p>
           </div>
           {isManagement && (
-            <Button variant="ghost" size="icon" className="rounded-full bg-white premium-shadow h-12 w-12" onClick={handleReset}>
+            <Button variant="ghost" size="icon" className="rounded-full bg-white premium-shadow h-12 w-12" onClick={handleReset} title="إعادة تعيين الدورة">
               <RefreshCcw className="h-5 w-5 text-primary" />
             </Button>
           )}
@@ -86,7 +87,7 @@ export default function RotationPage() {
               <User className="h-10 w-10" strokeWidth={1.5} />
             </div>
             <CardContent className="p-8 space-y-12 relative z-10 text-right">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start flex-row-reverse">
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">الموظف المكلف حالياً</p>
                   <h2 className="text-3xl font-black font-headline tracking-tight">{currentPerson.name}</h2>
@@ -116,12 +117,12 @@ export default function RotationPage() {
              <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto">
                <Sparkles className="h-8 w-8 text-primary opacity-20" />
              </div>
-             <p className="text-slate-500 font-bold">اكتملت جميع المهام لهذا اليوم</p>
+             <p className="text-slate-500 font-bold">اكتملت جميع المهام لهذه الدورة</p>
           </Card>
         )}
 
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-slate-400 px-2 uppercase tracking-widest">ترتيب الدور</h3>
+          <h3 className="text-xs font-black text-slate-400 px-2 uppercase tracking-widest text-right">ترتيب الدور</h3>
           {!rotationEmployees && ready && (
             <div className="text-center py-10 text-slate-400 italic">جاري تحميل القائمة...</div>
           )}
@@ -140,8 +141,8 @@ export default function RotationPage() {
                     isDone && "opacity-60 bg-slate-100"
                   )}
                 >
-                  <CardContent className="p-5 flex items-center justify-between">
-                    <div className="flex items-center gap-5">
+                  <CardContent className="p-5 flex items-center justify-between flex-row-reverse">
+                    <div className="flex items-center gap-5 flex-row-reverse">
                       <div className={cn(
                         "h-12 w-12 rounded-[18px] flex items-center justify-center font-black text-lg font-headline transition-colors duration-500",
                         isToday ? "bg-premium-gradient text-white" : (isDone ? "bg-green-100 text-green-600" : "bg-slate-100 text-slate-400")
@@ -150,7 +151,7 @@ export default function RotationPage() {
                       </div>
                       <div className="space-y-0.5 text-right">
                         <h3 className={cn("font-bold text-slate-800", isDone && "line-through text-slate-400")}>{emp.name}</h3>
-                        <p className="text-[11px] text-slate-400 font-medium tracking-tight">{emp.phone}</p>
+                        <p className="text-[11px] text-slate-400 font-medium tracking-tight">الدور القادم</p>
                       </div>
                     </div>
                     
@@ -167,12 +168,12 @@ export default function RotationPage() {
           </div>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[28px] text-[11px] text-slate-500 flex items-start gap-4 border border-white premium-shadow text-right">
-          <div className="bg-primary/10 p-2 rounded-xl text-primary">
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[28px] text-[11px] text-slate-500 flex items-start gap-4 border border-white premium-shadow text-right flex-row-reverse">
+          <div className="bg-primary/10 p-2 rounded-xl text-primary shrink-0">
             <Info className="h-4 w-4" />
           </div>
           <p className="leading-relaxed">
-            يتم تحديث قائمة التدوير آلياً لضمان العدالة بين جميع الموظفين. يتم اختيار الشخص التالي بناءً على الأقدمية في القائمة.
+            <b>ملاحظة للنظام:</b> الدور لا ينتقل آلياً بنهاية اليوم لضمان إتمام المهمة فعلياً. يجب على المشرف الضغط على <b>"إتمام المهمة"</b> لنقل التكليف للموظف التالي في القائمة.
           </p>
         </div>
       </main>
