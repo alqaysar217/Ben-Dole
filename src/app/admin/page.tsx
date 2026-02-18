@@ -209,7 +209,7 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start">
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start flex-row-reverse">
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
@@ -259,7 +259,12 @@ export default function AdminPage() {
             <>
               <TabsContent value="menu" className="space-y-6">
                 <Card className="border-none shadow-sm bg-white">
-                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة صنف طعام</CardTitle></CardHeader>
+                  <CardHeader className="bg-slate-50 border-b pb-4">
+                    <CardTitle className="text-sm flex items-center gap-2 flex-row-reverse">
+                      <Plus className="h-4 w-4" /> 
+                      إضافة صنف طعام
+                    </CardTitle>
+                  </CardHeader>
                   <CardContent className="space-y-4 pt-6 text-right">
                     <div className="grid grid-cols-2 gap-3">
                       <Input placeholder="اسم الصنف" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="text-right" />
@@ -300,7 +305,12 @@ export default function AdminPage() {
 
               <TabsContent value="departments" className="space-y-6">
                 <Card className="border-none shadow-sm bg-white">
-                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة قسم بنكي جديد</CardTitle></CardHeader>
+                  <CardHeader className="bg-slate-50 border-b pb-4">
+                    <CardTitle className="text-sm flex items-center gap-2 flex-row-reverse">
+                      <Plus className="h-4 w-4" /> 
+                      إضافة قسم بنكي جديد
+                    </CardTitle>
+                  </CardHeader>
                   <CardContent className="space-y-4 pt-6 text-right">
                     <div className="flex gap-2">
                       <Input placeholder="اسم القسم" value={newDept} onChange={e => setNewDept(e.target.value)} className="text-right" />
