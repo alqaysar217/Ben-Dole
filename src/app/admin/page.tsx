@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
@@ -25,11 +25,14 @@ export default function AdminPage() {
   const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
   const { data: menu } = useCollection(menuQuery);
 
-  if (isUserLoading) return null;
-  if (!user) {
-    router.push("/login");
-    return null;
-  }
+  // Safely handle redirection in useEffect to avoid "setState during render" warning
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || !user) return null;
 
   const handleAddItem = () => {
     if (!newItem.name || !newItem.price) return;
