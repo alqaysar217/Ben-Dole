@@ -32,12 +32,12 @@ export default function LandingPage() {
           <div className="relative bg-white p-8 rounded-[3rem] shadow-[0_20px_50px_rgba(15,31,179,0.15)] border border-slate-50 transform transition-transform duration-500 hover:scale-105">
             <Image 
               src="https://picsum.photos/seed/banklogo/256/256" 
-              alt="Bank Logo" 
+              alt="شعار البنك" 
               width={140} 
               height={140} 
               className="rounded-[2.5rem]"
               priority
-              data-ai-hint="bank logo"
+              data-ai-hint="شعار البنك"
             />
           </div>
         </div>
@@ -45,16 +45,16 @@ export default function LandingPage() {
         <div className="mt-16 text-center space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="space-y-2">
             <h1 className="text-5xl font-black text-primary font-headline tracking-tighter">طلبات</h1>
-            <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">Premium Banking Experience</p>
+            <p className="text-slate-400 text-sm font-medium tracking-widest uppercase">تجربة مصرفية متميزة</p>
           </div>
           <div className="flex items-center justify-center gap-3 bg-slate-50 px-6 py-2.5 rounded-full w-fit mx-auto border border-slate-100 shadow-sm">
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Authenticating</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">جاري التحقق...</p>
           </div>
         </div>
 
         <div className="absolute bottom-12 text-center">
-          <p className="text-[10px] text-slate-300 font-bold tracking-[0.3em] uppercase">Powered by SmartRotation™</p>
+          <p className="text-[10px] text-slate-300 font-bold tracking-[0.3em] uppercase">نظام التدوير الذكي</p>
         </div>
       </div>
     );
@@ -62,16 +62,16 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#F4F6FA] flex flex-col items-center justify-center p-6 space-y-12 animate-in fade-in duration-700">
-      {/* Logo & Welcome */}
+      {/* الشعار والترحيب */}
       <div className="text-center space-y-6">
         <div className="mx-auto bg-white p-3 rounded-[2.5rem] w-fit premium-shadow border border-white">
           <Image 
             src="https://picsum.photos/seed/banklogo/200/200" 
-            alt="Logo" 
+            alt="الشعار" 
             width={90} 
             height={90} 
             className="rounded-[2rem]"
-            data-ai-hint="bank logo"
+            data-ai-hint="شعار البنك"
           />
         </div>
         <div className="space-y-2">
@@ -83,11 +83,11 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Role Selection Grid */}
-      <div className="grid grid-cols-1 gap-5 w-full max-w-sm">
+      {/* شبكة اختيار الدور */}
+      <div className="grid grid-cols-1 gap-5 w-full max-sm px-4">
         <Link href="/order" className="group">
           <Card className="border-none premium-shadow hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 bg-white rounded-[28px] overflow-hidden">
-            <CardContent className="p-7 flex items-center gap-6">
+            <CardContent className="p-7 flex items-center gap-6 flex-row-reverse">
               <div className="bg-[#F4F6FA] p-5 rounded-[22px] group-hover:bg-primary group-hover:text-white transition-colors duration-500">
                 <User className="h-9 w-9 text-primary group-hover:text-white" strokeWidth={1.5} />
               </div>
@@ -101,7 +101,7 @@ export default function LandingPage() {
 
         <Link href="/login" className="group">
           <Card className="border-none premium-shadow hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 bg-white rounded-[28px] overflow-hidden">
-            <CardContent className="p-7 flex items-center gap-6">
+            <CardContent className="p-7 flex items-center gap-6 flex-row-reverse">
               <div className="bg-[#F4F6FA] p-5 rounded-[22px] group-hover:bg-secondary group-hover:text-white transition-colors duration-500">
                 <UserCog className="h-9 w-9 text-secondary group-hover:text-white" strokeWidth={1.5} />
               </div>
@@ -115,12 +115,12 @@ export default function LandingPage() {
 
         <Link href="/login" className="group">
           <Card className="border-none premium-shadow hover:shadow-2xl transition-all duration-500 group-hover:-translate-y-2 bg-white rounded-[28px] overflow-hidden">
-            <CardContent className="p-7 flex items-center gap-6">
+            <CardContent className="p-7 flex items-center gap-6 flex-row-reverse">
               <div className="bg-[#F4F6FA] p-5 rounded-[22px] group-hover:bg-primary group-hover:text-white transition-colors duration-500">
                 <ShieldCheck className="h-9 w-9 text-primary group-hover:text-white" strokeWidth={1.5} />
               </div>
               <div className="text-right">
-                <h3 className="text-2xl font-bold text-slate-800">دخول كمدير للتطبيق</h3>
+                <h3 className="text-2xl font-bold text-slate-800">دخول كمدير للنظام</h3>
                 <p className="text-sm text-slate-500">التحكم الكامل في النظام</p>
               </div>
             </CardContent>
@@ -129,8 +129,8 @@ export default function LandingPage() {
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <p className="text-[11px] text-slate-400 font-bold tracking-widest uppercase">Safe • Secure • Reliable</p>
-        <p className="text-[10px] text-slate-300 font-medium">BankTalabat v2.0 • 2024</p>
+        <p className="text-[11px] text-slate-400 font-bold tracking-widest uppercase">آمن • موثوق • سهل الاستخدام</p>
+        <p className="text-[10px] text-slate-300 font-medium">إصدار 2.0 • 2024</p>
       </div>
     </div>
   );

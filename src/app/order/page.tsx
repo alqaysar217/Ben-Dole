@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza, Sparkles, MapPin, ChevronLeft } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza, Sparkles, MapPin } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -138,7 +138,7 @@ export default function OrderPage() {
     <div className="pt-16 pb-28 min-h-screen bg-[#F4F6FA]">
       <TopNav />
       
-      {/* Premium Notification Bar */}
+      {/* شريط الإشعارات المميز */}
       <div className="bg-premium-gradient text-white py-4 px-6 flex items-center justify-between sticky top-14 z-40 shadow-xl rounded-b-[28px] overflow-hidden">
         <div className="absolute inset-0 bg-waves opacity-20 pointer-events-none" />
         <div className="flex items-center gap-4 relative z-10">
@@ -146,7 +146,7 @@ export default function OrderPage() {
             <MapPin className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold uppercase opacity-60 tracking-[0.1em]">On Duty Today</span>
+            <span className="text-[10px] font-bold uppercase opacity-60 tracking-[0.1em]">المكلف بالنزول اليوم</span>
             <span className="text-lg font-black font-headline tracking-tight">{assignedPerson}</span>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function OrderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[11px] font-black flex items-center gap-2 text-slate-400 px-1 uppercase tracking-widest">
-                  <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} /> Department
+                  <Building2 className="h-4 w-4 text-primary" strokeWidth={1.5} /> القسم
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
                   <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow">
@@ -172,7 +172,7 @@ export default function OrderPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-[11px] font-black flex items-center gap-2 text-slate-400 px-1 uppercase tracking-widest">
-                  <User className="h-4 w-4 text-primary" strokeWidth={1.5} /> Employee Name
+                  <User className="h-4 w-4 text-primary" strokeWidth={1.5} /> اسم الموظف
                 </label>
                 <Select value={selectedEmployeeId || ""} onValueChange={setSelectedEmployeeId} disabled={!selectedDepartmentId}>
                   <SelectTrigger className="bg-[#F4F6FA] border-none h-14 rounded-2xl input-glow">
@@ -190,13 +190,13 @@ export default function OrderPage() {
         <div className="space-y-6">
           <div className="flex items-end justify-between px-2">
             <div className="space-y-1">
-              <h2 className="text-3xl font-black text-slate-800 font-headline">القائمة المختارة</h2>
-              <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Daily Premium Menu</p>
+              <h2 className="text-3xl font-black text-slate-800 font-headline">قائمة الطعام</h2>
+              <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">قائمة الأصناف المختارة</p>
             </div>
             <div className="relative group">
               <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 transition-colors group-focus-within:text-primary" />
               <Input 
-                placeholder="Search..." 
+                placeholder="بحث..." 
                 className="pr-10 h-12 w-48 rounded-full bg-white border-none premium-shadow text-sm input-glow"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

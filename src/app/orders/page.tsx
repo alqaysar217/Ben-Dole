@@ -123,13 +123,13 @@ export default function OrdersPage() {
   const renderOrderCard = (order: any) => (
     <Card key={order.id} className="border-none shadow-sm bg-white overflow-hidden group hover:shadow-md transition-shadow relative">
       <div className={cn("h-1 w-full", order.status === 'completed' ? "bg-green-500" : "bg-primary/20")} />
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-slate-800">
+      <CardContent className="p-4 space-y-3 text-right">
+        <div className="flex items-center justify-between flex-row-reverse">
+          <div className="flex items-center gap-2 font-bold text-slate-800 flex-row-reverse">
             <div className="bg-slate-50 p-1.5 rounded-lg">
               <User className="h-4 w-4 text-slate-500" />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col text-right">
               <span className="text-sm">{getEmployeeName(order.employeeId)}</span>
               <span className="text-[9px] text-slate-400 font-normal">
                 {order.createdAt?.toDate ? new Date(order.createdAt.toDate()).toLocaleString('ar-YE', { hour: '2-digit', minute: '2-digit' }) : 'الآن'}
@@ -153,8 +153,8 @@ export default function OrdersPage() {
         
         <div className="space-y-1.5 border-t pt-3 border-dashed border-slate-100">
           {order.items.map((item: any, idx: number) => (
-            <div key={idx} className="flex justify-between items-center text-xs">
-              <div className="flex gap-1.5 items-center">
+            <div key={idx} className="flex justify-between items-center text-xs flex-row-reverse">
+              <div className="flex gap-1.5 items-center flex-row-reverse">
                 <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold text-[10px]">{item.quantity}</span>
                 <span className="text-slate-700 font-medium">{item.itemName}</span>
               </div>
@@ -163,7 +163,7 @@ export default function OrdersPage() {
           ))}
         </div>
         
-        <div className="flex justify-between items-center border-t border-slate-100 pt-3 mt-1">
+        <div className="flex justify-between items-center border-t border-slate-100 pt-3 mt-1 flex-row-reverse">
           <span className="text-slate-500 text-[10px] font-bold">الإجمالي:</span>
           <span className="text-primary font-black font-headline text-lg">{order.totalPrice.toLocaleString()} <span className="text-[10px] font-normal">ريال</span></span>
         </div>
@@ -177,16 +177,16 @@ export default function OrdersPage() {
 
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-primary flex items-center gap-2">
+          <div className="flex items-center justify-between flex-row-reverse">
+            <div className="text-right">
+              <h1 className="text-xl font-bold text-primary flex items-center gap-2 flex-row-reverse">
                 <ReceiptText className="h-5 w-5" />
                 إدارة الطلبات
               </h1>
               {canManage && (
-                <div className="flex items-center gap-1 mt-1">
-                  <ShieldCheck className="h-3 w-3 text-green-600" />
+                <div className="flex items-center gap-1 mt-1 justify-end">
                   <span className="text-[9px] text-green-600 font-bold uppercase">نمط {isAdmin ? "المدير" : "المشرف"} مفعل</span>
+                  <ShieldCheck className="h-3 w-3 text-green-600" />
                 </div>
               )}
             </div>

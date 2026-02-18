@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Info, ShieldCheck, WifiOff, Lock, Smartphone } from "lucide-react";
+import { ArrowRight, Info, ShieldCheck, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -108,7 +108,7 @@ export default function LoginPage() {
             </div>
             <div className="space-y-1">
               <CardTitle className="text-3xl font-black text-slate-800 font-headline">تسجيل الدخول</CardTitle>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">Authorized Personnel Only</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">للموظفين المصرح لهم فقط</p>
             </div>
           </CardHeader>
           <CardContent className="pb-10 space-y-6 px-8">
@@ -116,7 +116,7 @@ export default function LoginPage() {
             {networkError && (
               <Alert variant="destructive" className="bg-red-50 border-none text-red-600 rounded-2xl">
                 <WifiOff className="h-4 w-4" />
-                <AlertTitle className="text-xs font-black uppercase">Network Issue</AlertTitle>
+                <AlertTitle className="text-xs font-black uppercase">مشكلة في الاتصال</AlertTitle>
                 <AlertDescription className="text-[10px] font-medium leading-relaxed">
                   فشل الاتصال بخدمات Firebase. يرجى التأكد من استقرار الإنترنت.
                 </AlertDescription>
@@ -129,7 +129,7 @@ export default function LoginPage() {
                   <Info className="h-4 w-4" />
                 </div>
                 <div className="space-y-1">
-                   <AlertTitle className="text-[10px] font-black uppercase tracking-widest">Authentication Notes</AlertTitle>
+                   <AlertTitle className="text-[10px] font-black uppercase tracking-widest">ملاحظات تسجيل الدخول</AlertTitle>
                    <AlertDescription className="text-[10px] leading-relaxed opacity-70">
                     كلمة مرور المدير: <code className="bg-white/80 px-1.5 py-0.5 rounded font-mono">adminha892019</code><br/>
                     كلمة مرور المشرف: <code className="bg-white/80 px-1.5 py-0.5 rounded font-mono">123456</code>
@@ -141,13 +141,13 @@ export default function LoginPage() {
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
                 <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
-                  <Smartphone className="h-3.5 w-3.5" /> Phone Number
+                  <Smartphone className="h-3.5 w-3.5" /> رقم الهاتف
                 </label>
                 <Input 
                   type="text" 
                   value={phone} 
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="Example: 77XXXXXXX"
+                  placeholder="مثال: 77XXXXXXX"
                   required
                   className="bg-[#F4F6FA] border-none h-14 rounded-2xl text-left font-mono font-bold tracking-widest input-glow"
                   dir="ltr"
@@ -155,7 +155,7 @@ export default function LoginPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-[11px] font-black text-slate-400 px-1 uppercase tracking-widest flex items-center gap-2">
-                  <Lock className="h-3.5 w-3.5" /> Password
+                  <Lock className="h-3.5 w-3.5" /> كلمة المرور
                 </label>
                 <Input 
                   type="password" 
@@ -168,7 +168,7 @@ export default function LoginPage() {
                 />
               </div>
               <Button type="submit" className="w-full h-16 bg-glossy-gradient rounded-[22px] font-black text-lg premium-shadow transition-all active:scale-95" disabled={loading}>
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Secure Login"}
+                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : "دخول آمن"}
               </Button>
             </form>
 
@@ -196,7 +196,7 @@ export default function LoginPage() {
             </DialogHeader>
             <div className="space-y-6 py-6">
               <div className="space-y-2">
-                <Label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">New Password</Label>
+                <Label className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-1">كلمة المرور الجديدة</Label>
                 <Input 
                   type="password" 
                   value={newPassword} 

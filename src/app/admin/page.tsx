@@ -39,19 +39,19 @@ export default function AdminPage() {
 
   const isAdmin = userRole === "ADMIN";
 
-  // Redirect if not logged in
+  // تحويل المستخدم إذا لم يكن مسجلاً للدخول
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push("/login");
     }
   }, [user, isUserLoading, router]);
 
-  // Form States
+  // حالات النماذج
   const [newItem, setNewItem] = useState({ name: "", price: "", category: "sandwich" });
   const [newDept, setNewDept] = useState("");
   const [newEmp, setNewEmp] = useState({ name: "", phone: "", deptId: "", role: "Employee", canRotate: true });
 
-  // Edit States
+  // حالات التعديل
   const [editingEntity, setEditingEntity] = useState<any>(null);
   const [editType, setEditType] = useState<"employee" | "menu" | "department" | null>(null);
 
@@ -161,10 +161,10 @@ export default function AdminPage() {
     <div className="pt-14 pb-20">
       <TopNav />
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between flex-row-reverse">
+          <div className="flex items-center gap-3 flex-row-reverse">
             <ShieldCheck className="h-8 w-8 text-primary" />
-            <div>
+            <div className="text-right">
               <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
               <p className="text-[10px] text-slate-500">{isAdmin ? "صلاحية: مدير تطبيق" : "صلاحية: مشرف قسم"}</p>
             </div>
@@ -181,26 +181,26 @@ export default function AdminPage() {
           <TabsContent value="employees" className="space-y-6">
             <Card className="border-none shadow-sm bg-white">
               <CardHeader className="bg-slate-50 border-b pb-4">
-                <CardTitle className="text-sm flex items-center gap-2">
+                <CardTitle className="text-sm flex items-center gap-2 flex-row-reverse">
                   <UserPlus className="h-4 w-4" /> 
                   {isAdmin ? "إضافة موظف أو مشرف جديد" : "تسجيل موظف جديد"}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 pt-6">
+              <CardContent className="space-y-4 pt-6 text-right">
                 <div className="grid grid-cols-2 gap-3">
-                  <Input placeholder="الاسم الكامل" value={newEmp.name} onChange={e => setNewEmp({...newEmp, name: e.target.value})} />
-                  <Input placeholder="رقم الهاتف" value={newEmp.phone} onChange={e => setNewEmp({...newEmp, phone: e.target.value})} />
+                  <Input placeholder="الاسم الكامل" value={newEmp.name} onChange={e => setNewEmp({...newEmp, name: e.target.value})} className="text-right" />
+                  <Input placeholder="رقم الهاتف" value={newEmp.phone} onChange={e => setNewEmp({...newEmp, phone: e.target.value})} className="text-right" />
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Select value={newEmp.deptId} onValueChange={id => setNewEmp({...newEmp, deptId: id})}>
-                    <SelectTrigger><SelectValue placeholder="اختر القسم" /></SelectTrigger>
+                    <SelectTrigger className="text-right"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
                     <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                   </Select>
 
                   {isAdmin && (
                     <Select value={newEmp.role} onValueChange={val => setNewEmp({...newEmp, role: val})}>
-                      <SelectTrigger><SelectValue placeholder="حدد الدور" /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Employee">موظف</SelectItem>
                         <SelectItem value="Supervisor">مشرف قسم</SelectItem>
@@ -223,12 +223,12 @@ export default function AdminPage() {
             </Card>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-bold text-slate-500 px-1">قائمة الموظفين</h3>
+              <h3 className="text-sm font-bold text-slate-500 px-1 text-right">قائمة الموظفين</h3>
               {employees?.map(emp => (
-                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col">
-                      <p className="font-bold flex items-center gap-2">
+                <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                  <div className="flex items-center gap-3 flex-row-reverse">
+                    <div className="flex flex-col text-right">
+                      <p className="font-bold flex items-center gap-2 flex-row-reverse">
                         {emp.name}
                         {emp.role === 'Supervisor' && <span className="bg-blue-100 text-blue-700 text-[8px] px-1 py-0 rounded font-bold">مشرف</span>}
                         {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
@@ -259,14 +259,14 @@ export default function AdminPage() {
             <>
               <TabsContent value="menu" className="space-y-6">
                 <Card className="border-none shadow-sm bg-white">
-                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة صنف طعام</CardTitle></CardHeader>
-                  <CardContent className="space-y-4 pt-6">
+                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2 flex-row-reverse"><Plus className="h-4 w-4" /> إضافة صنف طعام</CardTitle></CardHeader>
+                  <CardContent className="space-y-4 pt-6 text-right">
                     <div className="grid grid-cols-2 gap-3">
-                      <Input placeholder="اسم الصنف" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} />
-                      <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} />
+                      <Input placeholder="اسم الصنف" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} className="text-right" />
+                      <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} className="text-right" />
                     </div>
                     <Select value={newItem.category} onValueChange={val => setNewItem({...newItem, category: val})}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full text-right">
                         <SelectValue placeholder="الفئة" />
                       </SelectTrigger>
                       <SelectContent>
@@ -280,8 +280,8 @@ export default function AdminPage() {
                 </Card>
                 <div className="space-y-2">
                   {menu?.map(item => (
-                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                      <div>
+                    <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
+                      <div className="text-right">
                         <p className="font-bold">{item.itemName}</p>
                         <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
                       </div>
@@ -300,17 +300,17 @@ export default function AdminPage() {
 
               <TabsContent value="departments" className="space-y-6">
                 <Card className="border-none shadow-sm bg-white">
-                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><Plus className="h-4 w-4" /> إضافة قسم بنكي جديد</CardTitle></CardHeader>
-                  <CardContent className="space-y-4 pt-6">
-                    <div className="flex gap-2">
-                      <Input placeholder="اسم القسم" value={newDept} onChange={e => setNewDept(e.target.value)} />
+                  <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2 flex-row-reverse"><Plus className="h-4 w-4" /> إضافة قسم بنكي جديد</CardTitle></CardHeader>
+                  <CardContent className="space-y-4 pt-6 text-right">
+                    <div className="flex gap-2 flex-row-reverse">
+                      <Input placeholder="اسم القسم" value={newDept} onChange={e => setNewDept(e.target.value)} className="text-right" />
                       <Button onClick={handleAddDept}>إضافة</Button>
                     </div>
                   </CardContent>
                 </Card>
                 <div className="space-y-2">
                   {departments?.map(dept => (
-                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
+                    <div key={dept.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100 flex-row-reverse">
                       <p className="font-bold">{dept.deptName}</p>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => startEdit(dept, "department")} title="تعديل">
@@ -334,28 +334,28 @@ export default function AdminPage() {
             <DialogHeader>
               <DialogTitle className="text-right">تعديل البيانات</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-4 py-4 text-right">
               {editType === "employee" && editingEntity && (
                 <>
                   <div className="space-y-2">
                     <Label>الاسم</Label>
-                    <Input value={editingEntity.name} onChange={e => setEditingEntity({...editingEntity, name: e.target.value})} />
+                    <Input value={editingEntity.name} onChange={e => setEditingEntity({...editingEntity, name: e.target.value})} className="text-right" />
                   </div>
                   <div className="space-y-2">
                     <Label>الهاتف</Label>
-                    <Input value={editingEntity.phone} onChange={e => setEditingEntity({...editingEntity, phone: e.target.value})} />
+                    <Input value={editingEntity.phone} onChange={e => setEditingEntity({...editingEntity, phone: e.target.value})} className="text-right" />
                   </div>
                   <div className="space-y-2">
                     <Label>القسم</Label>
                     <Select value={editingEntity.departmentId} onValueChange={id => setEditingEntity({...editingEntity, departmentId: id})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
                       <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>الدور</Label>
                     <Select value={editingEntity.role} onValueChange={val => setEditingEntity({...editingEntity, role: val})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Employee">موظف</SelectItem>
                         <SelectItem value="Supervisor">مشرف قسم</SelectItem>
@@ -373,16 +373,16 @@ export default function AdminPage() {
                 <>
                   <div className="space-y-2">
                     <Label>اسم الصنف</Label>
-                    <Input value={editingEntity.itemName} onChange={e => setEditingEntity({...editingEntity, itemName: e.target.value})} />
+                    <Input value={editingEntity.itemName} onChange={e => setEditingEntity({...editingEntity, itemName: e.target.value})} className="text-right" />
                   </div>
                   <div className="space-y-2">
                     <Label>السعر</Label>
-                    <Input type="number" value={editingEntity.price} onChange={e => setEditingEntity({...editingEntity, price: e.target.value})} />
+                    <Input type="number" value={editingEntity.price} onChange={e => setEditingEntity({...editingEntity, price: e.target.value})} className="text-right" />
                   </div>
                   <div className="space-y-2">
                     <Label>الفئة</Label>
                     <Select value={editingEntity.category} onValueChange={val => setEditingEntity({...editingEntity, category: val})}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="sandwich">سندوتشات</SelectItem>
                         <SelectItem value="drink">مشروبات</SelectItem>
@@ -396,7 +396,7 @@ export default function AdminPage() {
               {editType === "department" && editingEntity && (
                 <div className="space-y-2">
                   <Label>اسم القسم</Label>
-                  <Input value={editingEntity.deptName} onChange={e => setEditingEntity({...editingEntity, deptName: e.target.value})} />
+                  <Input value={editingEntity.deptName} onChange={e => setEditingEntity({...editingEntity, deptName: e.target.value})} className="text-right" />
                 </div>
               )}
             </div>

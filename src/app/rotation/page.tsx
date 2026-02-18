@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking, useAuth } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking } from "@/firebase";
 import { collection, query, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ChevronRight, UserMinus, UserCheck, RefreshCcw, Info, Sparkles, CreditCard, Shield } from "lucide-react";
+import { CheckCircle2, UserMinus, UserCheck, RefreshCcw, Info, Sparkles, CreditCard, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -41,7 +41,7 @@ export default function RotationPage() {
 
   const handleDone = (employee: any) => {
     updateDocumentNonBlocking(doc(db, "employees", employee.id), { isDone: true });
-    toast({ title: "تم بنجاح", description: `تم تسجيل نزول ${employee.name} بنجاح` });
+    toast({ title: "تم بنجاح", description: `تم تسجيل إتمام مهمة ${employee.name}` });
   };
 
   const handleSkip = (employee: any) => {
@@ -69,7 +69,7 @@ export default function RotationPage() {
         <div className="flex items-end justify-between px-2">
           <div className="space-y-1">
             <h1 className="text-3xl font-black text-primary font-headline">نظام التدوير</h1>
-            <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">Active Rotation Management</p>
+            <p className="text-xs text-slate-400 font-medium uppercase tracking-widest">إدارة نظام النزول والمهام اليومية</p>
           </div>
           {isManagement && (
             <Button variant="ghost" size="icon" className="rounded-full bg-white premium-shadow h-12 w-12" onClick={handleReset}>
@@ -78,17 +78,17 @@ export default function RotationPage() {
           )}
         </div>
 
-        {/* Account Style Card for Current Person */}
+        {/* بطاقة الشخص الحالي بنمط بنكي */}
         {currentPerson ? (
           <Card className="border-none premium-shadow bg-premium-gradient text-white rounded-[32px] overflow-hidden relative">
             <div className="absolute inset-0 bg-waves opacity-20" />
             <div className="absolute top-6 left-6 opacity-40">
               <CreditCard className="h-10 w-10" strokeWidth={1} />
             </div>
-            <CardContent className="p-8 space-y-8 relative z-10">
+            <CardContent className="p-8 space-y-8 relative z-10 text-right">
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">Current Assignee</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">الموظف المكلف حالياً</p>
                   <h2 className="text-3xl font-black font-headline tracking-tight">{currentPerson.name}</h2>
                 </div>
                 <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
@@ -98,11 +98,11 @@ export default function RotationPage() {
 
               <div className="flex justify-between items-end">
                 <div className="space-y-1">
-                  <p className="text-[9px] font-bold opacity-60">ID NUMBER</p>
+                  <p className="text-[9px] font-bold opacity-60">رقم الموظف</p>
                   <p className="font-mono text-sm tracking-widest">**** **** {currentPerson.id.slice(-4)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] font-bold opacity-60">PHONE</p>
+                  <p className="text-[9px] font-bold opacity-60">الهاتف</p>
                   <p className="font-bold">{currentPerson.phone}</p>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default function RotationPage() {
                     className="bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl h-12 border border-white/20 backdrop-blur-sm transition-all active:scale-95"
                     onClick={() => handleSkip(currentPerson)}
                   >
-                    <UserMinus className="ml-2 h-4 w-4" /> تخطي
+                    <UserMinus className="ml-2 h-4 w-4" /> تخطي الموظف
                   </Button>
                 </div>
               )}
@@ -135,9 +135,9 @@ export default function RotationPage() {
         )}
 
         <div className="space-y-4">
-          <h3 className="text-xs font-black text-slate-400 px-2 uppercase tracking-widest">Queue Status</h3>
+          <h3 className="text-xs font-black text-slate-400 px-2 uppercase tracking-widest">ترتيب الدور</h3>
           {!rotationEmployees && ready && (
-            <div className="text-center py-10 text-slate-400 italic">جاري تحميل قائمة التدوير...</div>
+            <div className="text-center py-10 text-slate-400 italic">جاري تحميل القائمة...</div>
           )}
           
           <div className="grid grid-cols-1 gap-4">
@@ -162,7 +162,7 @@ export default function RotationPage() {
                       )}>
                         {isDone ? <CheckCircle2 className="h-6 w-6" /> : (idx + 1)}
                       </div>
-                      <div className="space-y-0.5">
+                      <div className="space-y-0.5 text-right">
                         <h3 className={cn("font-bold text-slate-800", isDone && "line-through text-slate-400")}>{emp.name}</h3>
                         <p className="text-[11px] text-slate-400 font-medium tracking-tight">{emp.phone}</p>
                       </div>
@@ -170,7 +170,7 @@ export default function RotationPage() {
                     
                     {isToday && !isDone && (
                       <div className="flex flex-col items-end gap-1">
-                        <Badge className="bg-primary/10 text-primary border-none text-[9px] px-2 py-0.5 font-black uppercase">On Duty</Badge>
+                        <Badge className="bg-primary/10 text-primary border-none text-[9px] px-2 py-0.5 font-black uppercase">عليه الدور</Badge>
                       </div>
                     )}
                     {isDone && <CheckCircle2 className="h-5 w-5 text-green-500" />}
@@ -181,12 +181,12 @@ export default function RotationPage() {
           </div>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[28px] text-[11px] text-slate-500 flex items-start gap-4 border border-white premium-shadow">
+        <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[28px] text-[11px] text-slate-500 flex items-start gap-4 border border-white premium-shadow text-right">
           <div className="bg-primary/10 p-2 rounded-xl text-primary">
             <Info className="h-4 w-4" />
           </div>
           <p className="leading-relaxed">
-            يتم تحديث قائمة التدوير آلياً لضمان العدالة بين جميع الموظفين. يمكنك الرجوع إلى سجل النزول من خلال لوحة الإدارة.
+            يتم تحديث قائمة التدوير آلياً لضمان العدالة بين جميع الموظفين. يتم اختيار الشخص التالي بناءً على الأقدمية في القائمة.
           </p>
         </div>
       </main>
