@@ -1,14 +1,15 @@
-
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useAppStore, MenuItem, Order, OrderItem } from "@/lib/store";
+import { useUIStore } from "@/lib/store";
+import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
+import { collection, query, where, orderBy, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Minus, Search, ShoppingCart, User } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2 } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -19,24 +20,47 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
-  const { menu, employees, orders, addOrder, currentRotationIndex, currentUser, setCurrentUser } = useAppStore();
+  const db = useFirestore();
+  const { selectedDepartmentId, setSelectedDepartmentId, selectedEmployeeId, setSelectedEmployeeId } = useUIStore();
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
 
-  const assignedPerson = useMemo(() => {
-    const eligible = employees.filter(e => e.isEligible);
-    return eligible[currentRotationIndex % eligible.length]?.name || "غير محدد";
-  }, [employees, currentRotationIndex]);
+  // Real-time Data
+  const deptsQuery = useMemoFirebase(() => collection(db, "departments"), [db]);
+  const { data: departments } = useCollection(deptsQuery);
+
+  const empsQuery = useMemoFirebase(() => {
+    if (!selectedDepartmentId) return null;
+    return query(collection(db, "employees"), where("departmentId", "==", selectedDepartmentId));
+  }, [db, selectedDepartmentId]);
+  const { data: employees } = useCollection(empsQuery);
+
+  const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
+  const { data: menu } = useCollection(menuQuery);
+
+  // Rotation logic
+  const rotationQuery = useMemoFirebase(() => 
+    query(
+      collection(db, "employees"), 
+      where("canRotate", "==", true),
+      where("isDone", "==", false),
+      orderBy("rotationPriority", "asc")
+    ), [db]);
+  const { data: rotationList } = useCollection(rotationQuery);
+
+  const assignedPerson = rotationList?.[0]?.name || "قيد التحديد...";
 
   const filteredMenu = useMemo(() => {
+    if (!menu) return [];
     return menu.filter(item => 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      item.itemName.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [menu, searchTerm]);
 
   const cartTotal = useMemo(() => {
+    if (!menu) return 0;
     return Object.entries(cart).reduce((acc, [id, qty]) => {
       const item = menu.find(m => m.id === id);
       return acc + (item?.price || 0) * qty;
@@ -56,59 +80,38 @@ export default function Home() {
   };
 
   const handlePlaceOrder = () => {
-    if (!currentUser) {
-      toast({
-        title: "خطأ",
-        description: "يرجى اختيار اسم الموظف أولاً",
-        variant: "destructive",
-      });
+    if (!selectedEmployeeId) {
+      toast({ title: "خطأ", description: "يرجى اختيار اسمك أولاً", variant: "destructive" });
       return;
     }
 
     if (Object.keys(cart).length === 0) {
-      toast({
-        title: "خطأ",
-        description: "السلة فارغة",
-        variant: "destructive",
-      });
+      toast({ title: "خطأ", description: "السلة فارغة", variant: "destructive" });
       return;
     }
 
-    // Check for duplicates in current session orders
-    const existingOrder = orders.find(o => o.employeeName === currentUser && o.status === 'pending');
-    if (existingOrder) {
-      toast({
-        title: "تنبيه",
-        description: "لديك طلب معلق بالفعل. سيتم إضافته إلى القائمة.",
-      });
-    }
-
-    const orderItems: OrderItem[] = Object.entries(cart).map(([id, qty]) => {
-      const item = menu.find(m => m.id === id)!;
+    const orderItems = Object.entries(cart).map(([id, qty]) => {
+      const item = menu?.find(m => m.id === id)!;
       return {
-        id: Math.random().toString(36).substr(2, 9),
         menuItemId: item.id,
-        name: item.name,
+        itemName: item.itemName,
         quantity: qty,
         price: item.price
       };
     });
 
-    const newOrder: Order = {
-      id: Math.random().toString(36).substr(2, 9),
-      employeeName: currentUser,
+    const newOrder = {
+      employeeId: selectedEmployeeId,
+      departmentId: selectedDepartmentId,
       items: orderItems,
-      total: cartTotal,
-      timestamp: Date.now(),
-      status: "pending"
+      totalPrice: cartTotal,
+      status: "pending",
+      createdAt: serverTimestamp(),
     };
 
-    addOrder(newOrder);
+    addDocumentNonBlocking(collection(db, "orders"), newOrder);
     setCart({});
-    toast({
-      title: "تم بنجاح",
-      description: "تم إرسال طلبك بنجاح",
-    });
+    toast({ title: "تم بنجاح", description: "تم إرسال طلبك بنجاح" });
   };
 
   return (
@@ -116,33 +119,54 @@ export default function Home() {
       <TopNav />
       
       {/* Rotation Banner */}
-      <div className="bg-accent text-white py-3 px-4 text-center sticky top-14 z-40 shadow-sm animate-in fade-in slide-in-from-top-2">
+      <div className="bg-primary text-primary-foreground py-3 px-4 text-center sticky top-14 z-40 shadow-lg">
         <p className="font-bold flex items-center justify-center gap-2">
           <span>المكلف بالنزول اليوم:</span>
-          <span className="underline decoration-2 underline-offset-4">{assignedPerson}</span>
+          <span className="underline decoration-2 underline-offset-4 font-headline">{assignedPerson}</span>
         </p>
       </div>
 
-      <main className="p-4 space-y-6">
+      <main className="p-4 space-y-6 max-w-2xl mx-auto">
         {/* User Selection */}
-        <Card className="border-none shadow-md overflow-hidden">
-          <CardContent className="p-4 bg-white space-y-4">
-            <div className="flex items-center gap-2 text-primary font-bold">
-              <User className="h-5 w-5" />
-              <h2>اختيار الموظف</h2>
+        <Card className="border-none shadow-sm overflow-hidden bg-white">
+          <CardContent className="p-4 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold flex items-center gap-2 text-muted-foreground">
+                  <Building2 className="h-4 w-4" /> القسم
+                </label>
+                <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
+                  <SelectTrigger className="w-full bg-slate-50 border-slate-200">
+                    <SelectValue placeholder="اختر القسم" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments?.map(dept => (
+                      <SelectItem key={dept.id} value={dept.id}>{dept.deptName}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold flex items-center gap-2 text-muted-foreground">
+                  <User className="h-4 w-4" /> الموظف
+                </label>
+                <Select 
+                  value={selectedEmployeeId || ""} 
+                  onValueChange={setSelectedEmployeeId}
+                  disabled={!selectedDepartmentId}
+                >
+                  <SelectTrigger className="w-full bg-slate-50 border-slate-200">
+                    <SelectValue placeholder="اختر اسمك" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees?.map(emp => (
+                      <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <Select value={currentUser || ""} onValueChange={setCurrentUser}>
-              <SelectTrigger className="w-full bg-background border-none shadow-inner h-12">
-                <SelectValue placeholder="اختر اسمك من القائمة" />
-              </SelectTrigger>
-              <SelectContent>
-                {employees.map(emp => (
-                  <SelectItem key={emp.id} value={emp.name}>
-                    {emp.name} ({emp.department})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </CardContent>
         </Card>
 
@@ -161,31 +185,31 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {filteredMenu.map((item) => (
-              <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-3 flex items-center justify-between">
+              <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white">
+                <CardContent className="p-4 flex items-center justify-between">
                   <div className="space-y-1">
-                    <h3 className="font-bold text-lg">{item.name}</h3>
-                    <p className="text-primary font-semibold text-sm">
+                    <h3 className="font-bold text-lg text-slate-800">{item.itemName}</h3>
+                    <p className="text-primary font-bold">
                       {item.price.toLocaleString()} ريال يمني
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 bg-background p-1 rounded-full">
+                  <div className="flex items-center gap-4 bg-slate-100 p-1.5 rounded-full border border-slate-200">
                     <Button 
                       size="icon" 
                       variant="ghost" 
-                      className="h-8 w-8 rounded-full text-destructive hover:text-destructive"
+                      className="h-8 w-8 rounded-full text-destructive"
                       onClick={() => updateCart(item.id, -1)}
                       disabled={!cart[item.id]}
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
-                    <span className="w-4 text-center font-bold">{cart[item.id] || 0}</span>
+                    <span className="w-4 text-center font-bold text-slate-700">{cart[item.id] || 0}</span>
                     <Button 
                       size="icon" 
                       variant="ghost" 
-                      className="h-8 w-8 rounded-full text-primary hover:text-primary"
+                      className="h-8 w-8 rounded-full text-primary"
                       onClick={() => updateCart(item.id, 1)}
                     >
                       <Plus className="h-4 w-4" />
@@ -200,18 +224,18 @@ export default function Home() {
 
       {/* Floating Cart Button */}
       {cartTotal > 0 && (
-        <div className="fixed bottom-20 left-4 right-4 animate-in slide-in-from-bottom-4">
+        <div className="fixed bottom-20 left-4 right-4 max-w-2xl mx-auto animate-in slide-in-from-bottom-4">
           <Button 
-            className="w-full h-14 bg-primary text-white rounded-xl shadow-xl flex items-center justify-between px-6"
+            className="w-full h-14 bg-primary text-white rounded-xl shadow-2xl flex items-center justify-between px-6"
             onClick={handlePlaceOrder}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-lg">
                 <ShoppingCart className="h-5 w-5" />
               </div>
-              <span className="font-bold">تأكيد الطلب</span>
+              <span className="font-bold text-lg">تأكيد الطلب</span>
             </div>
-            <span className="text-lg font-bold">
+            <span className="text-xl font-headline font-bold">
               {cartTotal.toLocaleString()} ريال
             </span>
           </Button>
