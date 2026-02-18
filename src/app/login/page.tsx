@@ -11,8 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight } from "lucide-react";
+import { Lock, ArrowRight, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -21,10 +22,12 @@ export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
       // Map phone to email for Firebase Auth dummy email approach
       // Format: 775258830 -> 775258830@bank.com
@@ -32,11 +35,22 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       toast({ title: "تم الدخول بنجاح", description: "أهلاً بك في نظام الإدارة" });
       router.push("/admin");
-    } catch (error: any) {
-      console.error("Login error:", error);
+    } catch (err: any) {
+      console.error("Login error:", err);
+      let message = "يرجى التحقق من رقم الهاتف وكلمة المرور.";
+      
+      if (err.code === 'auth/invalid-credential') {
+        message = "بيانات الدخول غير صحيحة. تأكد من إنشاء الحساب في لوحة تحكم Firebase وتفعيل موفر تسجيل الدخول (Email/Password).";
+      } else if (err.code === 'auth/user-not-found') {
+        message = "المستخدم غير موجود. يرجى التواصل مع المسؤول.";
+      } else if (err.code === 'auth/wrong-password') {
+        message = "كلمة المرور خاطئة.";
+      }
+      
+      setError(message);
       toast({ 
         title: "خطأ في الدخول", 
-        description: "يرجى التحقق من رقم الهاتف وكلمة المرور. تأكد من تفعيل الحساب في لوحة تحكم Firebase.", 
+        description: message, 
         variant: "destructive" 
       });
     } finally {
@@ -57,7 +71,15 @@ export default function LoginPage() {
             <CardTitle className="text-2xl font-bold text-primary">دخول المشرفين</CardTitle>
             <p className="text-xs text-slate-500">لوحة التحكم وإدارة الطلبات والتدوير</p>
           </CardHeader>
-          <CardContent className="pb-8">
+          <CardContent className="pb-8 space-y-4">
+            {error && (
+              <Alert variant="destructive" className="text-xs">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>تنبيه</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-600 px-1">رقم الهاتف</label>
