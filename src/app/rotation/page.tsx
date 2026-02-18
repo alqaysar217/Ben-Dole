@@ -7,7 +7,7 @@ import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNo
 import { collection, query, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, UserMinus, UserCheck, RefreshCcw, Info, Sparkles, CreditCard, Shield } from "lucide-react";
+import { CheckCircle2, UserMinus, UserCheck, RefreshCcw, Info, Sparkles, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -90,9 +90,6 @@ export default function RotationPage() {
                 <div className="space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">الموظف المكلف حالياً</p>
                   <h2 className="text-3xl font-black font-headline tracking-tight">{currentPerson.name}</h2>
-                </div>
-                <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
-                  <Shield className="h-6 w-6" />
                 </div>
               </div>
               
