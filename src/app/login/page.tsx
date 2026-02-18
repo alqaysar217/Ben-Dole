@@ -14,11 +14,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { ArrowRight, WifiOff, Lock, Smartphone, Loader2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -33,8 +31,6 @@ export default function LoginPage() {
   
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [newPassword, setNewPassword] = useState("");
-
-  const loginHero = PlaceHolderImages.find(img => img.id === "login-hero");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,22 +103,41 @@ export default function LoginPage() {
       <TopNav />
       <main className="w-full max-w-sm animate-in fade-in zoom-in-95 duration-700">
         <Card className="border-none premium-shadow bg-white rounded-[40px] overflow-hidden">
-          {/* الصورة الإنفوجرافيك الرسومية */}
-          <div className="relative w-full h-56 bg-primary/5">
-            {loginHero && (
-              <Image
-                src={loginHero.imageUrl}
-                alt={loginHero.description}
-                fill
-                className="object-contain p-6 transition-all hover:scale-105 duration-700"
-                priority
-                data-ai-hint={loginHero.imageHint}
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+          {/* SVG Infographic Hero Section */}
+          <div className="relative w-full h-64 bg-slate-50 flex items-center justify-center p-4">
+            <svg viewBox="0 0 240 240" className="w-full h-full max-w-[220px]" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Background Shapes */}
+              <circle cx="120" cy="120" r="100" fill="url(#login_grad_bg)" fillOpacity="0.05"/>
+              
+              {/* Card Illustration */}
+              <rect x="50" y="90" width="140" height="90" rx="16" fill="white" stroke="#0F1FB3" strokeWidth="1.5" className="animate-pulse duration-[4000ms] shadow-lg"/>
+              <rect x="65" y="105" width="30" height="20" rx="4" fill="#F4F6FA"/>
+              <rect x="65" y="145" width="80" height="8" rx="4" fill="#F4F6FA"/>
+              <rect x="160" y="145" width="20" height="20" rx="10" fill="#2A3BFF" fillOpacity="0.2"/>
+
+              {/* Security Shield */}
+              <path d="M120 40L155 60V110C155 141.25 120 160 120 160C120 160 85 141.25 85 110V60L120 40Z" fill="url(#login_grad_shield)" stroke="white" strokeWidth="2.5" className="drop-shadow-xl"/>
+              <path d="M110 100L117 107L132 92" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+              
+              {/* Floating Decorative Elements */}
+              <circle cx="200" cy="80" r="8" fill="#0F1FB3" fillOpacity="0.1" className="animate-bounce duration-[3000ms]"/>
+              <rect x="40" y="60" width="12" height="12" rx="3" fill="#2A3BFF" fillOpacity="0.1" transform="rotate(15 40 60)" className="animate-bounce duration-[2500ms]"/>
+
+              <defs>
+                <linearGradient id="login_grad_bg" x1="20" y1="20" x2="220" y2="220" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#0F1FB3"/>
+                  <stop offset="1" stopColor="#2A3BFF"/>
+                </linearGradient>
+                <linearGradient id="login_grad_shield" x1="85" y1="40" x2="155" x2="160" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#0F1FB3"/>
+                  <stop offset="1" stopColor="#2A3BFF"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent h-1/4 bottom-0 top-auto" />
           </div>
 
-          <CardHeader className="text-center space-y-2 -mt-10 relative z-10 px-8">
+          <CardHeader className="text-center space-y-2 -mt-6 relative z-10 px-8">
             <div className="space-y-1">
               <CardTitle className="text-3xl font-black text-slate-800 font-headline">تسجيل الدخول</CardTitle>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">للموظفين المصرح لهم فقط</p>
