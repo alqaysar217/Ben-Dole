@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -46,7 +45,7 @@ export default function LandingPage() {
         
         <div className="mt-12 text-center space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="space-y-2">
-            <h1 className="text-4xl font-black text-primary font-headline tracking-tighter">طلبات البنك</h1>
+            <h1 className="text-4xl font-black text-primary font-headline tracking-tighter">طلبات</h1>
             <p className="text-slate-400 text-sm font-medium">نظام التدوير الذكي v2.0</p>
           </div>
           <div className="flex items-center justify-center gap-3 bg-slate-50 px-4 py-2 rounded-full w-fit mx-auto border border-slate-100">
@@ -78,7 +77,7 @@ export default function LandingPage() {
         </div>
         <div className="space-y-1">
           <div className="flex items-center justify-center gap-2">
-            <h1 className="text-4xl font-black text-primary tracking-tight font-headline">طلبات البنك</h1>
+            <h1 className="text-4xl font-black text-primary tracking-tight font-headline">طلبات</h1>
             <Sparkles className="h-6 w-6 text-yellow-500 animate-pulse" />
           </div>
           <p className="text-slate-500 font-medium">نظام تدوير وتوصيل الطعام الذكي</p>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { UserCircle, LogOut, ShieldCheck, UserCog, User, Home } from "lucide-react";
@@ -52,7 +51,7 @@ export function TopNav() {
             data-ai-hint="bank logo"
           />
         </div>
-        <h1 className="text-xl font-bold text-primary tracking-tight">طلبات البنك</h1>
+        <h1 className="text-xl font-bold text-primary tracking-tight">طلبات</h1>
       </Link>
 
       <div className="flex items-center gap-2">
