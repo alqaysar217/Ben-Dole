@@ -6,10 +6,10 @@ import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useFirestore, useCollection, useMemoFirebase, useUser, deleteDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
-import { collection, query, orderBy, doc, where } from "firebase/firestore";
+import { collection, query, orderBy, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Clock, User, Trash2, ReceiptText } from "lucide-react";
+import { Copy, Clock, User, Trash2, ReceiptText, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function OrdersPage() {
@@ -20,23 +20,39 @@ export default function OrdersPage() {
   
   const canManage = userRole === "ADMIN" || userRole === "SUPERVISOR";
 
-  // Fetch all employees to map IDs to Names
+  // جلب كافة الموظفين لربط المعرفات بالأسماء
   const empsQuery = useMemoFirebase(() => collection(db, "employees"), [db]);
   const { data: employees } = useCollection(empsQuery);
 
-  // Real-time Orders
+  // جلب الطلبات مرتبة تنازلياً
   const ordersQuery = useMemoFirebase(() => 
     query(collection(db, "orders"), orderBy("createdAt", "desc")), [db]);
   const { data: orders } = useCollection(ordersQuery);
 
+  // فلترة الطلبات لتشمل "قيد الانتظار" و "تاريخ اليوم" فقط
   const pendingOrders = useMemo(() => {
-    return orders?.filter(o => o.status === "pending") || [];
+    if (!orders) return [];
+    
+    // تحديد بداية اليوم (الساعة 00:00:00)
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    return orders.filter(o => {
+      // يجب أن يكون الطلب معلقاً
+      if (o.status !== "pending") return false;
+      
+      // التحقق من تاريخ الطلب
+      if (!o.createdAt) return true; // للطلبات الجديدة التي لم تُحفظ بعد في السيرفر
+      
+      const orderDate = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+      return orderDate >= startOfToday;
+    });
   }, [orders]);
 
   const handleCopySummary = () => {
     if (pendingOrders.length === 0) return;
 
-    // Map to group items and their totals
+    // تجميع الأصناف وحساب إجمالياتها
     const summaryMap: Record<string, { quantity: number; price: number }> = {};
     let grandTotal = 0;
 
@@ -53,6 +69,8 @@ export default function OrdersPage() {
     });
 
     let text = "🏦 *ملخص طلبات البنك لهذا اليوم*\n";
+    const todayStr = new Date().toLocaleDateString('ar-YE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    text += `📅 *التاريخ:* ${todayStr}\n`;
     text += "━━━━━━━━━━━━━━━\n\n";
     
     Object.entries(summaryMap).forEach(([name, data]) => {
@@ -65,7 +83,7 @@ export default function OrdersPage() {
     navigator.clipboard.writeText(text).then(() => {
       toast({ 
         title: "تم النسخ", 
-        description: "تم نسخ ملخص الطلبات بتنسيق مفصل للواتساب" 
+        description: "تم نسخ ملخص طلبات اليوم بنجاح" 
       });
     });
   };
@@ -75,7 +93,7 @@ export default function OrdersPage() {
       toast({ title: "صلاحية مرفوضة", description: "فقط مدير النظام يمكنه مسح الطلبات", variant: "destructive" });
       return;
     }
-    if (!confirm("هل أنت متأكد من مسح جميع الطلبات؟")) return;
+    if (!confirm("هل أنت متأكد من مسح جميع طلبات اليوم؟")) return;
     pendingOrders.forEach(order => {
       deleteDocumentNonBlocking(doc(db, "orders", order.id));
     });
@@ -95,9 +113,12 @@ export default function OrdersPage() {
           <div>
             <h1 className="text-xl font-bold text-primary flex items-center gap-2">
               <ReceiptText className="h-5 w-5" />
-              الطلبات الجارية
+              طلبات اليوم
             </h1>
-            <p className="text-[10px] text-slate-500 font-medium">إجمالي الطلبات النشطة: {pendingOrders.length}</p>
+            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+              <CalendarDays className="h-3 w-3" />
+              تاريخ اليوم • {pendingOrders.length} طلبات
+            </p>
           </div>
           <div className="flex gap-2">
             {canManage && (
@@ -113,7 +134,7 @@ export default function OrdersPage() {
               </Button>
             )}
             {userRole === "ADMIN" && (
-              <Button size="icon" variant="destructive" onClick={handleClearOrders} title="مسح كافة الطلبات">
+              <Button size="icon" variant="destructive" onClick={handleClearOrders} title="مسح طلبات اليوم">
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
@@ -123,7 +144,7 @@ export default function OrdersPage() {
         {pendingOrders.length === 0 ? (
           <div className="text-center py-20 text-slate-400">
             <Clock className="h-12 w-12 mx-auto mb-4 opacity-20" />
-            <p className="font-medium">لا توجد طلبات جارية حالياً</p>
+            <p className="font-medium">لا توجد طلبات جديدة اليوم حتى الآن</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -158,7 +179,7 @@ export default function OrdersPage() {
                   </div>
                   
                   <div className="flex justify-between items-center border-t border-slate-100 pt-3 mt-1">
-                    <span className="text-slate-500 text-[10px] font-bold">المجموع:</span>
+                    <span className="text-slate-500 text-[10px] font-bold">إجمالي الموظف:</span>
                     <span className="text-primary font-black font-headline text-lg">{order.totalPrice.toLocaleString()} <span className="text-[10px] font-normal">ريال</span></span>
                   </div>
                 </CardContent>
