@@ -6,31 +6,34 @@ import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useAuth } from "@/firebase";
 import { useUIStore } from "@/lib/store";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight, Info, ShieldCheck, UserCog } from "lucide-react";
+import { Lock, ArrowRight, Info, ShieldCheck, UserCog, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 export default function LoginPage() {
   const auth = useAuth();
   const { setUserRole } = useUIStore();
   const { toast } = useToast();
   const router = useRouter();
+  
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Logic to distinguish between Admin and Supervisor accounts in Firebase Auth
-      // We assume two different email mappings for the same phone based on password provided
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
 
@@ -40,9 +43,16 @@ export default function LoginPage() {
       }
 
       const email = `${phone.trim()}_${emailSuffix}@bank.com`;
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
       setUserRole(role);
+
+      // Requirement: Supervisor with default password 123456 must change it
+      if (role === "SUPERVISOR" && password === "123456") {
+        setShowChangePassword(true);
+        setLoading(false);
+        return;
+      }
       
       toast({ 
         title: role === "ADMIN" ? "مرحباً كمدير للنظام" : "مرحباً كمشرف قسم", 
@@ -53,11 +63,26 @@ export default function LoginPage() {
     } catch (err: any) {
       toast({ 
         title: "خطأ في الدخول", 
-        description: "يرجى التأكد من صحة رقم الهاتف وكلمة المرور، وتأكد من إنشاء الحسابات في Firebase Console.", 
+        description: "يرجى التأكد من صحة رقم الهاتف وكلمة المرور. الافتراضية للمشرف هي 123456", 
         variant: "destructive" 
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!auth.currentUser || newPassword.length < 6) {
+      toast({ title: "خطأ", description: "كلمة المرور يجب أن تكون 6 أحرف على الأقل", variant: "destructive" });
+      return;
+    }
+    try {
+      await updatePassword(auth.currentUser, newPassword);
+      toast({ title: "تم التغيير", description: "تم تحديث كلمة المرور بنجاح" });
+      setShowChangePassword(false);
+      router.push("/admin");
+    } catch (err: any) {
+      toast({ title: "فشل التحديث", description: err.message, variant: "destructive" });
     }
   };
 
@@ -78,11 +103,10 @@ export default function LoginPage() {
             
             <Alert className="bg-blue-50 border-blue-200 text-blue-800">
               <Info className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-xs font-bold">تنبيه للمطور</AlertTitle>
+              <AlertTitle className="text-xs font-bold">تنبيه للمستخدم</AlertTitle>
               <AlertDescription className="text-[10px] leading-relaxed">
-                يجب إنشاء حسابين في <b>Authentication</b>:<br/>
-                1. كمدير: <code className="bg-white px-1">775258830_admin@bank.com</code><br/>
-                2. كمشرف: <code className="bg-white px-1">775258830_sup@bank.com</code>
+                كلمة السر الافتراضية للمشرف هي <code className="bg-white px-1">123456</code><br/>
+                وسيطلب منك النظام تغييرها فور الدخول.
               </AlertDescription>
             </Alert>
 
@@ -93,7 +117,7 @@ export default function LoginPage() {
                   type="text" 
                   value={phone} 
                   onChange={e => setPhone(e.target.value)}
-                  placeholder="775258830"
+                  placeholder="مثال: 775258830"
                   required
                   className="bg-slate-50 border-slate-200 h-12 text-left"
                   dir="ltr"
@@ -126,6 +150,34 @@ export default function LoginPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Password Change Dialog */}
+        <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-center text-primary">تغيير كلمة المرور الافتراضية</DialogTitle>
+              <DialogDescription className="text-center">
+                يجب عليك تغيير كلمة المرور الافتراضية (123456) لأسباب أمنية قبل المتابعة.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>كلمة المرور الجديدة</Label>
+                <Input 
+                  type="password" 
+                  value={newPassword} 
+                  onChange={e => setNewPassword(e.target.value)} 
+                  placeholder="أدخل 6 أحرف على الأقل"
+                  className="text-left"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button className="w-full font-bold" onClick={handleUpdatePassword}>تحديث ومتابعة</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
       <BottomNav />
     </div>

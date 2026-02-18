@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useEffect } from "react";
@@ -7,27 +8,30 @@ import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNo
 import { collection, query, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, ChevronRight, UserMinus, UserCheck, RefreshCcw } from "lucide-react";
+import { CheckCircle2, ChevronRight, UserMinus, UserCheck, RefreshCcw, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { useUIStore } from "@/lib/store";
 
 export default function RotationPage() {
   const db = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { userRole } = useUIStore();
   const { toast } = useToast();
 
-  // Ensure user is signed in anonymously before data hooks fire
+  const isManagement = userRole === "ADMIN" || userRole === "SUPERVISOR";
+
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
-  // Wait for auth check AND user to be present and stable
   const ready = !isUserLoading && user !== null;
 
+  // Only get employees who ARE allowed to rotate
   const empsQuery = useMemoFirebase(() => {
     if (!ready) return null;
     return query(collection(db, "employees"), where("canRotate", "==", true));
@@ -61,7 +65,7 @@ export default function RotationPage() {
     rotationEmployees.forEach(emp => {
       updateDocumentNonBlocking(doc(db, "employees", emp.id), { isDone: false });
     });
-    toast({ title: "تم التصفير", description: "تمت إعادة تعيين الدورة" });
+    toast({ title: "تم التصفير", description: "تمت إعادة تعيين الدورة اليومية" });
   };
 
   return (
@@ -70,8 +74,11 @@ export default function RotationPage() {
 
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">تدوير التوصيل</h1>
-          {user && (
+          <div>
+            <h1 className="text-2xl font-bold text-primary">تدوير التوصيل</h1>
+            <p className="text-[10px] text-slate-500">قائمة الموظفين المكلفين بالنزول</p>
+          </div>
+          {isManagement && (
             <Button variant="ghost" size="icon" onClick={handleReset}>
               <RefreshCcw className="h-5 w-5 text-primary" />
             </Button>
@@ -80,9 +87,16 @@ export default function RotationPage() {
 
         <div className="space-y-3">
           {!rotationEmployees && ready && (
-            <div className="text-center py-10 text-slate-400">جاري تحميل قائمة التدوير...</div>
+            <div className="text-center py-10 text-slate-400 italic">جاري تحميل قائمة التدوير...</div>
           )}
           
+          {sortedEmployees.length === 0 && ready && (
+            <div className="bg-white p-8 rounded-xl text-center border-2 border-dashed border-slate-200">
+              <Info className="h-8 w-8 mx-auto mb-2 text-slate-300" />
+              <p className="text-slate-500 text-sm">لا يوجد موظفين مسجلين في الدورة حالياً</p>
+            </div>
+          )}
+
           {sortedEmployees.map((emp, idx) => {
             const isToday = currentPerson?.id === emp.id;
             const isDone = emp.isDone;
@@ -115,7 +129,7 @@ export default function RotationPage() {
                     </div>
                   </div>
 
-                  {isToday && user && !isDone && (
+                  {isToday && isManagement && !isDone && (
                     <div className="flex gap-2">
                       <Button 
                         size="sm" 
@@ -137,7 +151,7 @@ export default function RotationPage() {
                     </div>
                   )}
 
-                  {isToday && !isDone && !user && (
+                  {isToday && !isDone && !isManagement && (
                     <Badge className="bg-primary animate-pulse py-1 px-3">المكلف اليوم</Badge>
                   )}
                 </CardContent>
@@ -146,10 +160,10 @@ export default function RotationPage() {
           })}
         </div>
 
-        <div className="bg-slate-100 p-4 rounded-xl text-sm text-slate-600 flex items-start gap-3 border border-slate-200">
-          <ChevronRight className="h-5 w-5 mt-0.5 text-primary" />
+        <div className="bg-slate-100 p-4 rounded-xl text-xs text-slate-600 flex items-start gap-3 border border-slate-200 leading-relaxed">
+          <ChevronRight className="h-5 w-5 mt-0.5 text-primary shrink-0" />
           <p>
-            يتم التدوير بشكل آلي بين الموظفين المؤهلين. يمكن للمشرف تخطي دور الموظف إذا كان غائباً، وسيتم الانتقال للدور التالي تلقائياً.
+            يتم استبعاد الموظفين الإداريين أو كبار السن من هذه القائمة تلقائياً بناءً على إعدادات المدير. التدوير يتم بين الموظفين الشباب والميدانيين فقط لضمان كفاءة العمل.
           </p>
         </div>
       </main>

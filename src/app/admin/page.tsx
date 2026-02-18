@@ -4,14 +4,14 @@
 import { useState, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { collection, doc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, ShieldCheck, Database, Users, Building2, UtensilsCrossed, UserPlus, Save } from "lucide-react";
+import { Trash2, Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, Edit2, CheckCircle2, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { 
@@ -21,6 +21,8 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 export default function AdminPage() {
   const db = useFirestore();
@@ -33,9 +35,11 @@ export default function AdminPage() {
   const isSupervisor = userRole === "SUPERVISOR";
 
   // Form States
-  const [newItem, setNewItem] = useState({ name: "", price: "", category: "sandwiches" });
+  const [newItem, setNewItem] = useState({ name: "", price: "", category: "sandwich" });
   const [newDept, setNewDept] = useState("");
   const [newEmp, setNewEmp] = useState({ name: "", phone: "", deptId: "", role: "Employee", canRotate: true });
+  
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
   const { data: menu } = useCollection(menuQuery);
@@ -61,7 +65,7 @@ export default function AdminPage() {
       price: parseInt(newItem.price),
       category: newItem.category
     });
-    setNewItem({ ...newItem, name: "", price: "" });
+    setNewItem({ name: "", price: "", category: "sandwich" });
     toast({ title: "تم الحفظ", description: "تمت إضافة الصنف الجديد" });
   };
 
@@ -86,7 +90,7 @@ export default function AdminPage() {
       isDone: false,
       rotationPriority: employees ? employees.length + 1 : 1
     });
-    setNewEmp({ ...newEmp, name: "", phone: "" });
+    setNewEmp({ name: "", phone: "", deptId: newEmp.deptId, role: "Employee", canRotate: true });
     toast({ title: "تم الحفظ", description: "تمت إضافة الموظف بنجاح" });
   };
 
@@ -97,6 +101,11 @@ export default function AdminPage() {
     }
     deleteDocumentNonBlocking(doc(db, col, id));
     toast({ title: "تم الحذف", description: "تمت إزالة السجل بنجاح" });
+  };
+
+  const toggleRotation = (emp: any) => {
+    if (!isAdmin) return;
+    updateDocumentNonBlocking(doc(db, "employees", emp.id), { canRotate: !emp.canRotate });
   };
 
   return (
@@ -129,13 +138,26 @@ export default function AdminPage() {
                     <Input placeholder="اسم الصنف" value={newItem.name} onChange={e => setNewItem({...newItem, name: e.target.value})} />
                     <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} />
                   </div>
+                  <Select value={newItem.category} onValueChange={val => setNewItem({...newItem, category: val})}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="الفئة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sandwich">سندوتشات</SelectItem>
+                      <SelectItem value="drink">مشروبات</SelectItem>
+                      <SelectItem value="add-on">إضافات</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button className="w-full font-bold" onClick={handleAddItem}>حفظ الصنف</Button>
                 </CardContent>
               </Card>
               <div className="space-y-2">
                 {menu?.map(item => (
                   <div key={item.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                    <div><p className="font-bold">{item.itemName}</p><p className="text-xs text-primary">{item.price} ريال</p></div>
+                    <div>
+                      <p className="font-bold">{item.itemName}</p>
+                      <p className="text-[10px] text-slate-500">{item.category === 'sandwich' ? 'سندوتش' : item.category === 'drink' ? 'مشروب' : 'إضافة'} • {item.price} ريال</p>
+                    </div>
                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("menu_items", item.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 ))}
@@ -155,29 +177,45 @@ export default function AdminPage() {
                   <SelectTrigger><SelectValue placeholder="اختر القسم" /></SelectTrigger>
                   <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                 </Select>
+                
                 {isAdmin && (
-                  <Select value={newEmp.role} onValueChange={role => setNewEmp({...newEmp, role: role as any})}>
-                    <SelectTrigger><SelectValue placeholder="الدور" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Employee">موظف</SelectItem>
-                      <SelectItem value="Supervisor">مشرف قسم</SelectItem>
-                      <SelectItem value="Admin">مدير نظام</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center space-x-2 space-x-reverse bg-slate-50 p-3 rounded-lg">
+                    <Checkbox 
+                      id="canRotate" 
+                      checked={newEmp.canRotate} 
+                      onCheckedChange={(checked) => setNewEmp({...newEmp, canRotate: checked as boolean})} 
+                    />
+                    <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">يدخل في دورة التوصيل (النزول)</Label>
+                  </div>
                 )}
+
                 <Button className="w-full font-bold" onClick={handleAddEmp}><Save className="h-4 w-4 ml-2" /> حفظ الموظف</Button>
               </CardContent>
             </Card>
             <div className="space-y-2">
               {employees?.map(emp => (
                 <div key={emp.id} className="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center border border-slate-100">
-                  <div>
-                    <p className="font-bold">{emp.name}</p>
-                    <p className="text-[10px] text-slate-500">
-                      {departments?.find(d => d.id === emp.departmentId)?.deptName || "بدون قسم"} • {emp.role}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col">
+                      <p className="font-bold flex items-center gap-2">
+                        {emp.name}
+                        {emp.canRotate ? <CheckCircle2 className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-slate-300" />}
+                      </p>
+                      <p className="text-[10px] text-slate-500">
+                        {departments?.find(d => d.id === emp.departmentId)?.deptName || "بدون قسم"} • {emp.canRotate ? "مكلف بالنزول" : "معفي من النزول"}
+                      </p>
+                    </div>
                   </div>
-                  {isAdmin && <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("employees", emp.id)}><Trash2 className="h-4 w-4" /></Button>}
+                  <div className="flex gap-1">
+                    {isAdmin && (
+                      <>
+                        <Button variant="ghost" size="icon" onClick={() => toggleRotation(emp)} className={emp.canRotate ? "text-green-600" : "text-slate-400"}>
+                          <RefreshCcw className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete("employees", emp.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -210,3 +248,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+import { RefreshCcw } from "lucide-react";
