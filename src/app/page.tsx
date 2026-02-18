@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, ShieldCheck, UserCog, Loader2, Sparkles } from "lucide-react";
+import { User, ShieldCheck, UserCog, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -78,7 +78,6 @@ export default function LandingPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-center gap-3">
             <h1 className="text-5xl font-black text-primary tracking-tight font-headline">طلبات</h1>
-            <Sparkles className="h-6 w-6 text-primary animate-pulse" />
           </div>
           <p className="text-slate-500 font-medium">نظام تدوير وتوصيل الطعام الذكي</p>
         </div>
