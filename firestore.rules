@@ -4,6 +4,7 @@ service cloud.firestore {
 
     /**
      * BANK FOOD ORDERING SYSTEM - SECURITY RULES
+     * Triggering deployment: 2024-05-20
      */
 
     function isSignedIn() {
@@ -52,7 +53,8 @@ service cloud.firestore {
       allow write: if isSuperAdmin();
     }
 
-    // Employees: Public list/get for selection and rotation visibility
+    // Employees: Public read for selection and rotation visibility. 
+    // Secure write for admins and supervisors.
     match /employees/{employeeId} {
       allow read: if true;
       allow create: if isSuperAdmin();
@@ -60,10 +62,10 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
-    // Orders: Publicly readable for tracking, anyone can create (anonymous auth)
+    // Orders: Publicly readable for tracking, anyone can create (anonymous auth required for security context)
     match /orders/{orderId} {
       allow read: if true;
-      allow create: if true;
+      allow create: if isSignedIn();
       allow update: if isSuperAdmin() || isSupervisor() || (isSignedIn() && request.auth.uid == resource.data.employeeId);
       allow delete: if isSuperAdmin();
     }

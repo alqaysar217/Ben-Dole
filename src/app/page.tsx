@@ -29,37 +29,41 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
 
-  // Ensure user is at least anonymously signed in for secure interaction
+  // Ensure user is signed in anonymously before data hooks fire to satisfy rules context if needed
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
-  // Real-time Data
-  const deptsQuery = useMemoFirebase(() => collection(db, "departments"), [db]);
+  // Real-time Data - Only fetch if user session is ready or at least attempted
+  const ready = !isUserLoading;
+
+  const deptsQuery = useMemoFirebase(() => 
+    ready ? collection(db, "departments") : null, [db, ready]);
   const { data: departments } = useCollection(deptsQuery);
 
   const empsQuery = useMemoFirebase(() => {
-    if (!selectedDepartmentId) return null;
+    if (!ready || !selectedDepartmentId) return null;
     return query(collection(db, "employees"), where("departmentId", "==", selectedDepartmentId));
-  }, [db, selectedDepartmentId]);
+  }, [db, selectedDepartmentId, ready]);
   const { data: employees } = useCollection(empsQuery);
 
-  const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
+  const menuQuery = useMemoFirebase(() => 
+    ready ? collection(db, "menu_items") : null, [db, ready]);
   const { data: menu } = useCollection(menuQuery);
 
   // Rotation logic
   const rotationQuery = useMemoFirebase(() => 
-    query(
+    ready ? query(
       collection(db, "employees"), 
       where("canRotate", "==", true),
       where("isDone", "==", false),
       orderBy("rotationPriority", "asc")
-    ), [db]);
+    ) : null, [db, ready]);
   const { data: rotationList } = useCollection(rotationQuery);
 
-  const assignedPerson = rotationList?.[0]?.name || "قيد التحديد...";
+  const assignedPerson = rotationList?.[0]?.name || "جاري التحميل...";
 
   const filteredMenu = useMemo(() => {
     if (!menu) return [];
