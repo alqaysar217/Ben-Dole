@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, Edit2, CheckCircle2, XCircle } from "lucide-react";
+import { Trash2, Plus, ShieldCheck, Users, Building2, UtensilsCrossed, UserPlus, Save, CheckCircle2, XCircle, RefreshCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { 
@@ -34,12 +34,17 @@ export default function AdminPage() {
   const isAdmin = userRole === "ADMIN";
   const isSupervisor = userRole === "SUPERVISOR";
 
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isUserLoading, router]);
+
   // Form States
   const [newItem, setNewItem] = useState({ name: "", price: "", category: "sandwich" });
   const [newDept, setNewDept] = useState("");
   const [newEmp, setNewEmp] = useState({ name: "", phone: "", deptId: "", role: "Employee", canRotate: true });
-  
-  const [editingId, setEditingId] = useState<string | null>(null);
 
   const menuQuery = useMemoFirebase(() => collection(db, "menu_items"), [db]);
   const { data: menu } = useCollection(menuQuery);
@@ -50,15 +55,10 @@ export default function AdminPage() {
   const empsQuery = useMemoFirebase(() => collection(db, "employees"), [db]);
   const { data: employees } = useCollection(empsQuery);
 
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, isUserLoading, router]);
-
   if (isUserLoading || !user) return null;
 
   const handleAddItem = () => {
+    if (!isAdmin) return;
     if (!newItem.name || !newItem.price) return;
     addDocumentNonBlocking(collection(db, "menu_items"), {
       itemName: newItem.name,
@@ -70,6 +70,7 @@ export default function AdminPage() {
   };
 
   const handleAddDept = () => {
+    if (!isAdmin) return;
     if (!newDept) return;
     addDocumentNonBlocking(collection(db, "departments"), { deptName: newDept });
     setNewDept("");
@@ -167,7 +168,12 @@ export default function AdminPage() {
 
           <TabsContent value="employees" className="space-y-6">
             <Card className="border-none shadow-sm bg-white">
-              <CardHeader className="bg-slate-50 border-b pb-4"><CardTitle className="text-sm flex items-center gap-2"><UserPlus className="h-4 w-4" /> تسجيل موظف جديد</CardTitle></CardHeader>
+              <CardHeader className="bg-slate-50 border-b pb-4">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" /> 
+                  {isAdmin ? "إضافة موظف/مشرف جديد" : "تسجيل موظف جديد"}
+                </CardTitle>
+              </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 <div className="grid grid-cols-2 gap-3">
                   <Input placeholder="الاسم الكامل" value={newEmp.name} onChange={e => setNewEmp({...newEmp, name: e.target.value})} />
@@ -178,16 +184,14 @@ export default function AdminPage() {
                   <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                 </Select>
                 
-                {isAdmin && (
-                  <div className="flex items-center space-x-2 space-x-reverse bg-slate-50 p-3 rounded-lg">
-                    <Checkbox 
-                      id="canRotate" 
-                      checked={newEmp.canRotate} 
-                      onCheckedChange={(checked) => setNewEmp({...newEmp, canRotate: checked as boolean})} 
-                    />
-                    <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">يدخل في دورة التوصيل (النزول)</Label>
-                  </div>
-                )}
+                <div className="flex items-center space-x-2 space-x-reverse bg-slate-50 p-3 rounded-lg">
+                  <Checkbox 
+                    id="canRotate" 
+                    checked={newEmp.canRotate} 
+                    onCheckedChange={(checked) => setNewEmp({...newEmp, canRotate: checked as boolean})} 
+                  />
+                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">يدخل في دورة النزول</Label>
+                </div>
 
                 <Button className="w-full font-bold" onClick={handleAddEmp}><Save className="h-4 w-4 ml-2" /> حفظ الموظف</Button>
               </CardContent>
@@ -248,5 +252,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-import { RefreshCcw } from "lucide-react";

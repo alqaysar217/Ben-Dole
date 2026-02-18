@@ -12,10 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight, Info, ShieldCheck, UserCog, AlertCircle } from "lucide-react";
+import { ArrowRight, Info, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -37,17 +38,18 @@ export default function LoginPage() {
       let emailSuffix = "sup";
       let role: "ADMIN" | "SUPERVISOR" = "SUPERVISOR";
 
+      // تحديد الدور بناءً على كلمة المرور المطلوبة
       if (password === "adminha892019") {
         emailSuffix = "admin";
         role = "ADMIN";
       }
 
       const email = `${phone.trim()}_${emailSuffix}@bank.com`;
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       
       setUserRole(role);
 
-      // Requirement: Supervisor with default password 123456 must change it
+      // إذا كان مشرفاً ويستخدم كلمة السر الافتراضية، نطلب منه التغيير
       if (role === "SUPERVISOR" && password === "123456") {
         setShowChangePassword(true);
         setLoading(false);
@@ -151,7 +153,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Password Change Dialog */}
         <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
