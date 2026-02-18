@@ -207,13 +207,13 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start flex-row-reverse">
-                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
+                <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-lg justify-start">
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
                     onCheckedChange={(checked) => setNewEmp({...newEmp, canRotate: checked as boolean})} 
                   />
+                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
                 </div>
 
                 <Button className="w-full font-bold" onClick={handleAddEmp}><Save className="h-4 w-4 ml-2" /> حفظ البيانات</Button>
