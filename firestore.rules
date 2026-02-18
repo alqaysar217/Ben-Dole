@@ -1,7 +1,14 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // فتح الصلاحيات بالكامل لجميع العمليات بما في ذلك الحذف لضمان عمل كافة ميزات الإدارة
+    // فتح كافة الصلاحيات (قراءة، كتابة، حذف) لجميع المجموعات لضمان عمل ميزات الإدارة بشكل كامل
+    match /branches/{document=**} { allow read, write, delete: if true; }
+    match /departments/{document=**} { allow read, write, delete: if true; }
+    match /employees/{document=**} { allow read, write, delete: if true; }
+    match /menu_items/{document=**} { allow read, write, delete: if true; }
+    match /orders/{document=**} { allow read, write, delete: if true; }
+    
+    // قاعدة عامة احتياطية لضمان عدم حظر أي مسار آخر
     match /{document=**} {
       allow read, create, update, delete: if true;
     }

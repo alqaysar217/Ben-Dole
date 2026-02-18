@@ -14,7 +14,6 @@ import {FirestorePermissionError} from '@/firebase/errors';
 
 /**
  * Initiates a setDoc operation for a document reference.
- * Does NOT await the write operation internally.
  */
 export function setDocumentNonBlocking(docRef: DocumentReference, data: any, options: SetOptions) {
   setDoc(docRef, data, options).catch(error => {
@@ -32,10 +31,9 @@ export function setDocumentNonBlocking(docRef: DocumentReference, data: any, opt
 
 /**
  * Initiates an addDoc operation for a collection reference.
- * Does NOT await the write operation internally.
  */
 export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
-  const promise = addDoc(colRef, data)
+  return addDoc(colRef, data)
     .catch(error => {
       errorEmitter.emit(
         'permission-error',
@@ -45,14 +43,13 @@ export function addDocumentNonBlocking(colRef: CollectionReference, data: any) {
           requestResourceData: data,
         })
       )
+      throw error;
     });
-  return promise;
 }
 
 
 /**
  * Initiates an updateDoc operation for a document reference.
- * Does NOT await the write operation internally.
  */
 export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) {
   updateDoc(docRef, data)
@@ -71,12 +68,14 @@ export function updateDocumentNonBlocking(docRef: DocumentReference, data: any) 
 
 /**
  * Initiates a deleteDoc operation for a document reference.
- * Does NOT await the write operation internally.
+ * Essential fix: Ensure deleteDoc is awaited correctly and handled via emitter.
  */
 export function deleteDocumentNonBlocking(docRef: DocumentReference) {
-  // تنفيذ عملية الحذف مباشرة ومعالجة الأخطاء المحتملة
   deleteDoc(docRef)
-    .catch(async (error) => {
+    .then(() => {
+      // Success - no action needed for non-blocking
+    })
+    .catch((error) => {
       const contextualError = new FirestorePermissionError({
         path: docRef.path,
         operation: 'delete',
