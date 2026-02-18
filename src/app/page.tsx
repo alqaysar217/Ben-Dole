@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useUIStore } from "@/lib/store";
-import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, useAuth, useUser, initiateAnonymousSignIn } from "@/firebase";
 import { collection, query, where, orderBy, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,11 +21,20 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const db = useFirestore();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const { selectedDepartmentId, setSelectedDepartmentId, selectedEmployeeId, setSelectedEmployeeId } = useUIStore();
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
+
+  // Ensure user is at least anonymously signed in for order tracking
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [user, isUserLoading, auth]);
 
   // Real-time Data
   const deptsQuery = useMemoFirebase(() => collection(db, "departments"), [db]);
@@ -178,7 +187,7 @@ export default function Home() {
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="بحث..." 
-                className="pr-9 h-10 rounded-full bg-white border-none shadow-sm"
+                className="pr-9 h-10 rounded-full bg-white border-none shadow-sm text-right"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

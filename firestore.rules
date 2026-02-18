@@ -4,153 +4,75 @@ service cloud.firestore {
 
     /**
      * BANK FOOD ORDERING SYSTEM - SECURITY RULES
-     *
-     * CORE PHILOSOPHY:
-     * This ruleset implements a Role-Based Access Control (RBAC) model combined with strict 
-     * document ownership. Access is primarily determined by the user's role and department 
-     * membership, which are stored in the user's corresponding document in the /employees collection.
-     *
-     * DATA STRUCTURE:
-     * - /branches: Global list of bank branches.
-     * - /departments: Global list of departments, linked to branches via branchId.
-     * - /menu_items: Global menu available to all users.
-     * - /employees: User profiles where the document ID matches the Firebase Auth UID.
-     * - /orders: Transactional data for food orders.
-     *
-     * KEY SECURITY DECISIONS:
-     * 1. Authorization Hub: The /employees/{uid} document is the "source of truth" for roles. 
-     *    Rules use get() to fetch the requester's role and department.
-     * 2. Denormalization: Orders contain 'employeeId' and 'departmentId' to allow efficient 
-     *    permission checks without multiple document lookups.
-     * 3. Supervisor Scope: Supervisors are restricted to managing only employees and orders 
-     *    within their own department.
-     * 4. Super Admin: Identified by the 'Super Admin' role, granting unrestricted CRUD.
      */
-
-    // --- HELPER FUNCTIONS ---
 
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Retrieves the current user's profile data
+    // Retrieves the current user's profile data safely
     function getEmployeeData() {
-      return get(/databases/$(database)/documents/employees/$(request.auth.uid)).data;
+      let path = /databases/$(database)/documents/employees/$(request.auth.uid);
+      return exists(path) ? get(path).data : null;
     }
 
     function hasRole(role) {
-      return isSignedIn() && getEmployeeData().role == role;
+      let data = getEmployeeData();
+      return isSignedIn() && data != null && data.role == role;
     }
 
     function isSuperAdmin() {
-      return hasRole('Super Admin');
+      return hasRole('Admin');
     }
 
     function isSupervisor() {
-      return hasRole('Department Supervisor');
+      return hasRole('Supervisor');
     }
 
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Checks if the requester belongs to the specified department
-    function isInDepartment(deptId) {
-      return isSignedIn() && getEmployeeData().departmentId == deptId;
-    }
-
     // --- COLLECTION RULES ---
 
-    /**
-     * @description Global metadata for bank branches.
-     * @path /branches/{branchId}
-     * @allow Authenticated users (get, list); Super Admin (create, update, delete).
-     * @deny Unauthenticated write attempts.
-     * @principle Public read for authenticated context; restricted admin writes.
-     */
     match /branches/{branchId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isSuperAdmin();
+      allow get, list: if true;
+      allow write: if isSuperAdmin();
     }
 
-    /**
-     * @description Global metadata for departments.
-     * @path /departments/{departmentId}
-     * @allow Authenticated users (get, list); Super Admin (create, update, delete).
-     * @deny Write attempts by non-admins.
-     * @principle Relational metadata accessible to all users for UI context.
-     */
     match /departments/{departmentId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isSuperAdmin();
+      allow get, list: if true;
+      allow write: if isSuperAdmin();
     }
 
-    /**
-     * @description Global menu items for the ordering system.
-     * @path /menu_items/{menuItemId}
-     * @allow Authenticated users (get, list); Super Admin (create, update, delete).
-     * @deny Price or item modifications by employees.
-     * @principle Centralized menu management.
-     */
     match /menu_items/{menuItemId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isSuperAdmin();
+      allow get, list: if true;
+      allow write: if isSuperAdmin();
     }
 
-    /**
-     * @description Employee profiles and rotation status.
-     * @path /employees/{employeeId}
-     * @allow Owner (get); Supervisor in same dept (get, update); Super Admin (all).
-     * @deny Updating sensitive role fields by the owner themselves.
-     * @principle Identity-based access with department-scoped supervisory control.
-     */
     match /employees/{employeeId} {
-      allow get: if isOwner(employeeId) || isSuperAdmin() || (isSupervisor() && isInDepartment(resource.data.departmentId));
-      allow list: if isSuperAdmin() || isSupervisor();
-      allow create: if isSuperAdmin() || (isOwner(employeeId) && request.resource.data.role == 'Employee');
-      allow update: if isSuperAdmin() || (isOwner(employeeId) && request.resource.data.role == resource.data.role) || (isSupervisor() && isInDepartment(resource.data.departmentId));
+      // Allow public list/get for the employee selection dropdown and rotation status
+      allow get, list: if true;
+      allow create: if isSuperAdmin();
+      allow update: if isSuperAdmin() || isOwner(employeeId) || (isSupervisor() && getEmployeeData().departmentId == resource.data.departmentId);
       allow delete: if isSuperAdmin();
     }
 
-    /**
-     * @description Food orders placed by employees.
-     * @path /orders/{orderId}
-     * @allow Owner (get, create); Supervisor in same dept (get, list, update); Super Admin (all).
-     * @deny Creating orders for other users or updating completed orders.
-     * @principle Denormalized ownership and department markers for fast authorization.
-     */
     match /orders/{orderId} {
-      // Get: Allow the person who placed it, their supervisor, or an admin
-      allow get: if isSuperAdmin() || (resource != null && (isOwner(resource.data.employeeId) || (isSupervisor() && isInDepartment(resource.data.departmentId))));
+      // Allow reading orders for status tracking and supervisor summaries
+      allow read: if true;
       
-      // List: Queries must be filtered by employeeId (for employees) or departmentId (for supervisors)
-      allow list: if isSignedIn();
+      // Allow anyone to create an order (satisfies "no password required" for employees)
+      allow create: if true;
 
-      // Create: Users can only create orders for themselves
-      allow create: if isSignedIn() && request.resource.data.employeeId == request.auth.uid;
+      // Allow supervisors and admins to update order status
+      allow update: if isSuperAdmin() || isSupervisor() || (isSignedIn() && request.auth.uid == resource.data.employeeId);
 
-      // Update: Supervisors can update status; Owners can update if still pending
-      allow update: if resource != null && (isSuperAdmin() || (isSupervisor() && isInDepartment(resource.data.departmentId)) || (isOwner(resource.data.employeeId) && resource.data.status == 'pending'));
-
-      // Delete: Strictly restricted to Super Admin
       allow delete: if isSuperAdmin();
     }
 
-    /**
-     * @description Internal configuration documents.
-     * @path /_config_/{configId}
-     * @deny All access for all users.
-     * @principle System-only data, not accessible to clients.
-     */
     match /_config_/{configId} {
       allow read, write: if false;
     }
   }
 }
-
-/** 
- * PROTOTYPING MODE NOTICE:
- * Schema validation for non-relational fields (e.g., item names, descriptions, prices) 
- * is intentionally omitted to allow for rapid frontend iteration. 
- * Authorization and relational integrity (UID matches) are strictly enforced.
- */
