@@ -221,36 +221,47 @@ export default function OrderPage() {
             {CATEGORIES.map(cat => (
               <TabsContent key={cat.id} value={cat.id} className="mt-4 grid grid-cols-1 gap-4 outline-none">
                 {filteredMenu.map((item) => (
-                  <Card key={item.id} className="border-none premium-shadow bg-white rounded-[24px] group hover:scale-[1.01] transition-all duration-300">
-                    <CardContent className="p-5 flex items-center justify-between">
-                      <div className="flex items-center gap-5">
-                        <div className={cn("p-4 rounded-[20px] transition-colors group-hover:bg-primary/5", cat.bg)}>
-                          <cat.icon className={cn("h-7 w-7", cat.color)} strokeWidth={1} />
+                  <Card key={item.id} className="border-none premium-shadow bg-white rounded-[24px] group hover:scale-[1.01] transition-all duration-300 overflow-hidden">
+                    <CardContent className="p-5 flex flex-col gap-4">
+                      {/* الصف الأول: الاسم والأيقونة */}
+                      <div className="flex items-start justify-between gap-3 w-full">
+                        <div className="flex-1 text-right">
+                          <h3 className="font-bold text-lg text-slate-800 leading-tight break-words">
+                            {item.itemName}
+                          </h3>
                         </div>
-                        <div className="space-y-1 text-right">
-                          <h3 className="font-bold text-lg text-slate-800">{item.itemName}</h3>
-                          <p className="text-primary font-black text-sm font-headline tracking-tighter">{item.price} <span className="text-[10px] font-normal text-slate-400">ريال</span></p>
+                        <div className={cn("p-3 rounded-2xl shrink-0", cat.bg)}>
+                          <cat.icon className={cn("h-6 w-6", cat.color)} strokeWidth={1.5} />
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 bg-[#F4F6FA] p-2 rounded-2xl border border-white">
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          className="h-10 w-10 rounded-xl bg-white shadow-sm text-primary hover:bg-white hover:text-primary-foreground" 
-                          onClick={() => updateCart(item.id, 1)}
-                        >
-                          <Plus className="h-4 w-4" strokeWidth={3} />
-                        </Button>
-                        <span className="w-6 text-center font-black text-lg text-primary">{cart[item.id] || 0}</span>
-                        <Button 
-                          size="icon" 
-                          variant="ghost" 
-                          className="h-10 w-10 rounded-xl bg-white shadow-sm text-slate-400 hover:text-destructive hover:bg-white" 
-                          onClick={() => updateCart(item.id, -1)} 
-                          disabled={!cart[item.id]}
-                        >
-                          <Minus className="h-4 w-4" strokeWidth={3} />
-                        </Button>
+
+                      {/* الصف الثاني: السعر وأدوات التحكم */}
+                      <div className="flex items-center justify-between border-t border-slate-50 pt-3">
+                        <div className="text-right">
+                          <p className="text-primary font-black text-lg font-headline tracking-tighter">
+                            {item.price} <span className="text-[10px] font-normal text-slate-400">ريال</span>
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 bg-[#F4F6FA] p-1.5 rounded-2xl border border-white">
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-10 w-10 rounded-xl bg-white shadow-sm text-primary hover:bg-white active:scale-90 transition-transform" 
+                            onClick={() => updateCart(item.id, 1)}
+                          >
+                            <Plus className="h-4 w-4" strokeWidth={3} />
+                          </Button>
+                          <span className="w-6 text-center font-black text-lg text-primary">{cart[item.id] || 0}</span>
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-10 w-10 rounded-xl bg-white shadow-sm text-slate-400 hover:text-destructive hover:bg-white active:scale-90 transition-transform" 
+                            onClick={() => updateCart(item.id, -1)} 
+                            disabled={!cart[item.id]}
+                          >
+                            <Minus className="h-4 w-4" strokeWidth={3} />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -284,3 +295,4 @@ export default function OrderPage() {
     </div>
   );
 }
+
