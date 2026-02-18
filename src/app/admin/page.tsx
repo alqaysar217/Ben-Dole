@@ -162,8 +162,8 @@ export default function AdminPage() {
     <div className="pt-14 pb-20">
       <TopNav />
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between flex-row-reverse">
+          <div className="flex items-center gap-3 flex-row-reverse">
             <ShieldCheck className="h-8 w-8 text-primary" />
             <div className="text-right">
               <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
@@ -195,13 +195,13 @@ export default function AdminPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Select value={newEmp.deptId} onValueChange={id => setNewEmp({...newEmp, deptId: id})}>
-                    <SelectTrigger className="text-right"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
+                    <SelectTrigger className="text-right flex-row-reverse"><SelectValue placeholder="اختر القسم" /></SelectTrigger>
                     <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                   </Select>
 
                   {isAdmin && (
                     <Select value={newEmp.role} onValueChange={val => setNewEmp({...newEmp, role: val})}>
-                      <SelectTrigger className="text-right"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue placeholder="حدد الدور" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Employee">موظف</SelectItem>
                         <SelectItem value="Supervisor">مشرف قسم</SelectItem>
@@ -210,13 +210,13 @@ export default function AdminPage() {
                   )}
                 </div>
                 
-                <div className="flex items-center space-x-2 space-x-reverse bg-slate-50 p-3 rounded-lg">
+                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg flex-row-reverse">
+                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
                   <Checkbox 
                     id="canRotate" 
                     checked={newEmp.canRotate} 
                     onCheckedChange={(checked) => setNewEmp({...newEmp, canRotate: checked as boolean})} 
                   />
-                  <Label htmlFor="canRotate" className="text-xs font-bold cursor-pointer">هل الموظف مكلف بالنزول؟</Label>
                 </div>
 
                 <Button className="w-full font-bold" onClick={handleAddEmp}><Save className="h-4 w-4 ml-2" /> حفظ البيانات</Button>
@@ -267,7 +267,7 @@ export default function AdminPage() {
                       <Input type="number" placeholder="السعر" value={newItem.price} onChange={e => setNewItem({...newItem, price: e.target.value})} className="text-right" />
                     </div>
                     <Select value={newItem.category} onValueChange={val => setNewItem({...newItem, category: val})}>
-                      <SelectTrigger className="w-full text-right">
+                      <SelectTrigger className="w-full text-right flex-row-reverse">
                         <SelectValue placeholder="الفئة" />
                       </SelectTrigger>
                       <SelectContent>
@@ -349,23 +349,23 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <Label>القسم</Label>
                     <Select value={editingEntity.departmentId} onValueChange={id => setEditingEntity({...editingEntity, departmentId: id})}>
-                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
                       <SelectContent>{departments?.map(d => <SelectItem key={d.id} value={d.id}>{d.deptName}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>الدور</Label>
                     <Select value={editingEntity.role} onValueChange={val => setEditingEntity({...editingEntity, role: val})}>
-                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Employee">موظف</SelectItem>
                         <SelectItem value="Supervisor">مشرف قسم</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center space-x-2 space-x-reverse">
-                    <Checkbox id="editRotate" checked={editingEntity.canRotate} onCheckedChange={checked => setEditingEntity({...editingEntity, canRotate: !!checked})} />
+                  <div className="flex items-center justify-between flex-row-reverse">
                     <Label htmlFor="editRotate">مكلف بالنزول</Label>
+                    <Checkbox id="editRotate" checked={editingEntity.canRotate} onCheckedChange={checked => setEditingEntity({...editingEntity, canRotate: !!checked})} />
                   </div>
                 </>
               )}
@@ -383,7 +383,7 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <Label>الفئة</Label>
                     <Select value={editingEntity.category} onValueChange={val => setEditingEntity({...editingEntity, category: val})}>
-                      <SelectTrigger className="text-right"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="text-right flex-row-reverse"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="sandwich">سندوتشات</SelectItem>
                         <SelectItem value="drink">مشروبات</SelectItem>
@@ -411,4 +411,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
