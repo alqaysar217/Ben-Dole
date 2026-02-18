@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { TopNav } from "@/components/layout/top-nav";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking } from "@/firebase";
+import { useFirestore, useCollection, useMemoFirebase, useUser, updateDocumentNonBlocking, useAuth, initiateAnonymousSignIn } from "@/firebase";
 import { collection, query, orderBy, where, doc } from "firebase/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,29 @@ import { Badge } from "@/components/ui/badge";
 
 export default function RotationPage() {
   const db = useFirestore();
-  const { user } = useUser();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const { toast } = useToast();
 
-  const empsQuery = useMemoFirebase(() => 
-    query(collection(db, "employees"), where("canRotate", "==", true), orderBy("rotationPriority", "asc")), [db]);
+  // Ensure user is signed in anonymously before data hooks fire to satisfy rules context
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [user, isUserLoading, auth]);
+
+  // Real-time Data - Wait for auth check to finish before querying
+  const ready = !isUserLoading;
+
+  const empsQuery = useMemoFirebase(() => {
+    if (!ready) return null;
+    return query(
+      collection(db, "employees"), 
+      where("canRotate", "==", true), 
+      orderBy("rotationPriority", "asc")
+    );
+  }, [db, ready]);
+  
   const { data: eligibleEmployees } = useCollection(empsQuery);
 
   const currentPerson = eligibleEmployees?.find(e => !e.isDone);
@@ -58,6 +76,10 @@ export default function RotationPage() {
         </div>
 
         <div className="space-y-3">
+          {!eligibleEmployees && ready && (
+            <div className="text-center py-10 text-slate-400">جاري تحميل قائمة التدوير...</div>
+          )}
+          
           {eligibleEmployees?.map((emp, idx) => {
             const isToday = currentPerson?.id === emp.id;
             const isDone = emp.isDone;

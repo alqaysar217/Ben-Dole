@@ -4,8 +4,8 @@ service cloud.firestore {
 
     /**
      * BANK FOOD ORDERING SYSTEM - SECURITY RULES
-     * Deployment Trigger: 2024-05-20 15:00:00
-     * Fixed: Standardized read permissions for employees and departments to support collection-wide queries.
+     * Deployment Trigger: 2024-05-20 16:30:00
+     * Fixed: Explicitly granted list permissions for public collections to resolve permission errors on queries.
      */
 
     function isSignedIn() {
@@ -39,24 +39,24 @@ service cloud.firestore {
 
     // Branches & Departments: Publicly readable for navigation
     match /branches/{branchId} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSuperAdmin();
     }
 
     match /departments/{departmentId} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSuperAdmin();
     }
 
     // Menu Items: Publicly readable for ordering
     match /menu_items/{menuItemId} {
-      allow read: if true;
+      allow get, list: if true;
       allow write: if isSuperAdmin();
     }
 
     // Employees: Public read is REQUIRED for the selection dropdown and rotation engine.
     match /employees/{employeeId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSuperAdmin();
       allow update: if isSuperAdmin() || isOwner(employeeId) || (isSupervisor() && getEmployeeData().departmentId == resource.data.departmentId);
       allow delete: if isSuperAdmin();
@@ -64,7 +64,7 @@ service cloud.firestore {
 
     // Orders: Publicly readable for tracking, anyone can create (requires anonymous auth for context)
     match /orders/{orderId} {
-      allow read: if true;
+      allow get, list: if true;
       allow create: if isSignedIn();
       allow update: if isSuperAdmin() || isSupervisor() || (isSignedIn() && request.auth.uid == resource.data.employeeId);
       allow delete: if isSuperAdmin();
