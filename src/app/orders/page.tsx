@@ -41,12 +41,15 @@ export default function OrdersPage() {
     query(collection(db, "orders"), orderBy("createdAt", "desc")), [db]);
   const { data: allOrders } = useCollection(ordersQuery);
 
-  // تحديد بداية اليوم
+  // تحديد بداية اليوم (مع التعامل مع Hydration)
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
   const startOfToday = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     return d;
-  }, []);
+  }, [isMounted]);
 
   // فلترة طلبات اليوم (النشطة فقط)
   const todayOrders = useMemo(() => {
