@@ -208,9 +208,9 @@ export default function OrderPage() {
                 <TabsTrigger 
                   key={cat.id} 
                   value={cat.id} 
-                  className="h-full flex items-center justify-center gap-2 font-bold text-xs rounded-[18px] transition-all duration-500 data-[state=active]:bg-premium-gradient data-[state=active]:text-white data-[state=active]:shadow-xl z-20"
+                  className="h-full flex items-center justify-center gap-2 font-bold text-xs rounded-[18px] transition-all duration-500 data-[state=active]:bg-premium-gradient data-[state=active]:text-white data-[state=active]:shadow-xl z-20 relative overflow-hidden"
                 >
-                  <cat.icon className={cn("h-4 w-4 transition-colors", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2} />
+                  <cat.icon className={cn("h-4 w-4 relative z-30 transition-colors", activeTab === cat.id ? "text-white" : cat.color)} strokeWidth={2} />
                   <span className="relative z-30">{cat.label}</span>
                 </TabsTrigger>
               ))}
