@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -161,8 +162,8 @@ export default function AdminPage() {
     <div className="pt-14 pb-20">
       <TopNav />
       <main className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between flex-row-reverse">
-          <div className="flex items-center gap-3 flex-row-reverse">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <ShieldCheck className="h-8 w-8 text-primary" />
             <div className="text-right">
               <h1 className="text-2xl font-bold text-primary font-headline">لوحة التحكم</h1>
@@ -410,3 +411,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
