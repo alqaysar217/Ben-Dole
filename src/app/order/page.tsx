@@ -10,7 +10,7 @@ import { collection, query, where, serverTimestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Minus, Search, ShoppingCart, User, Building2 } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Utensils } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -127,26 +127,30 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="pt-14 pb-20">
+    <div className="pt-14 pb-24">
       <TopNav />
       
-      <div className="bg-primary text-primary-foreground py-3 px-4 text-center sticky top-14 z-40 shadow-lg">
-        <p className="font-bold flex items-center justify-center gap-2">
-          <span>المكلف بالنزول اليوم:</span>
-          <span className="underline decoration-2 underline-offset-4 font-headline">{assignedPerson}</span>
-        </p>
+      {/* الشريط العلوي للمكلف بالنزول - جزء من "الرئيسية" */}
+      <div className="bg-primary text-primary-foreground py-4 px-4 text-center sticky top-14 z-40 shadow-xl border-b border-white/10">
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold">المكلف بالنزول وتوصيل الطلبات اليوم</p>
+          <p className="text-xl font-black flex items-center justify-center gap-2">
+            <Utensils className="h-5 w-5" />
+            <span className="underline decoration-wavy decoration-2 underline-offset-4 font-headline">{assignedPerson}</span>
+          </p>
+        </div>
       </div>
 
-      <main className="p-4 space-y-6 max-w-2xl mx-auto">
+      <main className="p-4 space-y-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-500">
         <Card className="border-none shadow-sm overflow-hidden bg-white">
-          <CardContent className="p-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="p-5 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-2 text-muted-foreground">
-                  <Building2 className="h-4 w-4" /> القسم
+                <label className="text-xs font-bold flex items-center gap-2 text-slate-500 px-1">
+                  <Building2 className="h-3.5 w-3.5" /> القسم البنكي
                 </label>
                 <Select value={selectedDepartmentId || ""} onValueChange={setSelectedDepartmentId}>
-                  <SelectTrigger className="w-full bg-slate-50 border-slate-200">
+                  <SelectTrigger className="w-full bg-slate-50 border-slate-200 h-11">
                     <SelectValue placeholder="اختر القسم" />
                   </SelectTrigger>
                   <SelectContent>
@@ -158,15 +162,15 @@ export default function OrderPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold flex items-center gap-2 text-muted-foreground">
-                  <User className="h-4 w-4" /> الموظف
+                <label className="text-xs font-bold flex items-center gap-2 text-slate-500 px-1">
+                  <User className="h-3.5 w-3.5" /> اسم الموظف
                 </label>
                 <Select 
                   value={selectedEmployeeId || ""} 
                   onValueChange={setSelectedEmployeeId}
                   disabled={!selectedDepartmentId}
                 >
-                  <SelectTrigger className="w-full bg-slate-50 border-slate-200">
+                  <SelectTrigger className="w-full bg-slate-50 border-slate-200 h-11">
                     <SelectValue placeholder="اختر اسمك" />
                   </SelectTrigger>
                   <SelectContent>
@@ -181,13 +185,13 @@ export default function OrderPage() {
         </Card>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-primary">قائمة الطعام</h2>
-            <div className="relative w-1/2">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-lg font-bold text-slate-800">قائمة الوجبات</h2>
+            <div className="relative w-48">
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input 
-                placeholder="بحث..." 
-                className="pr-9 h-10 rounded-full bg-white border-none shadow-sm text-right"
+                placeholder="بحث سريع..." 
+                className="pr-9 h-9 rounded-full bg-white border-slate-200 shadow-sm text-right text-xs"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -196,29 +200,29 @@ export default function OrderPage() {
 
           <div className="grid grid-cols-1 gap-3">
             {filteredMenu.map((item) => (
-              <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-shadow bg-white">
+              <Card key={item.id} className="border-none shadow-sm hover:shadow-md transition-all active:scale-[0.98] bg-white">
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="space-y-1">
-                    <h3 className="font-bold text-lg text-slate-800">{item.itemName}</h3>
-                    <p className="text-primary font-bold">
-                      {item.price.toLocaleString()} ريال يمني
+                    <h3 className="font-bold text-slate-800">{item.itemName}</h3>
+                    <p className="text-primary font-bold text-sm">
+                      {item.price.toLocaleString()} ريال
                     </p>
                   </div>
-                  <div className="flex items-center gap-4 bg-slate-100 p-1.5 rounded-full border border-slate-200">
+                  <div className="flex items-center gap-4 bg-slate-50 p-1 rounded-full border border-slate-100">
                     <Button 
                       size="icon" 
                       variant="ghost" 
-                      className="h-8 w-8 rounded-full text-destructive"
+                      className="h-8 w-8 rounded-full text-destructive hover:bg-destructive/10"
                       onClick={() => updateCart(item.id, -1)}
                       disabled={!cart[item.id]}
                     >
                       <Minus className="h-4 w-4" />
                     </Button>
-                    <span className="w-4 text-center font-bold text-slate-700">{cart[item.id] || 0}</span>
+                    <span className="w-4 text-center font-bold text-slate-700 text-sm">{cart[item.id] || 0}</span>
                     <Button 
                       size="icon" 
                       variant="ghost" 
-                      className="h-8 w-8 rounded-full text-primary"
+                      className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
                       onClick={() => updateCart(item.id, 1)}
                     >
                       <Plus className="h-4 w-4" />
@@ -227,25 +231,31 @@ export default function OrderPage() {
                 </CardContent>
               </Card>
             ))}
+            {filteredMenu.length === 0 && (
+              <div className="text-center py-10 text-slate-400">لا توجد أصناف مطابقة للبحث</div>
+            )}
           </div>
         </div>
       </main>
 
       {cartTotal > 0 && (
-        <div className="fixed bottom-20 left-4 right-4 max-w-2xl mx-auto animate-in slide-in-from-bottom-4">
+        <div className="fixed bottom-20 left-4 right-4 max-w-2xl mx-auto z-50 animate-in slide-in-from-bottom-10">
           <Button 
-            className="w-full h-14 bg-primary text-white rounded-xl shadow-2xl flex items-center justify-between px-6"
+            className="w-full h-14 bg-primary text-white rounded-2xl shadow-2xl flex items-center justify-between px-6 hover:bg-primary/90 active:scale-95 transition-transform"
             onClick={handlePlaceOrder}
           >
             <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-lg">
+              <div className="bg-white/20 p-2 rounded-xl">
                 <ShoppingCart className="h-5 w-5" />
               </div>
-              <span className="font-bold text-lg">تأكيد الطلب</span>
+              <span className="font-bold text-lg">إتمام الطلب</span>
             </div>
-            <span className="text-xl font-headline font-bold">
-              {cartTotal.toLocaleString()} ريال
-            </span>
+            <div className="text-left">
+              <span className="text-xl font-headline font-bold">
+                {cartTotal.toLocaleString()}
+              </span>
+              <span className="text-[10px] mr-1 opacity-80 uppercase">Rial</span>
+            </div>
           </Button>
         </div>
       )}

@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ListOrdered, RefreshCw, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, ListOrdered, RefreshCw, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/store";
 
@@ -11,9 +11,9 @@ export function BottomNav() {
   const pathname = usePathname();
   const { userRole } = useUIStore();
 
-  // العناصر الأساسية التي تظهر للجميع (الموظفين والزوار)
+  // العناصر الأساسية للموظفين (تسمية "الرئيسية" تشير لصفحة الطلب حسب طلب المستخدم)
   const navItems = [
-    { label: "الرئيسية", icon: Home, href: "/" },
+    { label: "الرئيسية", icon: LayoutDashboard, href: "/order" },
     { label: "الطلبات", icon: ListOrdered, href: "/orders" },
     { label: "التدوير", icon: RefreshCw, href: "/rotation" },
   ];
@@ -23,6 +23,9 @@ export function BottomNav() {
     navItems.push({ label: "الإدارة", icon: ShieldAlert, href: "/admin" });
   }
 
+  // إذا كنا في صفحة الهبوط، قد لا نحتاج لعرض البار السفلي أو نعرضه بشكل بسيط
+  // لكن سنبقيه للسهولة مع تمييز الصفحة النشطة
+  
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t h-16 flex items-center justify-around px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
       {navItems.map((item) => {

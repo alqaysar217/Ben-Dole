@@ -1,11 +1,12 @@
 
 "use client";
 
-import { UserCircle, LogOut, ShieldCheck, UserCog, User } from "lucide-react";
+import { UserCircle, LogOut, ShieldCheck, UserCog, User, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useUser, useAuth } from "@/firebase";
 import { useUIStore } from "@/lib/store";
 import { signOut } from "firebase/auth";
+import Link from "next/link";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -40,7 +41,7 @@ export function TopNav() {
 
   return (
     <header className="fixed top-0 left-0 right-0 h-14 bg-white text-slate-900 flex items-center justify-between px-4 z-50 shadow-sm border-b border-slate-200">
-      <div className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
         <div className="bg-primary/10 p-1.5 rounded-lg">
           <Image 
             src="https://picsum.photos/seed/banklogo/200/200" 
@@ -51,10 +52,15 @@ export function TopNav() {
             data-ai-hint="bank logo"
           />
         </div>
-        <h1 className="text-xl font-bold text-primary tracking-tight">طلبات</h1>
-      </div>
+        <h1 className="text-xl font-bold text-primary tracking-tight">طلبات البنك</h1>
+      </Link>
 
       <div className="flex items-center gap-2">
+        <Link href="/">
+          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-primary rounded-full h-8 w-8">
+            <Home className="h-4 w-4" />
+          </Button>
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="gap-2 px-2 hover:bg-slate-100 rounded-full border border-slate-100">
@@ -81,8 +87,10 @@ export function TopNav() {
               </DropdownMenuItem>
             )}
             {!user && (
-              <DropdownMenuItem onClick={() => window.location.href = '/login'} className="font-bold text-primary">
-                دخول الإدارة
+              <DropdownMenuItem asChild>
+                <Link href="/login" className="w-full font-bold text-primary flex items-center">
+                  دخول الإدارة
+                </Link>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
