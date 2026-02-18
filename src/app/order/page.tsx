@@ -146,7 +146,7 @@ export default function OrderPage() {
             <MapPin className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase opacity-60 tracking-[0.1em]">On Duty Today</span>
+            <span className="text-[10px] font-bold uppercase opacity-60 tracking-[0.1em]">On Duty Today</span>
             <span className="text-lg font-black font-headline tracking-tight">{assignedPerson}</span>
           </div>
         </div>
