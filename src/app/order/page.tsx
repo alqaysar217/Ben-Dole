@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza, Sparkles, MapPin } from "lucide-react";
+import { Plus, Minus, Search, ShoppingCart, User, Building2, Sandwich, Coffee, Pizza, MapPin } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -150,7 +150,6 @@ export default function OrderPage() {
             <span className="text-lg font-black font-headline tracking-tight">{assignedPerson}</span>
           </div>
         </div>
-        <Sparkles className="h-6 w-6 text-yellow-300 animate-pulse" />
       </div>
 
       <main className="p-6 space-y-8 max-w-2xl mx-auto">
