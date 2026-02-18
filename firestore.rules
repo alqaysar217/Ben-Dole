@@ -35,39 +35,36 @@ service cloud.firestore {
 
     // --- COLLECTION RULES ---
 
+    // Branches & Departments: Public list/get for navigation
     match /branches/{branchId} {
-      allow get, list: if true;
+      allow read: if true;
       allow write: if isSuperAdmin();
     }
 
     match /departments/{departmentId} {
-      allow get, list: if true;
+      allow read: if true;
       allow write: if isSuperAdmin();
     }
 
+    // Menu: Public list/get for ordering
     match /menu_items/{menuItemId} {
-      allow get, list: if true;
+      allow read: if true;
       allow write: if isSuperAdmin();
     }
 
+    // Employees: Public list/get for selection and rotation visibility
     match /employees/{employeeId} {
-      // Allow public list/get for the employee selection dropdown and rotation status
-      allow get, list: if true;
+      allow read: if true;
       allow create: if isSuperAdmin();
       allow update: if isSuperAdmin() || isOwner(employeeId) || (isSupervisor() && getEmployeeData().departmentId == resource.data.departmentId);
       allow delete: if isSuperAdmin();
     }
 
+    // Orders: Publicly readable for tracking, anyone can create (anonymous auth)
     match /orders/{orderId} {
-      // Allow reading orders for status tracking and supervisor summaries
       allow read: if true;
-      
-      // Allow anyone to create an order (satisfies "no password required" for employees)
       allow create: if true;
-
-      // Allow supervisors and admins to update order status
       allow update: if isSuperAdmin() || isSupervisor() || (isSignedIn() && request.auth.uid == resource.data.employeeId);
-
       allow delete: if isSuperAdmin();
     }
 

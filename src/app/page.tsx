@@ -29,7 +29,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Record<string, number>>({});
 
-  // Ensure user is at least anonymously signed in for order tracking
+  // Ensure user is at least anonymously signed in for secure interaction
   useEffect(() => {
     if (!isUserLoading && !user) {
       initiateAnonymousSignIn(auth);
